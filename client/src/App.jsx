@@ -3,7 +3,8 @@ import { useAuthStore } from "./store/useAuthStore.js";
 import { useEffect } from "react";
 
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
-import RoleBasedProfile from "./components/RoleBasedProfile.jsx"
+import RoleBasedProfile from "./layouts/RoleBasedProfile.jsx"
+import HomePage from "./pages/HomePage/HomePage.jsx";
 import SettingsPage from "./pages/SettingsPage/SettingsPage.jsx";
 
 import { Loader } from "lucide-react";
@@ -32,7 +33,8 @@ export const App = () => {
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/signup" element={<LandingPage />} />
-                <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/profile" />} />
+                <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
+                <Route path="/home" element={authUser ? <HomePage /> : <Navigate to="/" />} />
                 <Route path="/profile" element={authUser ? <RoleBasedProfile /> : <Navigate to="/" />} />
                 <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
             </Routes>

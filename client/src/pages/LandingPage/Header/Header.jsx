@@ -68,8 +68,8 @@ const Header = () => {
       const modalInstance = bootstrap.Modal.getInstance(modalEl);
       modalInstance.hide();
 
-      // navigate to profile
-      navigate("/profile");
+      // navigate to home
+      navigate("/home");
     } catch (err) {
       console.error("Login failed:", err.response?.data || err.message);
       alert(err.response?.data?.message || "Login failed");
