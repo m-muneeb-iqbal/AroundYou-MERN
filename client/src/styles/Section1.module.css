@@ -1,0 +1,356 @@
+.section1 {
+
+  height: 100vh;
+  background: linear-gradient(90deg, #082134, #002B45, #002B45);
+
+}
+.privateSocialText, .collegeLifeText{
+
+  font-size: 45px;
+  color: #4AA162;
+
+}
+.line {
+
+  width: 250px;
+  
+}
+
+.joinBtn{
+
+    font-family: 'Times New Roman', Times, serif;
+    width: 180px;
+    font-size: 20px;
+    background-color: #3A814E;
+}
+
+.btn-success:hover {
+
+  text-decoration: underline;
+
+}
+
+.waitingList{
+
+  font-size: 32px;
+
+}
+
+.mouseIcon {
+
+  cursor: pointer;
+  animation: vibrate 2s linear infinite;
+
+}
+
+@keyframes vibrate {
+
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(70%);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(70%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+
+}
+
+.outer1{
+
+  border: 1px solid #000;
+  height: 350px;
+  width: 350px;
+  
+}
+
+.mainImage img{
+
+  height: 30px;
+  width: 30px;
+
+}
+
+.checkImage1, .checkImage3, .checkImage4, 
+.checkImage6, .checkImage7, .checkImage9, 
+.checkImage10, .checkImage12, .checkImage13 {
+
+  z-index: 2;
+
+}
+
+.checkImage1 {
+
+  transform: translate(-590%, -650%);
+
+}
+
+.checkImage3 {
+
+  transform: translate(300%, -690%);
+
+}
+
+.checkImage4 {
+
+  transform: translate(590%, -350%);
+
+}
+
+.checkImage6 {
+
+  transform: translate(700%, 20%);
+
+}
+
+.checkImage7 {
+
+  transform: translate(1430%, 230%);
+
+}
+
+.checkImage9 {
+
+  transform: translate(190%, 800%);
+
+}
+
+.checkImage10 {
+
+  transform: translate(-120%, 350%);
+
+}
+
+.checkImage12 {
+
+  transform: translate(-1130%, 130%);
+
+}
+
+.checkImage13 {
+
+  transform: translate(-540%, -240%);
+
+}
+
+.image1, .image2, .image3, .image4, .image5, 
+.image6, .image7, .image8, .image9, .image10, 
+.image11, .image12, .image13 {
+
+  z-index: 1;
+
+}
+
+.image1 {
+
+  transform: translate(-240%, -540%);
+
+}
+
+.image2 {
+
+  transform: translate(-20%, -200%);
+
+}
+
+.image3 {
+
+  transform: translate(70%, -400%);
+
+}
+
+.image4 {
+
+  transform: translate(130%, -170%);
+
+}
+
+.image5 {
+
+  transform: translate(450%, -170%);
+
+}
+
+.image6 {
+
+  transform: translate(180%, -20%);
+
+}
+
+.image7 {
+
+  transform: translate(500%, 120%);
+
+}
+
+.image8 {
+
+  transform: translate(120%, 170%);
+
+}
+.image9 {
+
+  transform: translate(35%, 385%);
+
+}
+
+.image10 {
+
+  transform: translate(-60%, 170%);
+
+}
+
+.image11 {
+
+  transform: translate(-280%, 340%);
+
+}
+
+.image12 {
+
+  transform: translate(-410%, 70%);
+
+}
+
+.image13 {
+
+  transform: translate(-180%, -130%);
+
+}
+
+.line1, .line2, .line3, .line4, .line5, .line6, .line7,
+.line8, .line9, .line10, .line11, .line12, .line13 {
+  
+  height: 1px;
+  background-color: #000;
+  
+}
+  
+.line2, .line4, .line6, .line8, .line10, .line12 {
+  
+  width: 150px;
+  transform: translateX(-67%);
+  
+}
+  
+.line3, .line7, .line11 {
+  
+  width: 50px;
+  transform: translateX(-100%);
+  
+}
+  
+.line1, .line5, .line9, .line13 {
+  
+  width: 100px;
+  transform: translateX(-75%);
+  
+}
+  
+.line1 {
+  
+  rotate: 35deg;
+  
+}
+
+.line2 {
+  
+  rotate: 65deg;
+  
+}
+
+.line3 {
+  
+  rotate: 85deg;
+
+}
+
+.line4 {
+  
+  rotate: 100deg;
+  
+}
+
+.line5 {
+    
+  rotate: 130deg;
+  
+}
+
+.line6 {
+  
+  rotate: 160deg;
+  
+}
+
+.line7 {
+  
+  rotate: 175deg;
+  
+}
+
+.line8 {
+  
+  rotate: 195deg;
+  
+}
+
+.line9 {
+    
+  rotate: 235deg;
+  
+}
+
+.line10 {
+  
+  rotate: 265deg;
+  
+}
+
+.line11 {
+  
+  rotate: 290deg;
+  
+  }
+
+.line12 {
+  
+  rotate: 310deg;
+  
+}
+
+.line13 {
+  
+  rotate: 350deg;
+    
+}
+
+.outer2{
+  
+  border: 1px solid #000;
+  height: 250px;
+  width: 250px;
+  
+}
+.outer3{
+  
+  border: 1px solid #000;
+  height: 150px;
+  width: 150px;
+  
+}
+
+.outer4{
+  
+  background-color: #082134;
+  height: 50px;
+  width: 50px;
+    
+}
