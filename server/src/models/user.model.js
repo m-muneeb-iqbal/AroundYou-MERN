@@ -23,6 +23,16 @@ const userSchema = new mongoose.Schema (
             enum: ["Admin", "Student", "Alumni"],
             required: true
         },
+        jobTitle: {
+            type: String,
+            required: true,
+            unique: false
+        },
+        company: {
+            type: String,
+            required: true,
+            unique: false
+        },
         password: {
             type: String,
             required: true,

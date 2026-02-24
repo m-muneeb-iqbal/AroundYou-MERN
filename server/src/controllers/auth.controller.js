@@ -5,10 +5,10 @@ import { generateToken } from "../lib/utils.js";
 
 export const signup = async (req, res) => {
 
-    const { fullName, username, email, role, password} = req.body;
+    const { fullName, username, email, role, jobTitle, company, password} = req.body;
 
     try {
-        if (!fullName || !email || !role || !password) 
+        if (!fullName || !email || !role || !jobTitle || !company || !password) 
             return res.status(400).json({ message: "Please fill in all fields." });
 
         if (password.length < 8) 
@@ -27,6 +27,8 @@ export const signup = async (req, res) => {
             username: username,
             email: email,
             role: role,
+            jobTitle: jobTitle,
+            company: company,
             password: hashedPassword,
         });
 
@@ -39,6 +41,8 @@ export const signup = async (req, res) => {
                 username: newUser.username,
                 email: newUser.email,
                 role: newUser.role,
+                jobTitle: newUser.jobTitle,
+                company: newUser.company,
                 profilePic: newUser.profilePic,
             });
 
@@ -82,6 +86,8 @@ export const login = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 role: user.role,
+                jobTitle: user.jobTitle,
+                company: user.company,
                 profilePic: user.profilePic,
             },
         });
