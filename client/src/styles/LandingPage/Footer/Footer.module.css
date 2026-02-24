@@ -1,0 +1,38 @@
+.footerSection2 {
+
+  background-color: #F9F9F9;
+
+}
+
+.footerAppleButton {
+
+  cursor: pointer;
+
+}
+
+.footerItems.footerItems{
+  
+  color: #646464;
+  text-decoration: none;
+
+}
+
+.footerItems.footerItems:hover{
+
+  color: #646464;
+  text-decoration: underline;
+  
+}
+
+.noHoverPrivacyPolicy {
+  
+  color: #646464;
+  text-decoration: none;
+
+}
+
+ul {
+
+  font-size: 20px;
+
+}

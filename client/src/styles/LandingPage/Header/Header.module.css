@@ -4,7 +4,7 @@ header{
 
 }
 
-.menu-btn {
+.menuBtn.menuBtn {
 
   cursor: pointer;
 
@@ -25,19 +25,19 @@ header{
   
 }
 
-.sidebarMenuItemsColor {
+.sidebarMenuItemsColor.sidebarMenuItemsColor {
 
   color: #353535;
 
 }
 
-.sidebarMenuItemsColor:hover {
+.sidebarMenuItemsColor.sidebarMenuItemsColor:hover {
 
   text-decoration: underline;
 
 }
 
-.signIn {
+.signIn.signIn {
 
   font-size: 32px;
 

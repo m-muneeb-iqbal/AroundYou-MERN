@@ -1,10 +1,10 @@
-import React from "react";
+import styles from "../../../styles/LandingPage/Footer/Footer.module.css";
 
 const Footer = () => {
   return (
     <footer>
       <div className="container mt-0">
-        <div className="row footer-section-1">
+        <div className={`row ${styles.footerSection1}`}>
           <div className="col-md-4 col-12 d-flex justify-content-md-center">
             <p className="h1">About</p>
           </div>
@@ -48,7 +48,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="container-fluid px-5 footer-section-2">
+      <div className={`container-fluid px-5 ${styles.footerSection2}`}>
         <div className="row">
           <div className="col-lg-10 col-sm-8 col-12 d-flex flex-column">
             <div className="col-lg-10 col-sm-8 col-12 d-flex justify-content-sm-start justify-content-center mt-3">
@@ -68,7 +68,7 @@ const Footer = () => {
               <img
                 src="../Images/notIcons/apple-button-footer.svg"
                 alt="app store download button"
-                className="img-fluid footer-apple-button"
+                className={`img-fluid ${styles.footerAppleButton}`}
                 height="35px"
               />
             </div>
@@ -77,31 +77,31 @@ const Footer = () => {
           <div className="col-lg-2 col-sm-4 col-12 d-flex justify-content-sm-start justify-content-center">
             <ul className="nav flex-column align-items-sm-start align-items-center mt-sm-3 mt-1">
               <li className="nav-item">
-                <a className="nav-link footer-items" href="#">
+                <a className={`nav-link ${styles.footerItems}`} href="#">
                   Features
                 </a>
               </li>
 
               <li className="nav-item">
-                <a className="nav-link footer-items" href="#">
+                <a className={`nav-link ${styles.footerItems}`} href="#">
                   About Us
                 </a>
               </li>
 
               <li className="nav-item">
-                <a className="nav-link footer-items" href="#">
+                <a className={`nav-link ${styles.footerItems}`} href="#">
                   Schools
                 </a>
               </li>
 
               <li className="nav-item">
-                <a className="nav-link footer-items" href="#">
+                <a className={`nav-link ${styles.footerItems}`} href="#">
                   Wishlist
                 </a>
               </li>
 
               <li className="nav-item">
-                <a className="nav-link footer-items" href="#">
+                <a className={`nav-link ${styles.footerItems}`} href="#">
                   Contact Us
                 </a>
               </li>
@@ -111,20 +111,20 @@ const Footer = () => {
 
         <div className="row">
           <div className="col-lg-9 col-12 d-flex justify-content-lg-start justify-content-center">
-            <p className="no-hover-privacy-policy">
-              All rights reserved. AROUNDYOU © 2025
+            <p className={styles.noHoverPrivacyPolicy}>
+              All rights reserved. AroundYOU © 2026
             </p>
           </div>
 
           <div className="col-lg-3 col-12 d-flex justify-content-center">
-            <a href="#" className="footer-items">
+            <a href="#" className={styles.footerItems}>
               Privacy Policy
             </a>
 
-            <a href="#" className="footer-items">
+            <a href="#" className={styles.footerItems}>
               <img
                 src="../Images/icons/Globe.png"
-                className="footer-items"
+                className={styles.footerItems}
                 alt="globe"
               />
               English

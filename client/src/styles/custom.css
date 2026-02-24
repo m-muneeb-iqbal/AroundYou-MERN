@@ -1,22 +1,4 @@
-.heading, .apple-header-button, .footer-apple-button {
-
-  cursor: pointer;
-
-}
-
-.apple-header-button {
-
-  height: 40px;
-
-}
-
-.btn-success:hover {
-
-  text-decoration: underline;
-
-}
-
-.section-3, .section-4 {
+.section-3{
 
   font-family: 'Times New Roman', Times, serif;
 
@@ -138,36 +120,4 @@
     transform: translate(195%, -60%);
 
   }
-}
-
-.footer-items, .no-hover-privacy-policy {
-  
-  color: #646464;
-  text-decoration: none;
-
-}
-
-.footer-items:hover{
-
-  color: #646464;
-  text-decoration: underline;
-  
-}
-
-.footer-apple-button {
-
-  height: 45px;
-
-}
-
- ul {
-
-  font-size: 20px;
-
-}
-
-.footer-section-2 {
-
-  background-color: #F9F9F9;
-
 }
