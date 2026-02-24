@@ -1,8 +1,10 @@
+import styles from "../../../styles/Section1.module.css";
+
 const Section2 = () => {
 
     return (
 
-        <section className="container-fluid section-2 pt-5">
+        <section className={`container-fluid ${styles.section2} pt-5`}>
 
             <div className="row">
 
