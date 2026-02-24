@@ -1,4 +1,4 @@
-import styles from "../../../styles/Section1.module.css";
+import styles from "../../../styles/LandingPage/Main/Section2.module.css";
 
 const Section2 = () => {
 

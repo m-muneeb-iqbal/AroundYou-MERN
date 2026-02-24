@@ -3,6 +3,7 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore" // adjust path if needed
 import axios from "axios";
+import styles from "../../../styles/LandingPage/Header/Header.module.css";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ const Header = () => {
           {/* Left: Menu Button */}
           <div className="col-4">
             <button
-              className="menu-btn border-0 bg-transparent p-0"
+              className={`${styles.menuBtn} border-0 bg-transparent p-0`}
               type="button"
               data-bs-toggle="offcanvas"
               data-bs-target="#offcanvasExample"
@@ -111,7 +112,7 @@ const Header = () => {
           <div className="col-4 d-flex justify-content-center">
             <button
               type="button"
-              className="btn btn-success btn-sm signin-btn"
+              className={`${styles.signinBtn} btn btn-success btn-sm`}
               onClick={() => navigate("/login")}
             >
               Log In
@@ -160,16 +161,14 @@ const Header = () => {
             style={{ height: "200px" }}
           >
             <div className="d-flex flex-column justify-content-between col-lg-4">
-              <h3 className="fw-bold sidebar-menu-items-color">Features</h3>
-              <h3 className="fw-bold sidebar-menu-items-color">About Us</h3>
-              <h3 className="fw-bold sidebar-menu-items-color">Schools</h3>
+              <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Features</h3>
+              <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>About Us</h3>
+              <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Schools</h3>
             </div>
             <div className="d-flex flex-column justify-content-between col-lg-8">
-              <h3 className="fw-bold sidebar-menu-items-color">Wishlist</h3>
-              <h3 className="fw-bold sidebar-menu-items-color">Contact Us</h3>
-              <h3 className="fw-bold sidebar-menu-items-color">
-                Privacy Policy
-              </h3>
+              <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Wishlist</h3>
+              <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Contact Us</h3>
+              <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Privacy Policy</h3>
             </div>
           </div>
 
@@ -183,7 +182,7 @@ const Header = () => {
               "Contact Us",
               "Privacy Policy",
             ].map((item, idx) => (
-              <h3 key={idx} className="fw-bold sidebar-menu-items-color">
+              <h3 key={idx} className={`fw-bold ${styles.sidebarMenuItemsColor}`}>
                 {item}
               </h3>
             ))}
@@ -253,7 +252,7 @@ const Header = () => {
             </div>
 
             <div className="modal-body p-5">
-              <p className="fw-bolder text-start sign-in">
+              <p className={`fw-bolder text-start ${styles.signIn}`}>
                 Sign In to Your Account
               </p>
               <p className="text-start">

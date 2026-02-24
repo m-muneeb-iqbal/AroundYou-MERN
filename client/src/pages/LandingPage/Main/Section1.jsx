@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "../../../store/useAuthStore";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "../../../styles/Section1.module.css";
+import styles from "../../../styles/LandingPage/Main/Section1.module.css";
 
 const Section1 = () => {
   const scrollToSectionCover = useScrollToSectionCover();

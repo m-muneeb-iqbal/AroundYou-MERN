@@ -16,15 +16,15 @@
   
 }
 
-.joinBtn{
+.joinBtn.joinBtn{
 
-    font-family: 'Times New Roman', Times, serif;
-    width: 180px;
-    font-size: 20px;
-    background-color: #3A814E;
+  font-family: 'Times New Roman', Times, serif;
+  width: 180px;
+  font-size: 20px;
+  background-color: #3A814E;
 }
 
-.btn-success:hover {
+.joinBtn.joinBtn:hover {
 
   text-decoration: underline;
 

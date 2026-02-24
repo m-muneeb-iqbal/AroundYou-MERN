@@ -1,24 +1,6 @@
-header, .section-1 {
-
-  background: linear-gradient(90deg, #082134, #002B45, #002B45);
-
-}
-
-.menu-btn, .heading, .apple-header-button, .footer-apple-button {
+.heading, .apple-header-button, .footer-apple-button {
 
   cursor: pointer;
-
-}
-
-.sidebar-menu-items-color {
-
-  color: #353535;
-
-}
-
-.sidebar-menu-items-color:hover {
-
-  text-decoration: underline;
 
 }
 
@@ -28,37 +10,17 @@ header, .section-1 {
 
 }
 
-.signin-btn {
-
-  background-color: #3A814E;
-  
-}
-
-.signin-btn{
-
-  width: 100px;
-  font-size: 20px;
-
-}
-
 .btn-success:hover {
 
   text-decoration: underline;
 
 }
 
-.sign-in {
-
-  font-size: 32px;
-
-}
-
-.signin-btn, .section-3, .section-4 {
+.section-3, .section-4 {
 
   font-family: 'Times New Roman', Times, serif;
 
 }
-
 
 .button-container {
 
