@@ -1,13 +1,14 @@
 import { useSectionNavigation } from "../../../hooks/useSectionNavigation";
+
 const Section3 = () => {
   const { scrollToSection } = useSectionNavigation();
   return (
-    <section className="section-3 container-fluid mb-0">
+    <section className="section3 container-fluid mb-0">
       <div className="row">
         <div className="col-2"></div>
 
         <div className="col-md-4 col-sm-4 col-8 d-flex flex-column justify-content-center section mt-md-0 mt-sm-0 mt-5">
-          <div className="col-1 position-fixed button-container">
+          <div className="col-1 position-fixed buttonContainer">
             <button
               onClick={() => scrollToSection(0)}
               className="border-0 bg-white image-button"

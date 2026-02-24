@@ -7,8 +7,7 @@ import App from './App.jsx'
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-import './scripts/script.js';
-import './index.css'
+import './styles/LandingPage/Main/Section3.css'
 
 createRoot(document.getElementById('root')).render (
     <StrictMode>
