@@ -75,7 +75,7 @@ const Footer = () => {
           </div>
 
           <div className="col-lg-2 col-sm-4 col-12 d-flex justify-content-sm-start justify-content-center">
-            <ul className="nav flex-column align-items-sm-start align-items-center mt-sm-3 mt-1">
+            <ul className={`${styles.ul} nav flex-column align-items-sm-start align-items-center mt-sm-3 mt-1`}>
               <li className="nav-item">
                 <a className={`nav-link ${styles.footerItems}`} href="#">
                   Features

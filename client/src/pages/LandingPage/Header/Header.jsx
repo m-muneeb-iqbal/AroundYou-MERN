@@ -79,7 +79,7 @@ const Header = () => {
     }
   };
   return (
-    <header>
+    <header className={styles.header}>
       <div className="container-fluid">
         <div className="row pt-5 align-items-center">
           {/* Left: Menu Button */}
