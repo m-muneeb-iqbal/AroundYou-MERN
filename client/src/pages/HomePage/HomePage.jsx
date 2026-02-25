@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
 import Layout from "./Layout/Layout";
 
 import Header from "./Header/Header";

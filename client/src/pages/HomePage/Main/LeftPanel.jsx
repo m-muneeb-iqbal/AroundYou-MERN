@@ -1,40 +1,27 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-
 import { Settings, Bookmark, UserRoundPlus, SquarePlay } from "lucide-react";
 import { Card, ListGroup } from "react-bootstrap";
 
+import { useNavigate } from "react-router-dom";
+import { useAuthStore} from "../../../store/useAuthStore";
+
 const LeftPanel = () => {
 
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { authUser } = useAuthStore();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await axios.get("http://localhost:5000/api/auth/check", {
-                withCredentials: true, // send cookie JWT
-                });
-                setUser(res.data); // res.data contains user object
-            } catch (err) {
-                console.error("Failed to fetch user:", err.response?.data || err.message);
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, []);
+    if(!authUser) {
+        navigate("/");
+        return null;
+    }
 
     return (
         <div>
             <Card style={{ width: '18rem' }} className="mb-4">
                 <Card.Body>
 
-                    <Card.Title>{loading ? "Loading..." : user ? user.fullName : "User not found"}</Card.Title>
+                    <Card.Title>{authUser ? authUser.fullName : "User not found"}</Card.Title>
                     <Card.Subtitle className="mb-2 text-muted">
-                        {loading ? "Loading..." : user ? user.jobTitle : "Job title not found"} at {loading ? "Loading..." : user ? user.company : "Company not found"}
+                        {authUser ? authUser.jobTitle : "Job title not found"} at {authUser ? authUser.company : "Company not found"}
                     </Card.Subtitle>
                     
                     <Card.Text className="text-muted">
