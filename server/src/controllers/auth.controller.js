@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
+import { PassThrough } from "stream";
 
 export const signup = async (req, res) => {
 
@@ -110,28 +111,39 @@ export const logout = (req, res) => {
     }
 };
 
+export const updateProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const bufferStream = new PassThrough();
+    bufferStream.end(req.file.buffer);
+
+    cloudinary.uploader.upload_stream(
+      { folder: "profiles" },
+      async (error, uploaded) => {
+        if (error) return res.status(500).json({ message: error.message });
+
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { profilePic: uploaded.secure_url },
+          { new: true }
+        );
+
+        res.status(200).json(updatedUser);
+      }
+    ).end(req.file.buffer);
+
+  } catch (err) {
+    console.error("Error updating profile picture:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const updateProfile = async (req, res) => {
-
-    // try {
-    //     const { profilePic } = req.body;
-    //     const userId = req.user._id;
-
-    //     if (!profilePic) 
-    //         return res.status(400).json({ message: "Please provide a profile picture" });
-        
-    //     const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    //     const updatedUser = await User.findByIdAndUpdate(
-    //         userId,
-    //         { profilePic: uploadResponse.secure_url },
-    //         { new: true }
-    //     );
-
-    //     res.status(200).json(updatedUser);
-
-    // } catch (error) {
-    //     console.log("Error in update profile controller: ", error.message);
-    //     res.status(500).json({ message: "Internal Server Error" });
-    // }
 
     try {
         const userId = req.user._id;

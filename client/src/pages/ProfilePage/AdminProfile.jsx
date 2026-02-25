@@ -5,7 +5,7 @@ const StudentProfile = () => {
 
     return (
         <div>
-            <h1>You're an admin.</h1>
+            {/* <h1>You're an admin.</h1> */}
             <Reusable />
         </div>
     );

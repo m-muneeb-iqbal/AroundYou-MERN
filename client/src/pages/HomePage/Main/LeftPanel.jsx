@@ -1,8 +1,8 @@
-import { Settings, Bookmark, UserRoundPlus, SquarePlay } from "lucide-react";
-import { Card, ListGroup } from "react-bootstrap";
-
 import { useNavigate } from "react-router-dom";
 import { useAuthStore} from "../../../store/useAuthStore";
+
+import { Settings, Bookmark, UserRoundPlus, SquarePlay } from "lucide-react";
+import { Card, ListGroup } from "react-bootstrap";
 
 const LeftPanel = () => {
 
