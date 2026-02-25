@@ -34,7 +34,6 @@ const RoleBasedProfile = () => {
         <div className="p-4">
 
             {renderProfile()}
-            <p> Welcome, {authUser?.fullName} </p>
 
         </div>
     );

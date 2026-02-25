@@ -112,24 +112,61 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
 
+    // try {
+    //     const { profilePic } = req.body;
+    //     const userId = req.user._id;
+
+    //     if (!profilePic) 
+    //         return res.status(400).json({ message: "Please provide a profile picture" });
+        
+    //     const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    //     const updatedUser = await User.findByIdAndUpdate(
+    //         userId,
+    //         { profilePic: uploadResponse.secure_url },
+    //         { new: true }
+    //     );
+
+    //     res.status(200).json(updatedUser);
+
+    // } catch (error) {
+    //     console.log("Error in update profile controller: ", error.message);
+    //     res.status(500).json({ message: "Internal Server Error" });
+    // }
+
     try {
-        const { profilePic } = req.body;
         const userId = req.user._id;
 
-        if (!profilePic) 
-            return res.status(400).json({ message: "Please provide a profile picture" });
-        
-        const uploadResponse = await cloudinary.uploader.upload(profilePic);
+        const {
+            email,
+            fullName,
+            username,
+            role,
+            description,
+            jobTitle,
+            company,
+            location,
+            website,
+        } = req.body;
+
         const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { profilePic: uploadResponse.secure_url },
-            { new: true }
-        );
+        userId,
+        {
+            email,
+            fullName,
+            username,
+            role,
+            description,
+            jobTitle,
+            company,
+            location,
+            website,
+        },
+        { new: true, runValidators: true }
+        ).select("-password");
 
         res.status(200).json(updatedUser);
-
     } catch (error) {
-        console.log("Error in update profile controller: ", error.message);
+        console.log("Error in updateProfile:", error.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };

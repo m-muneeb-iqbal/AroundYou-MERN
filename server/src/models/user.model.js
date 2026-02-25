@@ -23,16 +23,6 @@ const userSchema = new mongoose.Schema (
             enum: ["Admin", "Student", "Alumni"],
             required: true
         },
-        jobTitle: {
-            type: String,
-            required: true,
-            unique: false
-        },
-        company: {
-            type: String,
-            required: true,
-            unique: false
-        },
         password: {
             type: String,
             required: true,
@@ -41,7 +31,28 @@ const userSchema = new mongoose.Schema (
         profilePic: {
             type: String,
             default: ""
-        }
+        },
+        description: {
+            type: String,
+            default: "",
+            maxlength: 300,
+        },
+        jobTitle: {
+            type: String,
+            default: "",
+        },
+        company: {
+            type: String,
+            default: "",
+        },
+        location: {
+            type: String,
+            default: "",
+        },
+        website: {
+            type: String,
+            default: "",
+        },
     },
     {timestamps: true}
 
