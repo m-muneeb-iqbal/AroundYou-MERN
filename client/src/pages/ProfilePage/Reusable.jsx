@@ -4,7 +4,7 @@ import { Col, Form, Row, Image, Button, Dropdown, Card } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
 import { useAuthStore} from "../../store/useAuthStore";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
     
 const Reusable = () => {
@@ -12,7 +12,7 @@ const Reusable = () => {
     const { authUser, logout } = useAuthStore();
     const navigate = useNavigate();
     
-    if(!authUser) return <navigate to = "/" />;
+    if(!authUser) return <navigate to = "/" />;   
 
     const [formData, setFormData] = useState({
         email: "",
@@ -24,33 +24,29 @@ const Reusable = () => {
         website: "",
     });
 
-    // useEffect(() => {
-    //     const fetchUser = async () => {
-    //     try {
-    //         const res = await axios.get("http://localhost:5000/api/auth/check", {
-    //         withCredentials: true,
-    //         });
-    //         setFormData({
-    //         fullName: res.data.fullName || "",
-    //         email: res.data.email || "",
-    //         jobTitle: res.data.jobTitle || "",
-    //         role: res.data.role || "",
-    //         company: res.data.company || "",
-    //         city: res.data.location || "",
-    //         website: res.data.website || "",
-    //         });
-    //     } catch (err) {
-    //         console.error("Failed to fetch user:", err);
-    //     }
-    //     };
+    // Redirect + prefill form
+    useEffect(() => {
+        if (!authUser) {
+        navigate("/");
+        return;
+        }
 
-    //     fetchUser();
-    // }, []);
+        setFormData({
+            email: authUser.email || "",
+            fullName: authUser.fullName || "",
+            role: authUser.role || "",
+            jobTitle: authUser.jobTitle || "",
+            company: authUser.company || "",
+            location: authUser.location || "",
+            website: authUser.website || "",
+        });
+    }, [authUser, navigate]);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
+            ...prev,
+            [name]: value,
         }));
     };
 
@@ -58,25 +54,17 @@ const Reusable = () => {
         e.preventDefault();
 
         try {
-        const res = await axios.put(
-            "http://localhost:5000/api/auth/update-profile",
-            {
-                email: formData.email,
-                fullName: formData.fullName,
-                role: formData.role,
-                jobTitle: formData.jobTitle,
-                company: formData.company,
-                location: formData.location,
-                website: formData.website,
-            },
-            { withCredentials: true }
-        );
+            const res = await axios.put(
+                "http://localhost:5000/api/auth/update-profile",
+                formData,
+                { withCredentials: true }
+            );
 
-        console.log("Profile updated:", res.data);
-        alert("Profile updated successfully!");
+            console.log("Profile updated:", res.data);
+            alert("Profile updated successfully!");
         } catch (err) {
-        console.error("Update failed:", err.response?.data || err.message);
-        alert("Failed to update profile.");
+            console.error("Update failed:", err.response?.data || err.message);
+            alert("Failed to update profile.");
         }
     };
 
@@ -149,25 +137,25 @@ const Reusable = () => {
                         <Row className="mb-3">
                             <Form.Group as={Col} controlId="formGridFullName">
                                 <Form.Label>Full Name</Form.Label>
-                                <Form.Control value={formData.fullName} onChange={handleChange} type="text" placeholder="Your Full Name" />
+                                <Form.Control value={formData.fullName} onChange={handleChange} name="fullName" type="text" placeholder="Your Full Name" />
                             </Form.Group>
 
                             <Form.Group as={Col} controlId="formGridEmail">
                                 <Form.Label>Email</Form.Label>
-                                <Form.Control value={formData.email} onChange={handleChange} type="email" placeholder="Your Email Address" />
+                                <Form.Control value={formData.email} onChange={handleChange} name="email" type="email" placeholder="Your Email Address" />
                             </Form.Group>
                         </Row>
 
                         <Row className="mb-3">
                             <Form.Group as={Col} controlId="formGridDesignation">
                                 <Form.Label>Designation</Form.Label>
-                                <Form.Control value={formData.jobTitle} onChange={handleChange} type="text" placeholder="Your Designation" />
+                                <Form.Control value={formData.jobTitle} onChange={handleChange} name="jobTitle" type="text" placeholder="Your Designation" />
                             </Form.Group>
 
                             <Form.Group as={Col} controlId="formGridRole">
                                 <Form.Label>Role</Form.Label>
-                                <Form.Select value={formData.role} onChange={handleChange} defaultValue="Choose...">
-                                    <option disabled selected>-- Select your role --</option>
+                                <Form.Select value={formData.role} name="role" onChange={handleChange}>
+                                    <option disabled >-- Select your role --</option>
                                     <option>Alumni</option>
                                     <option>Student</option>
                                 </Form.Select>
@@ -175,19 +163,19 @@ const Reusable = () => {
 
                             <Form.Group as={Col} controlId="formGridCompany">
                                 <Form.Label>Company</Form.Label>
-                                <Form.Control value={formData.company} onChange={handleChange} type="text" placeholder="Your Company Name" />
+                                <Form.Control value={formData.company} onChange={handleChange} name="company" type="text" placeholder="Your Company Name" />
                             </Form.Group>
                         </Row>
 
                         <Row className="mb-3">
                             <Form.Group as={Col} controlId="formGridCity">
                                 <Form.Label>City</Form.Label>
-                                <Form.Control value={formData.location} onChange={handleChange} type="text" placeholder="Your City of Residence" />
+                                <Form.Control value={formData.location} onChange={handleChange} name="location" type="text" placeholder="Your City of Residence" />
                             </Form.Group>
 
                             <Form.Group as={Col} controlId="formGridWebsite">
                                 <Form.Label>Portfolio/Website</Form.Label>
-                                <Form.Control value={formData.website} onChange={handleChange} type="text" placeholder="Your Personal Website or Portfolio" />
+                                <Form.Control value={formData.website} onChange={handleChange} name="website" type="text" placeholder="Your Personal Website or Portfolio" />
                             </Form.Group>
                         </Row>
 

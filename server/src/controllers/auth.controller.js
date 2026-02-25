@@ -136,38 +136,44 @@ export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        const {
-            email,
-            fullName,
-            username,
-            role,
-            description,
-            jobTitle,
-            company,
-            location,
-            website,
-        } = req.body;
+        const allowedFields = [
+            "email",
+            "fullName",
+            "username",
+            "role",
+            "description",
+            "jobTitle",
+            "company",
+            "location",
+            "website",
+        ];
+        const updates = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        });
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({ message: "No valid fields provided to update." });
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        {
-            email,
-            fullName,
-            username,
-            role,
-            description,
-            jobTitle,
-            company,
-            location,
-            website,
-        },
-        { new: true, runValidators: true }
-        ).select("-password");
+            userId,
+            updates,
+            {
+                new: true,          // return updated document
+                runValidators: true // run schema validators
+            }
+            ).select("-password");
 
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
         res.status(200).json(updatedUser);
     } catch (error) {
-        console.log("Error in updateProfile:", error.message);
-        res.status(500).json({ message: "Internal Server Error" });
+            console.error("Error in updateProfile:", error.message);
+            res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
