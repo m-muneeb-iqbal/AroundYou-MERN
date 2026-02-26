@@ -4,7 +4,7 @@ import { useAuthStore} from "../../../store/useAuthStore";
 import { House, Users, BriefcaseBusiness, Bell, MessageCircleMore, UserRound, Search, LogOut } from "lucide-react";
 import { Dropdown } from 'react-bootstrap';
 
-import styles from "../../../styles/HomePage/Header/Header.module.css";
+import styles from "../../../styles/UI/DropDownItems.module.css";
 
 const Header = () => {
 

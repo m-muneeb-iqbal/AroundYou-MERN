@@ -1,0 +1,17 @@
+.dropDownItem:active {
+  background-color: #04263D; 
+  transition: all 0.05s ease;     
+}
+
+:global(.dropdown-item).dropDownItem:hover {
+  background-color: #F4F6F8;
+  color: #04263D;
+}
+
+/* active / selected state */
+:global(.dropdown-item.active).dropDownItem,
+:global(.dropdown-item:focus).dropDownItem,
+:global(.btn-check:checked) + .dropDownItem {
+  background-color: #04263D !important;
+  color: #FFFFFF !important;
+}

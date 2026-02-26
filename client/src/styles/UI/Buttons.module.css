@@ -1,0 +1,24 @@
+:global(.btn-outline-primary).submitButton {
+    background-color: #FFFFFF; 
+    color: #04263D;
+    border: 2px solid #04263D;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+:global(.btn-outline-primary).submitButton:hover {
+    background-color: #04263D;
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    font-weight: bold;
+}
+
+:global(.btn-outline-primary:focus).submitButton,
+:global(.btn-outline-primary:active).submitButton,
+:global(.btn-outline-primary.active).submitButton,
+:global(.btn-check:checked) + .submitButton {
+    background-color: #021624 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FFFFFF !important;
+    font-weight: bold;
+}

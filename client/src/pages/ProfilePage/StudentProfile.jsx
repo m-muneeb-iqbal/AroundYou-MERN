@@ -1,4 +1,3 @@
-import "./Reusable"
 import Reusable from "./Reusable";
     
 const StudentProfile = () => {

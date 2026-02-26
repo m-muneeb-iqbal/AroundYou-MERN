@@ -35,14 +35,14 @@ const LeftPanel = ({ authUser }) => {
 
     return (
         <div>
-            <Card style={{ width: '18rem' }} className="mb-4 text-center shadow-sm">
+            <Card style={{ width: '18rem', height: '20rem' }} className="mb-4 text-center shadow-sm">
                 <Card.Body>
 
                     <div className="position-relative d-flex justify-content-center mb-3">
 
                         <label htmlFor="avatar-upload" style={{ cursor: "pointer" }}>
 
-                            <img src={authUser?.profilePic || "/avatar-placeholder.png"} style={{ width: "96px", height: "96px", borderRadius: "50%", objectFit: "cover", border: "2px solid #DEE2E6", opacity: loading ? 0.6 : 1 }} title="Click to change avatar" alt="Profile" />
+                            <img src={authUser?.profilePic || "/Images/avatar-placeholder.png"} style={{ width: "150px", height: "150px", borderRadius: "50%", objectFit: "cover", border: "2px solid #DEE2E6", opacity: loading ? 0.6 : 1 }} title="Click to change avatar" alt="Profile" />
 
                         </label>
 
@@ -57,7 +57,9 @@ const LeftPanel = ({ authUser }) => {
                     <Card.Subtitle className="text-muted">
                         {authUser?.jobTitle || "Loading..."}
                     </Card.Subtitle>
-    
+                    <p style={{ fontSize: "0.9em" }}>
+                        {authUser?.company || "Loading..."}
+                    </p>
                 </Card.Body>
             </Card>
 
