@@ -121,9 +121,9 @@ export const updateProfilePicture = async (req, res) => {
         if (error) return res.status(500).json({ message: error.message });
 
         const updatedUser = await User.findByIdAndUpdate(
-          userId,
-          { profilePic: uploaded.secure_url },
-          { new: true }
+            userId,
+            { profilePic: uploaded.secure_url },
+            { new: true }
         );
 
         res.status(200).json(updatedUser);
@@ -136,18 +136,18 @@ export const updateProfilePicture = async (req, res) => {
   }
 };
 
-export const updateProfile = async (req, res) => {
+export const updatePersonalInformation = async (req, res) => {
 
     try {
         const userId = req.user._id;
 
         const allowedFields = [
-            "email",
+            
             "fullName",
-            "username",
-            "description",
-            "jobTitle",
-            "company",
+            "email",
+            "dob",
+            "phoneNumber",
+            "age",
             "location",
             "website",
         ];
@@ -157,7 +157,6 @@ export const updateProfile = async (req, res) => {
                 updates[field] = req.body[field];
             }
         });
-
         if (Object.keys(updates).length === 0) {
             return res.status(400).json({ message: "No valid fields provided to update." });
         }
@@ -176,8 +175,131 @@ export const updateProfile = async (req, res) => {
         }
         res.status(200).json(updatedUser);
     } catch (error) {
-            console.error("Error in updateProfile:", error.message);
-            res.status(500).json({ message: "Internal Server Error" });
+        console.error("updatePersonalInformation:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const updateEducation = async (req, res) => {
+
+    try {
+        const userId = req.user._id;
+
+        const allowedFields = [
+            
+            "education",
+            "field",
+            "passingYear",
+            "cgpa",
+            "institute",
+            "certificate",
+            "provider",
+        ];
+        const updates = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        });
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({ message: "No valid fields provided to update." });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            {
+                new: true,          // return updated document
+                runValidators: true // run schema validators
+            }
+            ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error("Error in updateEducation:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const updateExperience = async (req, res) => {
+
+    try {
+        const userId = req.user._id;
+
+        const allowedFields = [
+            
+            "company",
+            "jobTitle",
+            "joiningDate",
+            "resignationDate",
+        ];
+        const updates = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        });
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({ message: "No valid fields provided to update." });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            {
+                new: true,          // return updated document
+                runValidators: true // run schema validators
+            }
+            ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error("Error in updateExperience:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const updateSkills = async (req, res) => {
+
+    try {
+        const userId = req.user._id;
+
+        const allowedFields = [
+            
+            "skills"
+        ];
+        const updates = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        });
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({ message: "No valid fields provided to update." });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            {
+                new: true,          // return updated document
+                runValidators: true // run schema validators
+            }
+            ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error("Error in updateSkills:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
 

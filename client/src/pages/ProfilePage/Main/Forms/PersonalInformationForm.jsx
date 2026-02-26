@@ -1,21 +1,93 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Col, Form, Row, Button} from 'react-bootstrap';
+
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../../../store/useAuthStore";
+
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 import styles from "../../../../styles/UI/Buttons.module.css";
+
+const toDateInputValue = (date) => {
+  if (!date) return "";
+  return new Date(date).toISOString().split("T")[0];
+};
     
 const PersonalInformationForm = () => {
 
+    const { authUser } = useAuthStore();
+    const navigate = useNavigate();
+
+    if(!authUser) return <navigate to = "/" />;
+
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        dob: "",
+        phoneNumber: "",
+        age: "",
+        location: "",
+        website: "",
+    });
+
+    // Redirect + prefill form
+    useEffect(() => {
+        if (!authUser) {
+            navigate("/");
+            return;
+        }
+    
+        setFormData({
+            fullName: authUser.fullName || "",
+            email: authUser.email || "",
+            dob: toDateInputValue(authUser.dob),
+            phoneNumber: authUser.phoneNumber || "",
+            age: authUser.age || "",
+            location: authUser.location || "",
+            website: authUser.website || "",
+        });
+    }, [authUser, navigate]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await axios.put(
+                "http://localhost:5000/api/auth/update-personal-info",
+                formData,
+                { withCredentials: true }
+            );
+
+            console.log("Personal info updated:", res.data);
+            alert("Profile updated successfully!");
+        } catch (err) {
+            console.error("Update failed:", err.response?.data || err.message);
+            alert("Failed to update profile.");
+        }
+    };
+
     return (
 
-        <Form>
+        <Form onSubmit={ handleSubmit }>
             <Row className="mb-3">
 
                 <Form.Group as={Col} controlId="formGridFullName">
                     <Form.Label>Full Name</Form.Label>
-                    <Form.Control name="fullName" type="text" placeholder="Full Name" />
+                    <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" />
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="formGridEmail">
                     <Form.Label>Email</Form.Label>
-                    <Form.Control name="email" type="email" placeholder="yourname@example.com" />
+                    <Form.Control value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
                 </Form.Group>
 
             </Row>
@@ -24,12 +96,12 @@ const PersonalInformationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridDob">
                     <Form.Label>Date of birth</Form.Label>
-                    <Form.Control name="dob" type="date" />
+                    <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="formGridNumber">
                     <Form.Label>Phone</Form.Label>
-                    <Form.Control name="number" type="text" placeholder="(03xx xxx xxx)" />
+                    <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
                 </Form.Group>
 
             </Row>
@@ -38,12 +110,12 @@ const PersonalInformationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridAge">
                     <Form.Label>Age</Form.Label>
-                    <Form.Control  name="age" type="number" placeholder="21" />
+                    <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" />
                 </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridCompany">
-                    <Form.Label>Current residence city</Form.Label>
-                    <Form.Control name="company" type="text" placeholder="Company" />
+                <Form.Group as={Col} controlId="formGridCity">
+                    <Form.Label>City</Form.Label>
+                    <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" />
                 </Form.Group>
 
             </Row>
@@ -52,7 +124,7 @@ const PersonalInformationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridWebsite">
                     <Form.Label>Portfolio/Website</Form.Label>
-                    <Form.Control  name="website" type="text" placeholder="Personal Website or Portfolio" />
+                    <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" />
                 </Form.Group>
 
             </Row>
@@ -62,7 +134,6 @@ const PersonalInformationForm = () => {
                     Save & Next
                 </Button>
             </div>
-
 
         </Form>
 

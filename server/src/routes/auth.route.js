@@ -1,4 +1,4 @@
-import { checkAuth, login, logout, signup, updateProfilePicture, updateProfile } from "../controllers/auth.controller.js";
+import { checkAuth, login, logout, signup, updateProfilePicture, updatePersonalInformation, updateEducation, updateExperience, updateSkills } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import express from "express";
 import multer from "multer";
@@ -14,7 +14,13 @@ router.post("/logout", logout);
 
 router.patch("/update-profile-picture", upload.single("profilePic"), protectRoute, updateProfilePicture)
 
-router.put("/update-profile", protectRoute,  updateProfile);
+router.put("/update-personal-info", protectRoute,  updatePersonalInformation);
+
+router.put("/update-education", protectRoute,  updateEducation);
+
+router.put("/update-experience", protectRoute,  updateExperience);
+
+router.put("/update-skills", protectRoute,  updateSkills);
 
 router.get("/check", protectRoute, checkAuth);
 

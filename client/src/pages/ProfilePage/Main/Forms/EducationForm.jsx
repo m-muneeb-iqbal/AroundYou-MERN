@@ -1,18 +1,84 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Col, Form, Row, Button} from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
+
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../../../store/useAuthStore";
+
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import styles from "../../../../styles/UI/Buttons.module.css";
     
 const EducationForm = () => {
 
+    const { authUser } = useAuthStore();
+    const navigate = useNavigate();
+
+    if(!authUser) return <navigate to = "/" />;
+
+    const [formData, setFormData] = useState({
+        education: "",
+        field: "",
+        passingYear: "",
+        cgpa: "",
+        institute: "",
+        certificate: "",
+        provider: "",
+    });
+
+    // Redirect + prefill form
+    useEffect(() => {
+        if (!authUser) {
+            navigate("/");
+                return;
+        }
+    
+        setFormData({
+            education: authUser.education || "",
+            field: authUser.field || "",
+            passingYear: authUser.passingYear || "",
+            cgpa: authUser.cgpa || "",
+            institute: authUser.institute || "",
+            certificate: authUser.certificate || "",
+            provider: authUser.provider || "",
+        });
+    }, [authUser, navigate]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await axios.put(
+                "http://localhost:5000/api/auth/update-education",
+                formData,
+                { withCredentials: true }
+            );
+
+            console.log("Education updated:", res.data);
+            alert("Profile updated successfully!");
+        } catch (err) {
+            console.error("Update failed:", err.response?.data || err.message);
+            alert("Failed to update profile.");
+        }
+    };
+
     return (
 
-        <Form>
+        <Form onSubmit={ handleSubmit }>
             <Row className="mb-3">
 
                 <Form.Group as={Col} controlId="formGridEducationalLevel">
                     <Form.Label>Educational Level</Form.Label>
-                    <Form.Select name="educationalLevel" >
+                    <Form.Select value={formData.education} onChange={ handleChange } name="education" >
                         <option disabled >-- Choose Any --</option>
                         <option>Matriculation/O-Level</option>
                         <option>Intermediate/A-Level</option>
@@ -28,7 +94,7 @@ const EducationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridFieldofStudy">
                     <Form.Label>Field of Study</Form.Label>
-                    <Form.Select name="fieldOfStudy" >
+                    <Form.Select value={formData.field} onChange={ handleChange } name="field" >
                         <option disabled >-- Choose Any --</option>
                         <option>BA/BSc</option>
                         <option>BSCS (Bachelor of Science in Computer Science)</option>
@@ -47,12 +113,12 @@ const EducationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridPassingYear">
                     <Form.Label>Passing Year</Form.Label>
-                    <Form.Control name="passingYear" type="number" placeholder="Passing Year" />
+                    <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" />
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="formGridCGPA">
                     <Form.Label>CGPA</Form.Label>
-                    <Form.Control name="CGPA" type="number" placeholder="CGPA" />
+                    <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" />
                 </Form.Group>
 
             </Row>
@@ -61,7 +127,7 @@ const EducationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridInstitue">
                     <Form.Label>Institute</Form.Label>
-                    <Form.Select name="institute" >
+                    <Form.Select value={formData.institute} onChange={ handleChange } name="institute" >
                         <option disabled >-- Choose Any --</option>
                         <option>Bahria University</option>
                         <option>COMSATS University Islamabad</option>
@@ -96,12 +162,12 @@ const EducationForm = () => {
 
                 <Form.Group as={Col} controlId="formGridCertificate">
                     <Form.Label>Certificate/License</Form.Label>
-                    <Form.Control name="certificate" type="text" placeholder="Certificate or License" />
+                    <Form.Control value={formData.certificate} onChange={ handleChange } name="certificate" type="text" placeholder="Certificate or License" />
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="formGridProvider">
                     <Form.Label>Provider</Form.Label>
-                    <Form.Control name="provider" type="text" placeholder="Provider" />
+                    <Form.Control value={formData.provider} onChange={ handleChange } name="provider" type="text" placeholder="Provider" />
                 </Form.Group>
 
             </Row>
