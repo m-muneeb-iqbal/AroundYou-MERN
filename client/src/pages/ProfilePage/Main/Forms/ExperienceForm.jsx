@@ -1,4 +1,6 @@
 import { Col, Form, Row, Button} from 'react-bootstrap';
+import { SquarePlus, Trash } from 'lucide-react';
+
 import styles from "../../../../styles/UI/Buttons.module.css";
     
 const ExperienceForm = () => {
@@ -8,51 +10,40 @@ const ExperienceForm = () => {
         <Form>
             <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridFullName">
-                    <Form.Label>Full Name</Form.Label>
-                    <Form.Control name="fullName" type="text" placeholder="Your Full Name" />
-                </Form.Group>
-
-                <Form.Group as={Col} controlId="formGridEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control name="email" type="email" placeholder="Your Email Address" />
-                </Form.Group>
-
-            </Row>
-
-            <Row className="mb-3">
-
-                <Form.Group as={Col} controlId="formGridDesignation">
-                    <Form.Label>Designation</Form.Label>
-                    <Form.Control name="jobTitle" type="text" placeholder="Your Designation" />
-                </Form.Group>
-
-                <Form.Group as={Col} controlId="formGridRole">
-                    <Form.Label>Role</Form.Label>
-                    <Form.Select  name="role" >
-                        <option disabled >-- Select your role --</option>
-                        <option>Alumni</option>
-                        <option>Student</option>
-                    </Form.Select>
-                </Form.Group>
-
                 <Form.Group as={Col} controlId="formGridCompany">
-                    <Form.Label>Company</Form.Label>
-                    <Form.Control name="company" type="text" placeholder="Your Company Name" />
+                    <Form.Label>Company Name</Form.Label>
+                    <Form.Control name="company" type="text" placeholder="Company Name" />
+                </Form.Group>
+
+                <Form.Group as={Col} controlId="formGridJobTitle">
+                    <Form.Label>Designation</Form.Label>
+                    <Form.Control name="jobTitle" type="text" placeholder="Designation" />
                 </Form.Group>
 
             </Row>
 
             <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridCity">
-                    <Form.Label>City</Form.Label>
-                    <Form.Control  name="location" type="text" placeholder="Your City of Residence" />
+                <Form.Group as={Col} controlId="formGridJoiningDate">
+                    <Form.Label>Joining Date</Form.Label>
+                    <Form.Control name="joiningDate" type="date" />
                 </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridWebsite">
-                    <Form.Label>Portfolio/Website</Form.Label>
-                    <Form.Control  name="website" type="text" placeholder="Your Personal Website or Portfolio" />
+                <Form.Group as={Col} controlId="formGridResignationDate">
+                    <Form.Label>Resignation Date</Form.Label>
+                    <Form.Control name="resignationDate" type="date" />
+                    <Form.Check type="checkbox" id="currentlyWorking" label="Currently working here" className="mt-2" />
+                </Form.Group>
+
+            </Row>
+
+            <Row className="mb-3">
+
+                <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+
+                    <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
+                    <Trash color="#04263D" size={30} role="button" title="Delete" />
+                    
                 </Form.Group>
 
             </Row>
@@ -62,7 +53,6 @@ const ExperienceForm = () => {
                     Save & Next
                 </Button>
             </div>
-
 
         </Form>
 

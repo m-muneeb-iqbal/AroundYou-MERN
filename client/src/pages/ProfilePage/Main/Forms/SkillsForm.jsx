@@ -8,51 +8,48 @@ const SkillsForm = () => {
         <Form>
             <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridFullName">
-                    <Form.Label>Full Name</Form.Label>
-                    <Form.Control name="fullName" type="text" placeholder="Your Full Name" />
-                </Form.Group>
+                <Form.Group as={Col} controlId="formGridSkills">
+                    <Form.Label>Skills</Form.Label>
+                    <Form.Select name="skills" >
 
-                <Form.Group as={Col} controlId="formGridEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control name="email" type="email" placeholder="Your Email Address" />
-                </Form.Group>
+                        <option disabled >-- Choose Any --</option>
+                        <option>Android Studio</option>
+                        <option>Ansible</option>
+                        <option>AWS</option>
+                        <option>C</option>
+                        <option>Caido</option>
+                        <option>CI/CD</option>
+                        <option>C++</option>                  
+                        <option>C#</option>
+                        <option>Dart</option>
+                        <option>Docker</option>
+                        <option>Express.js</option>
+                        <option>Firebase</option>
+                        <option>Flutter</option>
+                        <option>Git (Version Control)</option>
+                        <option>Java</option>
+                        <option>JavaScript</option>
+                        <option>Jenkins</option>
+                        <option>Kotlin</option>
+                        <option>Kubernetes</option>
+                        <option>Laravel</option>
+                        <option>MongoDB</option>
+                        <option>MongoDB Compass</option>
+                        <option>MySQL Workbench</option> 
+                        <option>Node.js</option>
+                        <option>Nuxt.js</option>
+                        <option>PHP</option>
+                        <option>Postman</option>
+                        <option>Python</option>
+                        <option>React.js</option>
+                        <option>Socket.io</option>
+                        <option>Swagger</option>
+                        <option>Terraform</option>
+                        <option>Visual Studio Code</option>
+                        <option>Vue.js</option>
+                        <option>XAMPP</option>
 
-            </Row>
-
-            <Row className="mb-3">
-
-                <Form.Group as={Col} controlId="formGridDesignation">
-                    <Form.Label>Designation</Form.Label>
-                    <Form.Control name="jobTitle" type="text" placeholder="Your Designation" />
-                </Form.Group>
-
-                <Form.Group as={Col} controlId="formGridRole">
-                    <Form.Label>Role</Form.Label>
-                    <Form.Select  name="role" >
-                        <option disabled >-- Select your role --</option>
-                        <option>Alumni</option>
-                        <option>Student</option>
                     </Form.Select>
-                </Form.Group>
-
-                <Form.Group as={Col} controlId="formGridCompany">
-                    <Form.Label>Company</Form.Label>
-                    <Form.Control name="company" type="text" placeholder="Your Company Name" />
-                </Form.Group>
-
-            </Row>
-
-            <Row className="mb-3">
-
-                <Form.Group as={Col} controlId="formGridCity">
-                    <Form.Label>City</Form.Label>
-                    <Form.Control  name="location" type="text" placeholder="Your City of Residence" />
-                </Form.Group>
-
-                <Form.Group as={Col} controlId="formGridWebsite">
-                    <Form.Label>Portfolio/Website</Form.Label>
-                    <Form.Control  name="website" type="text" placeholder="Your Personal Website or Portfolio" />
                 </Form.Group>
 
             </Row>
@@ -62,7 +59,6 @@ const SkillsForm = () => {
                     Save Profile
                 </Button>
             </div>
-
 
         </Form>
 
