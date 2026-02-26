@@ -19,10 +19,13 @@ const LeftPanel = () => {
             <Card style={{ width: '18rem' }} className="mb-4">
                 <Card.Body>
 
-                    <Card.Title>{authUser ? authUser.fullName : "User not found"}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                        {authUser ? authUser.jobTitle : "Job title not found"} at {authUser ? authUser.company : "Company not found"}
+                    <Card.Title className="text-center">{authUser.fullName}</Card.Title>
+                    <Card.Subtitle className="text-muted text-center">
+                        {authUser?.jobTitle}
                     </Card.Subtitle>
+                    <p style={{ fontSize: "0.9em" }} className="text-center">
+                        {authUser?.company}
+                    </p>
                     
                     <Card.Text className="text-muted">
                         Computer Science graduate with experience in Flutter, MERN Stack and Laravel.

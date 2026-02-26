@@ -1,6 +1,6 @@
 import Reusable from "./Reusable";
     
-const StudentProfile = () => {
+const UserProfile = () => {
 
     return (
         <div>
@@ -9,4 +9,4 @@ const StudentProfile = () => {
         </div>
     );
 };
-export default StudentProfile;
+export default UserProfile;

@@ -51,14 +51,14 @@ const LeftPanel = ({ authUser }) => {
                     </div>
 
                    <Card.Title>
-                        {authUser?.fullName || "Loading..."}
+                        {authUser?.fullName}
                    </Card.Title>
 
                     <Card.Subtitle className="text-muted">
-                        {authUser?.jobTitle || "Loading..."}
+                        {authUser?.jobTitle}
                     </Card.Subtitle>
                     <p style={{ fontSize: "0.9em" }}>
-                        {authUser?.company || "Loading..."}
+                        {authUser?.location}
                     </p>
                 </Card.Body>
             </Card>

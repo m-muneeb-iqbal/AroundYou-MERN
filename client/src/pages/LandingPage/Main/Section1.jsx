@@ -15,7 +15,6 @@ const Section1 = () => {
     fullName: "",
     email: "",
     username: "",
-    role: "",
     password: "",
     confirmPassword: "",
   });
@@ -63,7 +62,6 @@ const Section1 = () => {
         fullName: "",
         email: "",
         username: "",
-        role: "",
         password: "",
         confirmPassword: "",
       });
@@ -194,20 +192,6 @@ const Section1 = () => {
                         }
                         required
                       />
-                      <select
-                        className="form-control col-md-12 mb-3"
-                        value={formData.role}
-                        onChange={(e) =>
-                          setFormData({ ...formData, role: e.target.value })
-                        }
-                        required
-                      >
-                        <option value="" disabled>
-                          -- Select your role --
-                        </option>
-                        <option value="Student">Student</option>
-                        <option value="Alumni">Alumni</option>
-                      </select>
                       <input
                         type="password"
                         placeholder="Enter Password"

@@ -1,6 +1,5 @@
 import AdminProfile from "../pages/ProfilePage/AdminProfile";
-import StudentProfile from "../pages/ProfilePage/StudentProfile";
-import AlumniProfile from "../pages/ProfilePage/AlumniProfile";
+import UserProfile from "../pages/ProfilePage/UserProfile";
 
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -17,11 +16,8 @@ const RoleBasedProfile = () => {
             case "Admin":
                 return <AdminProfile />;
 
-            case "Alumni":
-                return <AlumniProfile />;
-
-            case "Student":
-                return <StudentProfile />;
+            case "User":
+                return <UserProfile />;
             
             default:
                 return <p>No Profile available for this role.</p>

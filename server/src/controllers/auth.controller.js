@@ -6,10 +6,10 @@ import { PassThrough } from "stream";
 
 export const signup = async (req, res) => {
 
-    const { fullName, username, email, role, jobTitle, company, password} = req.body;
+    const { fullName, username, email, password} = req.body;
 
     try {
-        if (!fullName || !email || !role || !jobTitle || !company || !password) 
+        if (!fullName || !email || !username || !password) 
             return res.status(400).json({ message: "Please fill in all fields." });
 
         if (password.length < 8) 
@@ -27,9 +27,6 @@ export const signup = async (req, res) => {
             fullName: fullName,
             username: username,
             email: email,
-            role: role,
-            jobTitle: jobTitle,
-            company: company,
             password: hashedPassword,
         });
 
@@ -42,8 +39,6 @@ export const signup = async (req, res) => {
                 username: newUser.username,
                 email: newUser.email,
                 role: newUser.role,
-                jobTitle: newUser.jobTitle,
-                company: newUser.company,
                 profilePic: newUser.profilePic,
             });
 
@@ -87,8 +82,6 @@ export const login = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 role: user.role,
-                jobTitle: user.jobTitle,
-                company: user.company,
                 profilePic: user.profilePic,
             },
         });
@@ -152,7 +145,6 @@ export const updateProfile = async (req, res) => {
             "email",
             "fullName",
             "username",
-            "role",
             "description",
             "jobTitle",
             "company",
