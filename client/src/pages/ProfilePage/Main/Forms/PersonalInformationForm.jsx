@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Form, Row, Button} from 'react-bootstrap';
+import { Col, Form, Row, Button, Toast, ToastContainer } from 'react-bootstrap';
 
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/useAuthStore";
@@ -15,6 +15,22 @@ const toDateInputValue = (date) => {
 };
     
 const PersonalInformationForm = () => {
+
+    const [position] = useState('top-end');
+    const showToast = (message, variant = "success") => {
+        setToast({ show: true, message, variant });
+
+        // auto-hide after 4 seconds
+        setTimeout(() => {
+            setToast(prev => ({ ...prev, show: false }));
+        }, 7000);
+    };
+
+    const [toast, setToast] = useState({
+        show: false,
+        message: "",
+        variant: "",   // "success" or "danger"
+    });
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -68,74 +84,98 @@ const PersonalInformationForm = () => {
             );
 
             console.log("Personal info updated:", res.data);
-            alert("Profile updated successfully!");
+            showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            alert("Failed to update profile.");
+            showToast("Profile update failed", "danger");
         }
     };
 
     return (
+        
+        <>
 
-        <Form onSubmit={ handleSubmit }>
-            <Row className="mb-3">
+            <ToastContainer className='p-3' position={position} style={{ zIndex: 1 }}>
 
-                <Form.Group as={Col} controlId="formGridFullName">
-                    <Form.Label>Full Name</Form.Label>
-                    <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" />
-                </Form.Group>
+                <Toast
+                    onClose={() => setToast(prev => ({ ...prev, show: false }))}
+                    show={toast.show}
+                    bg={toast.variant === "success" ? "success" : "danger"}
+                    delay={4000}
+                    autohide
+                >
+                    <Toast.Header>
+                    <strong className="me-auto">
+                        {toast.variant === "success" ? "Success" : "Error"}
+                    </strong>
+                    <small>Just now</small>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
+                </Toast>
 
-                <Form.Group as={Col} controlId="formGridEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
-                </Form.Group>
+            </ToastContainer>
 
-            </Row>
+            <Form onSubmit={ handleSubmit }>
 
-            <Row className="mb-3">
+                <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridDob">
-                    <Form.Label>Date of birth</Form.Label>
-                    <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
-                </Form.Group>
+                    <Form.Group as={Col} controlId="formGridFullName">
+                        <Form.Label>Full Name</Form.Label>
+                        <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" />
+                    </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridNumber">
-                    <Form.Label>Phone</Form.Label>
-                    <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
-                </Form.Group>
+                    <Form.Group as={Col} controlId="formGridEmail">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
+                    </Form.Group>
 
-            </Row>
+                </Row>
 
-            <Row className="mb-3">
+                <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridAge">
-                    <Form.Label>Age</Form.Label>
-                    <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" />
-                </Form.Group>
+                        <Form.Group as={Col} controlId="formGridDob">
+                            <Form.Label>Date of birth</Form.Label>
+                            <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
+                        </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridCity">
-                    <Form.Label>City</Form.Label>
-                    <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" />
-                </Form.Group>
+                        <Form.Group as={Col} controlId="formGridNumber">
+                            <Form.Label>Phone</Form.Label>
+                            <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
+                        </Form.Group>
 
-            </Row>
+                </Row>
 
-            <Row className="mb-2">
+                <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridWebsite">
-                    <Form.Label>Portfolio/Website</Form.Label>
-                    <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" />
-                </Form.Group>
+                    <Form.Group as={Col} controlId="formGridAge">
+                        <Form.Label>Age</Form.Label>
+                        <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" />
+                    </Form.Group>
 
-            </Row>
+                    <Form.Group as={Col} controlId="formGridCity">
+                        <Form.Label>City</Form.Label>
+                        <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" />
+                    </Form.Group>
 
-            <div className="d-flex justify-content-end">
-                <Button variant='outline-primary' className={styles.submitButton} type="submit">
-                    Save & Next
-                </Button>
-            </div>
+                </Row>
 
-        </Form>
+                <Row className="mb-2">
+
+                    <Form.Group as={Col} controlId="formGridWebsite">
+                        <Form.Label>Portfolio/Website</Form.Label>
+                        <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" />
+                    </Form.Group>
+
+                </Row>
+
+                <div className="d-flex justify-content-end">
+                    <Button variant='outline-primary' className={styles.submitButton} type="submit">
+                        Save & Next
+                    </Button>
+                </div>
+
+            </Form>
+        </>
 
     );
 

@@ -6,6 +6,7 @@ const SkillsForm = () => {
     return (
 
         <Form>
+            
             <Row className="mb-3">
 
                 <Form.Group as={Col} controlId="formGridSkills">

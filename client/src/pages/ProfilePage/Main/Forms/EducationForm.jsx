@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Form, Row, Button} from 'react-bootstrap';
+import { Col, Form, Row, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,22 @@ import axios from "axios";
 import styles from "../../../../styles/UI/Buttons.module.css";
     
 const EducationForm = () => {
+
+    const [position] = useState('top-end');
+    const showToast = (message, variant = "success") => {
+        setToast({ show: true, message, variant });
+
+        // auto-hide after 4 seconds
+        setTimeout(() => {
+            setToast(prev => ({ ...prev, show: false }));
+        }, 7000);
+    };
+
+    const [toast, setToast] = useState({
+        show: false,
+        message: "",
+        variant: "",   // "success" or "danger"
+    });    
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -64,133 +80,156 @@ const EducationForm = () => {
             );
 
             console.log("Education updated:", res.data);
-            alert("Profile updated successfully!");
+            showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            alert("Failed to update profile.");
+            showToast("Profile update failed", "danger");
         }
     };
 
     return (
 
-        <Form onSubmit={ handleSubmit }>
-            <Row className="mb-3">
+        <>
 
-                <Form.Group as={Col} controlId="formGridEducationalLevel">
-                    <Form.Label>Educational Level</Form.Label>
-                    <Form.Select value={formData.education} onChange={ handleChange } name="education" >
-                        <option disabled >-- Choose Any --</option>
-                        <option>Matriculation/O-Level</option>
-                        <option>Intermediate/A-Level</option>
-                        <option>DAE</option>
-                        <option>Bachelors</option>
-                        <option>Masters</option>
-                        <option>PHD/Doctorate</option>
-                        <option>ACCA</option>
-                        <option>CA</option>
-                        <option>CMA</option>
-                    </Form.Select>
-                </Form.Group>
+            <ToastContainer className='p-3' position={position} style={{ zIndex: 1 }}>
 
-                <Form.Group as={Col} controlId="formGridFieldofStudy">
-                    <Form.Label>Field of Study</Form.Label>
-                    <Form.Select value={formData.field} onChange={ handleChange } name="field" >
-                        <option disabled >-- Choose Any --</option>
-                        <option>BA/BSc</option>
-                        <option>BSCS (Bachelor of Science in Computer Science)</option>
-                        <option>BSCS (Bachelor of Science in Software Engineering)</option>
-                        <option>B.Com (Bachelor of Commerce)</option>
-                        <option>BBA (Bachelor of Business Administration)</option>
-                        <option>BE (Bachelor of Engineering)</option>
-                        <option>BSc Engineering (Bachelor of Science in Engineering)</option>
-                        <option>MBBS (Bachelor of Medicine, Bachelor of Surgery)</option>
-                    </Form.Select>
-                </Form.Group>
+                <Toast
+                    onClose={() => setToast(prev => ({ ...prev, show: false }))}
+                    show={toast.show}
+                    bg={toast.variant === "success" ? "success" : "danger"}
+                    delay={4000}
+                    autohide
+                >
+                    <Toast.Header>
+                    <strong className="me-auto">
+                        {toast.variant === "success" ? "Success" : "Error"}
+                    </strong>
+                    <small>Just now</small>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
+                </Toast>
 
-            </Row>
+            </ToastContainer>
 
-            <Row className="mb-3">
+            <Form onSubmit={ handleSubmit }>
 
-                <Form.Group as={Col} controlId="formGridPassingYear">
-                    <Form.Label>Passing Year</Form.Label>
-                    <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" />
-                </Form.Group>
+                <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridCGPA">
-                    <Form.Label>CGPA</Form.Label>
-                    <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" />
-                </Form.Group>
+                    <Form.Group as={Col} controlId="formGridEducationalLevel">
+                        <Form.Label>Educational Level</Form.Label>
+                        <Form.Select value={formData.education} onChange={ handleChange } name="education" >
+                            <option disabled >-- Choose Any --</option>
+                            <option>Matriculation/O-Level</option>
+                            <option>Intermediate/A-Level</option>
+                            <option>DAE</option>
+                            <option>Bachelors</option>
+                            <option>Masters</option>
+                            <option>PHD/Doctorate</option>
+                            <option>ACCA</option>
+                            <option>CA</option>
+                            <option>CMA</option>
+                        </Form.Select>
+                    </Form.Group>
 
-            </Row>
+                    <Form.Group as={Col} controlId="formGridFieldofStudy">
+                        <Form.Label>Field of Study</Form.Label>
+                        <Form.Select value={formData.field} onChange={ handleChange } name="field" >
+                            <option disabled >-- Choose Any --</option>
+                            <option>BA/BSc</option>
+                            <option>BSCS (Bachelor of Science in Computer Science)</option>
+                            <option>BSCS (Bachelor of Science in Software Engineering)</option>
+                            <option>B.Com (Bachelor of Commerce)</option>
+                            <option>BBA (Bachelor of Business Administration)</option>
+                            <option>BE (Bachelor of Engineering)</option>
+                            <option>BSc Engineering (Bachelor of Science in Engineering)</option>
+                            <option>MBBS (Bachelor of Medicine, Bachelor of Surgery)</option>
+                        </Form.Select>
+                    </Form.Group>
 
-            <Row className="mb-3">
+                </Row>
 
-                <Form.Group as={Col} controlId="formGridInstitue">
-                    <Form.Label>Institute</Form.Label>
-                    <Form.Select value={formData.institute} onChange={ handleChange } name="institute" >
-                        <option disabled >-- Choose Any --</option>
-                        <option>Bahria University</option>
-                        <option>COMSATS University Islamabad</option>
-                        <option>CUST University</option>
-                        <option>Dawood University</option>
-                        <option>FAST University</option>
-                        <option>Habib University</option>
-                        <option>Hamdard University</option>
-                        <option>MAJU University</option>
-                        <option>Metropolitan University</option>
-                        <option>NED University</option>
-                        <option>NUML University</option>
-                        <option>NUST University</option>                  
-                        <option>Sir Syed University</option>
-                        <option>University of Haripur</option>
-                        <option>University of Karachi</option>
-                        <option>University of Wah</option>
+                <Row className="mb-3">
+
+                    <Form.Group as={Col} controlId="formGridPassingYear">
+                        <Form.Label>Passing Year</Form.Label>
+                        <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" />
+                    </Form.Group>
+
+                    <Form.Group as={Col} controlId="formGridCGPA">
+                        <Form.Label>CGPA</Form.Label>
+                        <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" />
+                    </Form.Group>
+
+                </Row>
+
+                <Row className="mb-3">
+
+                    <Form.Group as={Col} controlId="formGridInstitue">
+                        <Form.Label>Institute</Form.Label>
+                        <Form.Select value={formData.institute} onChange={ handleChange } name="institute" >
+                            <option disabled >-- Choose Any --</option>
+                            <option>Bahria University</option>
+                            <option>COMSATS University Islamabad</option>
+                            <option>CUST University</option>
+                            <option>Dawood University</option>
+                            <option>FAST University</option>
+                            <option>Habib University</option>
+                            <option>Hamdard University</option>
+                            <option>MAJU University</option>
+                            <option>Metropolitan University</option>
+                            <option>NED University</option>
+                            <option>NUML University</option>
+                            <option>NUST University</option>                  
+                            <option>Sir Syed University</option>
+                            <option>University of Haripur</option>
+                            <option>University of Karachi</option>
+                            <option>University of Wah</option>
+                            
+                        </Form.Select>
+                    </Form.Group>
+
+                    <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+
+                        <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
+                        <Trash color="#04263D" size={30} role="button" title="Delete" />
                         
-                    </Form.Select>
-                </Form.Group>
+                    </Form.Group>
 
-                <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+                </Row>
 
-                    <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
-                    <Trash color="#04263D" size={30} role="button" title="Delete" />
-                    
-                </Form.Group>
+                <Row className="mb-3">
 
-            </Row>
+                    <Form.Group as={Col} controlId="formGridCertificate">
+                        <Form.Label>Certificate/License</Form.Label>
+                        <Form.Control value={formData.certificate} onChange={ handleChange } name="certificate" type="text" placeholder="Certificate or License" />
+                    </Form.Group>
 
-            <Row className="mb-3">
+                    <Form.Group as={Col} controlId="formGridProvider">
+                        <Form.Label>Provider</Form.Label>
+                        <Form.Control value={formData.provider} onChange={ handleChange } name="provider" type="text" placeholder="Provider" />
+                    </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridCertificate">
-                    <Form.Label>Certificate/License</Form.Label>
-                    <Form.Control value={formData.certificate} onChange={ handleChange } name="certificate" type="text" placeholder="Certificate or License" />
-                </Form.Group>
+                </Row>
 
-                <Form.Group as={Col} controlId="formGridProvider">
-                    <Form.Label>Provider</Form.Label>
-                    <Form.Control value={formData.provider} onChange={ handleChange } name="provider" type="text" placeholder="Provider" />
-                </Form.Group>
+                <Row className="mb-3">
 
-            </Row>
+                    <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
 
-            <Row className="mb-3">
+                        <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
+                        <Trash color="#04263D" size={30} role="button" title="Delete" />
+                        
+                    </Form.Group>
 
-                <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+                </Row>
 
-                    <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
-                    <Trash color="#04263D" size={30} role="button" title="Delete" />
-                    
-                </Form.Group>
+                <div className="d-flex justify-content-end">
+                    <Button variant='outline-primary' className={styles.submitButton} type="submit">
+                        Save & Next
+                    </Button>
+                </div>
 
-            </Row>
-
-            <div className="d-flex justify-content-end">
-                <Button variant='outline-primary' className={styles.submitButton} type="submit">
-                    Save & Next
-                </Button>
-            </div>
-
-
-        </Form>
+            </Form>
+        </>    
 
     );
 

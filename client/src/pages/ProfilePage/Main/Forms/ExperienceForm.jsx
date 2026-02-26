@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Form, Row, Button} from 'react-bootstrap';
+import { Col, Form, Row, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,22 @@ const toDateInputValue = (date) => {
 };
     
 const ExperienceForm = () => {
+
+    const [position] = useState('top-end');
+    const showToast = (message, variant = "success") => {
+        setToast({ show: true, message, variant });
+
+        // auto-hide after 4 seconds
+        setTimeout(() => {
+            setToast(prev => ({ ...prev, show: false }));
+        }, 7000);
+    };
+
+    const [toast, setToast] = useState({
+        show: false,
+        message: "",
+        variant: "",   // "success" or "danger"
+    });
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -63,62 +79,87 @@ const ExperienceForm = () => {
             );
 
             console.log("Experience updated:", res.data);
-            alert("Profile updated successfully!");
+            showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            alert("Failed to update profile.");
+            showToast("Profile update failed", "danger");
         }
     };
     return (
 
-        <Form onSubmit={ handleSubmit }>
-            <Row className="mb-3">
+        <>
 
-                <Form.Group as={Col} controlId="formGridCompany">
-                    <Form.Label>Company Name</Form.Label>
-                    <Form.Control value={formData.company} onChange={ handleChange } name="company" type="text" placeholder="Company Name" />
-                </Form.Group>
+            <ToastContainer className='p-3' position={position} style={{ zIndex: 1 }}>
 
-                <Form.Group as={Col} controlId="formGridJobTitle">
-                    <Form.Label>Designation</Form.Label>
-                    <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Designation" />
-                </Form.Group>
+                <Toast
+                    onClose={() => setToast(prev => ({ ...prev, show: false }))}
+                    show={toast.show}
+                    bg={toast.variant === "success" ? "success" : "danger"}
+                    delay={4000}
+                    autohide
+                >
+                    <Toast.Header>
+                    <strong className="me-auto">
+                        {toast.variant === "success" ? "Success" : "Error"}
+                    </strong>
+                    <small>Just now</small>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
+                </Toast>
 
-            </Row>
+            </ToastContainer>
 
-            <Row className="mb-3">
+            <Form onSubmit={ handleSubmit }>
 
-                <Form.Group as={Col} controlId="formGridJoiningDate">
-                    <Form.Label>Joining Date</Form.Label>
-                    <Form.Control value={formData.joiningDate} onChange={ handleChange } name="joiningDate" type="date" />
-                </Form.Group>
+                <Row className="mb-3">
 
-                <Form.Group as={Col} controlId="formGridResignationDate">
-                    <Form.Label>Resignation Date</Form.Label>
-                    <Form.Control value={formData.resignationDate} onChange={ handleChange } name="resignationDate" type="date" />
-                    <Form.Check type="checkbox" id="currentlyWorking" label="Currently working here" className="mt-2" />
-                </Form.Group>
+                    <Form.Group as={Col} controlId="formGridCompany">
+                        <Form.Label>Company Name</Form.Label>
+                        <Form.Control value={formData.company} onChange={ handleChange } name="company" type="text" placeholder="Company Name" />
+                    </Form.Group>
 
-            </Row>
+                    <Form.Group as={Col} controlId="formGridJobTitle">
+                        <Form.Label>Designation</Form.Label>
+                        <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Designation" />
+                    </Form.Group>
 
-            <Row className="mb-3">
+                </Row>
 
-                <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+                <Row className="mb-3">
 
-                    <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
-                    <Trash color="#04263D" size={30} role="button" title="Delete" />
-                    
-                </Form.Group>
+                    <Form.Group as={Col} controlId="formGridJoiningDate">
+                        <Form.Label>Joining Date</Form.Label>
+                        <Form.Control value={formData.joiningDate} onChange={ handleChange } name="joiningDate" type="date" />
+                    </Form.Group>
 
-            </Row>
+                    <Form.Group as={Col} controlId="formGridResignationDate">
+                        <Form.Label>Resignation Date</Form.Label>
+                        <Form.Control value={formData.resignationDate} onChange={ handleChange } name="resignationDate" type="date" />
+                        <Form.Check type="checkbox" id="currentlyWorking" label="Currently working here" className="mt-2" />
+                    </Form.Group>
 
-            <div className="d-flex justify-content-end">
-                <Button variant='outline-primary' className={styles.submitButton} type="submit">
-                    Save & Next
-                </Button>
-            </div>
+                </Row>
 
-        </Form>
+                <Row className="mb-3">
+
+                    <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+
+                        <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
+                        <Trash color="#04263D" size={30} role="button" title="Delete" />
+                        
+                    </Form.Group>
+
+                </Row>
+
+                <div className="d-flex justify-content-end">
+                    <Button variant='outline-primary' className={styles.submitButton} type="submit">
+                        Save & Next
+                    </Button>
+                </div>
+
+            </Form>
+
+        </>
 
     );
 
