@@ -3,7 +3,7 @@ import { Card, ListGroup } from "react-bootstrap";
 
 const RightPanel = () => {
     return (
-        <div>
+        <>
             <Card style={{ width: '18rem' }}>
                 <Card.Body>
                     
@@ -45,7 +45,7 @@ const RightPanel = () => {
                 </Card.Body>
                             
             </Card>
-        </div>
+        </>
     );
 };
 

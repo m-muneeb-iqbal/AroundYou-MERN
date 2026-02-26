@@ -15,7 +15,7 @@ const LeftPanel = () => {
     }
 
     return (
-        <div>
+        <>
             <Card style={{ width: '18rem' }} className="mb-4">
                 <Card.Body>
 
@@ -71,7 +71,7 @@ const LeftPanel = () => {
 
                  </ListGroup>
             </Card>
-        </div>
+        </>
     );
 };
 

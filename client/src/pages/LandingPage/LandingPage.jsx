@@ -6,11 +6,11 @@ const LandingPage = () => {
 
     return (
 
-        <div>
+        <>
             <Header/>
             <Main/>
             <Footer/>
-        </div>
+        </>
 
     );
 
