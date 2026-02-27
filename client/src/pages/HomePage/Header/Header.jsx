@@ -22,7 +22,8 @@ const Header = () => {
             <Col xs={3}>
 
                 <div className="d-flex align-items-center gap-2">
-                    <img src="/Images/aroundyou.png" className="img-fluid" alt="aroundyou" style={{ height: "40px", width: "auto" }}/>
+
+                    <img src="/Images/aroundyou.png" className="img-fluid" onClick={async () => { navigate("/home"); }} style={{ height: "40px", width: "auto", cursor: "pointer" }} alt="aroundyou" />
                     <div className="position-relative flex-grow-1">
 
                         <input type="text" className="form-control form-control-sm pe-4" placeholder="Search" style={{ height: "40px", lineHeight: "40px", fontSize: "14px" }}/>
@@ -34,31 +35,40 @@ const Header = () => {
             </Col>
 
             <Col xs={9} className="d-flex justify-content-around">
+
                 <House color = "#04263D" role="button" title="Home" size={30}/>
                 <Users color = "#04263D" role="button" title="Users" size={30}/>
                 <BriefcaseBusiness color = "#04263D" role="button" title="Jobs" size={30}/>
                 <Bell color = "#04263D" role="button" title="Notifications" size={30}/>
                 <MessageCircleMore color = "#04263D" role="button" title="Messages" size={30}/>
+
                 <Dropdown align="end">
+
                     <Dropdown.Toggle as="span" id="profile-dropdown" style={{ cursor: "pointer" }} >
                         <UserRound color="#04263D" size={30} role="button" title="Profile" />
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                        <Dropdown.Item className={styles.dropDownItem} as="button" onClick={async () => { navigate("/profile"); }} >Profile</Dropdown.Item>
-                        <Dropdown.Item className={styles.dropDownItem} href="#/settings">Settings</Dropdown.Item>
+
+                        <Dropdown.Item className={styles.dropDownItem} as="a" href="/profile" >Profile</Dropdown.Item>
+                        <Dropdown.Item className={styles.dropDownItem} as="a" href="/settings">Settings</Dropdown.Item>
                         <Dropdown.Divider />
+
                         <Dropdown.Item className={styles.dropDownItem} as="button" onClick={async () => { await logout(); navigate("/"); }} >
+
                             <span>Logout</span>
                             <LogOut color="#FF0000" size={18} title="LogOut" className="mx-2" />
+
                         </Dropdown.Item>
 
                     </Dropdown.Menu>
+
                 </Dropdown>
 
             </Col>
 
         </Row>
+
     );
 };
 

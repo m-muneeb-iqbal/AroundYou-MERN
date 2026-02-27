@@ -193,7 +193,7 @@ const Section1 = () => {
 
                         <p className={`text-white fw-bold ${styles.privateSocialText} mt-5 pt-5`}>
 
-                            The private social app made for
+                            The private social app made for{" "}
                             <span className={`d-inline-block ${styles.collegeLifeText}`}>
                                 college life
                             </span>

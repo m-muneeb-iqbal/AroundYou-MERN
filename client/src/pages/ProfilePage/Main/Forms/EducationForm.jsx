@@ -12,7 +12,7 @@ import styles from "../../../../styles/UI/Buttons.module.css";
     
 const EducationForm = () => {
 
-    const [position] = useState('middle-end');
+    const [position] = useState('top-end');
     const showToast = (message, variant = "success") => {
         setToast({ show: true, message, variant });
 
