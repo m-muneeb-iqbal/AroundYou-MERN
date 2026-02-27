@@ -1,3 +1,5 @@
+import { Container, Row, Col } from "react-bootstrap";
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -97,32 +99,32 @@ const Header = () => {
 
         <header className={styles.header}>
 
-            <div className="container-fluid">
+            <Container fluid="xs">
 
-                <div className="row pt-5 align-items-center">
+                <Row className="pt-5 align-items-center">
 
                     {/* Left: Menu Button */}
-                    <div className="col-4">
+                    <Col xs={4}>
                         <button className={`${styles.menuBtn} border-0 bg-transparent p-0`} type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
                             <img src="/Images/icons/menu-button.png" alt="menu button" className="img-fluid"/>
                         </button>
-                    </div>
+                    </Col>
 
                     {/* Center: Logo */}
-                    <div className="col-4 text-center">
+                    <Col xs={4} className="text-center">
                         <img src="/Images/notIcons/aroundyou-main-heading.png" alt="Edyou logo" className="img-fluid"/>
-                    </div>
+                    </Col>
 
                     {/* Right: Log In Button */}
-                    <div className="col-4 d-flex justify-content-center">
+                    <Col xs={4} className="d-flex justify-content-center">
                         <button type="button" className={`${styles.signinBtn} btn btn-success btn-sm`} onClick={() => navigate("/login")} >
                             Log In
                         </button>
-                    </div>
+                    </Col>
 
-                </div>
+                </Row>
 
-            </div>
+            </Container>
 
             {/* --- Offcanvas Sidebar --- */}
             <div className="offcanvas offcanvas-start bg-light border" tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel" style={{ width: "1000px" }}>
@@ -140,25 +142,25 @@ const Header = () => {
                 <div className="offcanvas-body">
 
                     {/* Menu Items */}
-                    <div className="col-12">
+                    <Col xs={12}>
                         <h4 className="text-black-50">Menu</h4>
-                    </div>
+                    </Col>
 
                     {/* Desktop Menu */}
                     <div className="d-lg-flex d-none justify-content-between mt-5" style={{ height: "200px" }}>
 
-                        <div className="d-flex flex-column justify-content-between col-lg-4">
+                        <Col lg={4} className="d-flex flex-column justify-content-between">
                             <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Features</h3>
                             <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>About Us</h3>
                             <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Schools</h3>
-                        </div>
+                        </Col>
 
-                        <div className="d-flex flex-column justify-content-between col-lg-8">
+                        <Col lg={8} className="d-flex flex-column justify-content-between">
                             <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Wishlist</h3>
                             <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Contact Us</h3>
                             <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Privacy Policy</h3>
 
-                        </div>
+                        </Col>
 
                     </div>
 
@@ -175,24 +177,24 @@ const Header = () => {
                     {/* Contact Info */}
                     <div className="mt-5">
 
-                        <div className="row">
+                        <Row>
 
-                            <div className="col-md-6 col-12 mb-3">
+                            <Col xs={12} md={6} className="mb-3">
                                 <label className="fw-bold text-black-50">Email</label>
                                 <p className="fw-bold text-black-50">supportme@aroundyou.com</p>
-                            </div>
+                            </Col>
 
-                            <div className="col-md-6 col-12 mb-3">
+                            <Col xs={12} md={6} className="mb-3">
                                 <label className="fw-bold text-black-50">Phone</label>
                                 <p className="fw-bold text-black-50">+1 607 254 4636</p>
-                            </div>
+                            </Col>
 
-                            <div className="col-12">
+                            <Col xs={12} md={6}>
                                 <label className="fw-bold text-black-50">Address</label>
                                 <p className="fw-bold text-black-50"> Ithaca, NY 14850, United States </p>
-                            </div>
+                            </Col>
 
-                        </div>
+                        </Row>
 
                         <div className="mt-3">
                             <img src="/Images/notIcons/apple-button-sidebar-footer.svg" alt="apple button sidebar"/>
