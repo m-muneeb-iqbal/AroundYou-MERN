@@ -1,3 +1,5 @@
+import { Row, Col } from "react-bootstrap";
+
 import { useNavigate } from "react-router-dom";
 import { useAuthStore} from "../../../store/useAuthStore"
 
@@ -14,17 +16,19 @@ const Header = () => {
     if(!authUser) return <navigate to = "/" />;
 
     return (
-        <div className="row pt-5 align-items-center">
 
-            <div className="col-3">
+        <Row className="pt-5 align-items-center">
+
+            <Col xs={3}>
 
                 <div className="d-flex justify-content-center">
                     <img as="button" src="/Images/aroundyou.png" style={{ cursor: "pointer", height: "40px", width: "auto" }} className="img-fluid" alt="aroundyou" onClick={async () => { navigate("/home"); }} />
                 </div>
 
-            </div>
+            </Col>
 
-            <div className="col-9 d-flex justify-content-around">
+            <Col xs={9} className="d-flex justify-content-around">
+
                 <Users color = "#04263D" role="button" title="Users" size={30}/>
                 <BriefcaseBusiness color = "#04263D" role="button" title="Jobs" size={30}/>
                 <Bell color = "#04263D" role="button" title="Notifications" size={30}/>
@@ -46,9 +50,9 @@ const Header = () => {
                     </Dropdown.Menu>
                 </Dropdown>
 
-            </div>
+            </Col>
 
-        </div>
+        </Row>
     );
 };
 
