@@ -1,4 +1,4 @@
-import Reusable from "./Reusable";
+import Reusable from "../Reusable";
     
 const UserProfile = () => {
 

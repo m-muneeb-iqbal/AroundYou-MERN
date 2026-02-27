@@ -3,7 +3,7 @@ import axios from "axios";
 import { Card } from "react-bootstrap";
 import { useState } from "react";
 
-const LeftPanel = ({ authUser }) => {
+const Top = ({ authUser }) => {
 
     const [loading, setLoading] = useState(false);
 
@@ -36,7 +36,7 @@ const LeftPanel = ({ authUser }) => {
     return (
 
         <>
-            <Card style={{ width: '14.05rem', height: '15.34rem' }} className="mb-4 text-center shadow-sm">
+            <Card border="light" style={{ width: '17.98rem', height: '18.71rem' }} className="mb-4 text-center shadow">
 
                 <Card.Body>
 
@@ -44,7 +44,7 @@ const LeftPanel = ({ authUser }) => {
 
                         <label htmlFor="avatar-upload" style={{ cursor: "pointer" }}>
 
-                            <img src={authUser?.profilePic || "/Images/avatar-placeholder.png"} style={{ width: "7.5rem", height: "7.5rem", borderRadius: "50%", objectFit: "cover", border: "2px solid #DEE2E6", opacity: loading ? 0.6 : 1 }} title="Click to change avatar" alt="Profile" />
+                            <img src={authUser?.profilePic || "/Images/avatar-placeholder.png"} style={{ width: "10rem", height: "10rem", borderRadius: "50%", objectFit: "cover", border: "2px solid #DEE2E6", opacity: loading ? 0.6 : 1 }} title="Click to change avatar" alt="Profile" />
 
                         </label>
 
@@ -72,4 +72,4 @@ const LeftPanel = ({ authUser }) => {
     );
 };
 
-export default LeftPanel;
+export default Top;

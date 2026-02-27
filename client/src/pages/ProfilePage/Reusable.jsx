@@ -3,8 +3,8 @@ import { Container } from "react-bootstrap";
 import Layout from "./Layout/Layout"
 
 import Header from "./Header/Header";
-import LeftPanel from "./Main/LeftPanel";
-import Middle from "./Main/Middle";
+import Top from "./Main/Top";
+import Bottom from "./Main/Bottom";
 
 import { useAuthStore} from "../../store/useAuthStore";
 
@@ -19,8 +19,8 @@ const Reusable = () => {
             <Header />
 
             <Layout
-                left={<LeftPanel authUser={authUser}/>}
-                middle={<Middle />}
+                top={<Top authUser={authUser}/>}
+                bottom={<Bottom />}
             />
 
         </Container>

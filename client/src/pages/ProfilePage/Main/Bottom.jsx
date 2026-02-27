@@ -9,7 +9,7 @@ import SkillsForm from "./Forms/SkillsForm";
 import styles from "../../../styles/UI/ToggleButtons.module.css";
 
 
-const Middle = () => {
+const Bottom = () => {
 
     const [activeTab, setActiveTab] = useState(1);
 
@@ -47,4 +47,4 @@ const Middle = () => {
     );
 };
 
-export default Middle;
+export default Bottom;
