@@ -1,10 +1,12 @@
+import { Row, Col } from "react-bootstrap";
+
 const Layout = ({ left, middle, right }) => {
     return (
-        <div className="row pt-5">
-            {left && <div className="col-3">{left}</div>}
-            {middle && <div className="col-6 text-center">{middle}</div>}
-            {right && <div className="col-3">{right}</div>}
-        </div>
+        <Row className="pt-5">
+            {left && <Col xs={3}>{left}</Col>}
+            {middle && <Col xs={6} className="text-center">{middle}</Col>}
+            {right && <Col xs={3}>{right}</Col>}
+        </Row>
   );
 };
 
