@@ -34,8 +34,10 @@ const LeftPanel = ({ authUser }) => {
     };
 
     return (
-        <div>
+
+        <>
             <Card style={{ width: '18rem', height: '20rem' }} className="mb-4 text-center shadow-sm">
+
                 <Card.Body>
 
                     <div className="position-relative d-flex justify-content-center mb-3">
@@ -57,13 +59,16 @@ const LeftPanel = ({ authUser }) => {
                     <Card.Subtitle className="text-muted">
                         {authUser?.jobTitle}
                     </Card.Subtitle>
+                    
                     <p style={{ fontSize: "0.9em" }}>
                         {authUser?.location}
                     </p>
+
                 </Card.Body>
+
             </Card>
 
-        </div>
+        </>
     );
 };
 
