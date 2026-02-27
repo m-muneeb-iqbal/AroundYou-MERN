@@ -1,5 +1,5 @@
-import AdminProfile from "../pages/ProfilePage/AdminProfile";
-import UserProfile from "../pages/ProfilePage/UserProfile";
+import AdminProfile from "../pages/ProfilePage/Profiles/AdminProfile";
+import UserProfile from "../pages/ProfilePage/Profiles/UserProfile";
 
 import { useAuthStore } from "../store/useAuthStore";
 

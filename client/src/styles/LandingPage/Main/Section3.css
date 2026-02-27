@@ -1,3 +1,7 @@
+body {
+  overflow-x: hidden;
+}
+
 .section3{
 
   font-family: 'Times New Roman', Times, serif;
