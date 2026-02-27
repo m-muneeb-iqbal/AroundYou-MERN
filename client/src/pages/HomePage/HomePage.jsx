@@ -1,3 +1,5 @@
+import { Container } from "react-bootstrap";
+
 import Layout from "./Layout/Layout";
 
 import Header from "./Header/Header";
@@ -8,7 +10,7 @@ import RightPanel from "./Main/RightPanel.jsx";
 const HomePage = () => {
     return(
 
-        <div className="container">
+        <Container>
 
             <Header />
 
@@ -18,7 +20,7 @@ const HomePage = () => {
                 right={<RightPanel />}
             />
 
-        </div>
+        </Container>
 
     );
 };
