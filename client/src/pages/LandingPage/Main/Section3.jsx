@@ -1,3 +1,5 @@
+import { Container, Row, Col } from "react-bootstrap";
+
 import { useSectionNavigation } from "../../../hooks/useSectionNavigation";
 
 const Section3 = () => {
@@ -5,16 +7,18 @@ const Section3 = () => {
     const { scrollToSection } = useSectionNavigation();
 
     return (
+        
+        
 
-        <section className="section3 container-fluid mb-0">
+        <Container fluid="xs" className="mb-0 section3">
 
-            <div className="row">
+            <Row>
 
-                <div className="col-2"></div>
+                <Col xs={2}></Col>
+                
+                <Col xs={8} sm={4} className="d-flex flex-column justify-content-center section mt-md-0 mt-sm-0 mt-5">
 
-                <div className="col-md-4 col-sm-4 col-8 d-flex flex-column justify-content-center section mt-md-0 mt-sm-0 mt-5">
-
-                    <div className="col-1 position-fixed buttonContainer">
+                    <Col xs={1} className="position-fixed buttonContainer">
 
                         <button onClick={() => scrollToSection(0)} className="border-0 bg-white image-button" data-index="0" data-image-default="../Images/icons/post.png" data-image-selected="../Images/icons/selected-post.png">
 
@@ -46,7 +50,7 @@ const Section3 = () => {
 
                         </button>
 
-                    </div>
+                    </Col>
 
                     <p className="h1 text-success">Post</p>
                     <p>100% USER CONTROL</p>
@@ -56,15 +60,15 @@ const Section3 = () => {
 
                     <img src="../Images/notIcons/Post.png" className="img-fluid image"/>
 
-                </div>
+                </Col>
 
-            </div>
+            </Row>
 
-            <div className="row">
+            <Row>
 
-                <div className="col-2"></div>
+                <Col xs={2}></Col>
 
-                <div className="col-md-4 col-sm-4 col-8 d-flex flex-column justify-content-center section mt-5">
+                <Col xs={8} sm={4} className="d-flex flex-column justify-content-center section mt-5">
 
                     <p className="h1 text-success">Chat</p>
                     <p>Encrypted for your security.</p>
@@ -72,15 +76,15 @@ const Section3 = () => {
 
                     <img src="../Images/notIcons/Chat Images.png" className="img-fluid image"/>
 
-                </div>
+                </Col>
 
-            </div>
+            </Row>
 
-            <div className="row">
+            <Row>
 
-                <div className="col-2"></div>
+                <Col xs={2}></Col>
 
-                <div className="col-md-4 col-sm-4 col-8 d-flex flex-column justify-content-center section mt-5">
+                <Col xs={8} sm={4} className="d-flex flex-column justify-content-center section mt-5">
 
                     <p className="h1 text-success">U Events w/RSVP feature</p>
                     <p>Scheduling events, meetings, lunches and dinners have never been easier.</p>
@@ -89,9 +93,9 @@ const Section3 = () => {
 
                     <img src="../Images/notIcons/Birthday.png" className="img-fluid image"/>
 
-                </div>
+                </Col>
 
-            </div>
+            </Row>
 
             <div className="row">
 
@@ -123,7 +127,7 @@ const Section3 = () => {
 
             </div>
 
-        </section>
+        </Container>
     );
 
 };
