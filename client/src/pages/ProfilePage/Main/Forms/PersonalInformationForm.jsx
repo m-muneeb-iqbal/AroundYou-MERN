@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Form, Row, Button, Toast, ToastContainer } from 'react-bootstrap';
+import { Col, Row, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/useAuthStore";
@@ -119,12 +119,12 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} controlId="formGridFullName">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridFullName">
                         <Form.Label>Full Name</Form.Label>
                         <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" />
                     </Form.Group>
 
-                    <Form.Group as={Col} controlId="formGridEmail">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridEmail">
                         <Form.Label>Email</Form.Label>
                         <Form.Control value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
                     </Form.Group>
@@ -133,26 +133,26 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-3">
 
-                        <Form.Group as={Col} controlId="formGridDob">
-                            <Form.Label>Date of birth</Form.Label>
-                            <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
-                        </Form.Group>
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridDob">
+                        <Form.Label>Date of birth</Form.Label>
+                        <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
+                    </Form.Group>
 
-                        <Form.Group as={Col} controlId="formGridNumber">
-                            <Form.Label>Phone</Form.Label>
-                            <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
-                        </Form.Group>
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridNumber">
+                        <Form.Label>Phone</Form.Label>
+                        <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
+                    </Form.Group>
 
                 </Row>
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} controlId="formGridAge">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridAge">
                         <Form.Label>Age</Form.Label>
                         <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" />
                     </Form.Group>
 
-                    <Form.Group as={Col} controlId="formGridCity">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridCity">
                         <Form.Label>City</Form.Label>
                         <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" />
                     </Form.Group>
@@ -161,18 +161,18 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-2">
 
-                    <Form.Group as={Col} controlId="formGridWebsite">
+                    <Form.Group as={Col} xs={12} controlId="formGridWebsite">
                         <Form.Label>Portfolio/Website</Form.Label>
                         <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" />
                     </Form.Group>
 
                 </Row>
 
-                <div className="d-flex justify-content-end">
-                    <Button variant='outline-primary' className={styles.submitButton} type="submit">
+                <Row className='d-flex justify-content-end'>
+                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} type="submit">
                         Save & Next
-                    </Button>
-                </div>
+                    </Col>
+                </Row>
 
             </Form>
         </>

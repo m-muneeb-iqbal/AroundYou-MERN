@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Form, Row, Button, Toast, ToastContainer } from 'react-bootstrap';
+import { Col, Row, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
@@ -113,12 +113,12 @@ const ExperienceForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} controlId="formGridCompany">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridCompany">
                         <Form.Label>Company Name</Form.Label>
                         <Form.Control value={formData.company} onChange={ handleChange } name="company" type="text" placeholder="Company Name" />
                     </Form.Group>
 
-                    <Form.Group as={Col} controlId="formGridJobTitle">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridJobTitle">
                         <Form.Label>Designation</Form.Label>
                         <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Designation" />
                     </Form.Group>
@@ -127,12 +127,12 @@ const ExperienceForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} controlId="formGridJoiningDate">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridJoiningDate">
                         <Form.Label>Joining Date</Form.Label>
                         <Form.Control value={formData.joiningDate} onChange={ handleChange } name="joiningDate" type="date" />
                     </Form.Group>
 
-                    <Form.Group as={Col} controlId="formGridResignationDate">
+                    <Form.Group as={Col} sm={12} md={6} controlId="formGridResignationDate">
                         <Form.Label>Resignation Date</Form.Label>
                         <Form.Control value={formData.resignationDate} onChange={ handleChange } name="resignationDate" type="date" />
                         <Form.Check type="checkbox" id="currentlyWorking" label="Currently working here" className="mt-2" />
@@ -142,7 +142,7 @@ const ExperienceForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
+                    <Form.Group as={Col} xs={12} className='gap-3 d-flex align-items-end justify-content-end'>
 
                         <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
                         <Trash color="#04263D" size={30} role="button" title="Delete" />
@@ -151,11 +151,11 @@ const ExperienceForm = () => {
 
                 </Row>
 
-                <div className="d-flex justify-content-end">
-                    <Button variant='outline-primary' className={styles.submitButton} type="submit">
+                <Row className='d-flex justify-content-end'>
+                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} type="submit">
                         Save & Next
-                    </Button>
-                </div>
+                    </Col>
+                </Row>
 
             </Form>
 

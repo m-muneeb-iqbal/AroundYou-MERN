@@ -1,21 +1,37 @@
 /* unchecked (override bootstrap) */
 :global(.btn-outline-primary).ToggleButtonForm {
-  --bs-btn-color: #04263D;
-  --bs-btn-border-color: #04263D;
-  --bs-btn-bg: #FFFFFF;
+    --bs-btn-color: #04263D;
+    --bs-btn-border-color: #04263D;
+    --bs-btn-bg: #FFFFFF;
 
-  --bs-btn-hover-color: #04263D;
-  --bs-btn-hover-bg: #FFFFFF;
-  --bs-btn-hover-border-color: #04263D;
+    --bs-btn-hover-color: #04263D;
+    --bs-btn-hover-bg: #FFFFFF;
+    --bs-btn-hover-border-color: #04263D;
 
-  font-weight: bold;
-  transition: all 0.4s ease;
+    font-weight: bold;
+    transition: all 0.4s ease;
 }
 
 /* checked */
 :global(.btn-check:checked) + :global(.btn-outline-primary).ToggleButtonForm {
-  --bs-btn-active-bg: #04263D;
-  --bs-btn-active-color: #FFFFFF;
-  --bs-btn-active-border-color: #FFFFFF;
-  font-weight: bold;
+    --bs-btn-active-bg: #04263D;
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-border-color: #FFFFFF;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .tabs {
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+    }
+}
+
+.ToggleButtonForm {
+    white-space: nowrap;
+}
+
+.tabs {
+    scrollbar-width: thin; 
 }

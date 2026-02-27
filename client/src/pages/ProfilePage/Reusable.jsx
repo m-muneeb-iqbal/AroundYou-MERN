@@ -14,11 +14,11 @@ const Reusable = () => {
 
     return(
 
-        <Container>
+        <Container fluid="md">
 
             <Header />
 
-            <Layout 
+            <Layout
                 left={<LeftPanel authUser={authUser}/>}
                 middle={<Middle />}
             />

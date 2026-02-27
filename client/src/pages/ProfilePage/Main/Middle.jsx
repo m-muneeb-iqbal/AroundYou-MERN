@@ -15,8 +15,8 @@ const Middle = () => {
 
     return (
 
-        <div>
-            <ToggleButtonGroup className="d-flex justify-content-center" type="radio" name="profileTabs" value={activeTab} onChange={setActiveTab}>
+        <>
+            <ToggleButtonGroup className={`d-flex ${styles.tabs}`} type="radio" name="profileTabs" value={activeTab} onChange={setActiveTab}>
 
                 <ToggleButton className={styles.ToggleButtonForm} variant="outline-primary" id="tbg-radio-1" value={1}>
                     Personal Information
@@ -43,7 +43,7 @@ const Middle = () => {
                 {activeTab === 4 && <SkillsForm />}
             </div>
 
-        </div>
+        </>
     );
 };
 

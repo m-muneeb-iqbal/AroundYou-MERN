@@ -55,11 +55,11 @@ const SkillsForm = () => {
 
             </Row>
 
-            <div className="d-flex justify-content-end">
-                <Button variant='outline-primary' className={styles.submitButton} type="submit">
+            <Row className='d-flex justify-content-end'>
+                <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} type="submit">
                     Save Profile
-                </Button>
-            </div>
+                </Col>
+            </Row>
 
         </Form>
 
