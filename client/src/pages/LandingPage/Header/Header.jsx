@@ -31,13 +31,13 @@ function VerticallyCenteredModal({
 
             <Form className="needs-validation" onSubmit={handleLogin}>
 
-                <Form.Group as={Col} sm={12} controlId="formGridEmail">
+                <Form.Group as={Col} xs={12} controlId="formGridEmail">
 
                     <Form.Control value={formData.email} onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
 
                 </Form.Group>
 
-                <Form.Group as={Col} sm={12} controlId="formGridPassword">
+                <Form.Group as={Col} xs={12} controlId="formGridPassword">
 
                     <Form.Control value={formData.password} onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter your password" required/>
                     

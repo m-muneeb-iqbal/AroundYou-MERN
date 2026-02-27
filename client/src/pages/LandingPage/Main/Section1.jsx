@@ -1,8 +1,11 @@
-import { useScrollToSectionCover } from "../../../hooks/useScrollToSectionCover";
 import { useState, useEffect } from "react";
-import { useAuthStore } from "../../../store/useAuthStore";
-import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 import { useLocation, useNavigate } from "react-router-dom";
+import {Container, Row, Col, Form, Button} from "react-bootstrap";
+
+import { useScrollToSectionCover } from "../../../hooks/useScrollToSectionCover";
+import { useAuthStore } from "../../../store/useAuthStore";
+
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 import styles from "../../../styles/LandingPage/Main/Section1.module.css";
 
 const Section1 = () => {
@@ -91,11 +94,11 @@ const Section1 = () => {
   };
   return (
 
-    <section className={`container-fluid mt-0 ${styles.section1}`}>
+    <Container fluid="xs" className={`mt-0 ${styles.section1}`}>
 
-        <div className="row">
+        <Row>
 
-            <div className="col-lg-7 col-12 d-flex flex-column align-items-center text-center mt-3 pt-3">
+            <Col xs={12} lg={7} className="d-flex flex-column align-items-center text-center mt-3 pt-3">
 
                 <p className={`text-white fw-bold ${styles.privateSocialText} mt-5 pt-5`}>
 
@@ -110,12 +113,12 @@ const Section1 = () => {
 
                 <div className="mt-5 pt-5 pb-1 mt-md-3 pt-md-3 pb-md-0 ">
 
-                    <button type="button" className={`btn btn-success ${styles.joinBtn}`} onClick = {() => navigate("/signup")} >
+                    <Button variant="success" className={`btn btn-success ${styles.joinBtn}`} onClick = {() => navigate("/signup")} >
 
                         Sign up Now
                         <img src="/Images/icons/arrow-icon.png" className="img-fluid" />
 
-                    </button>
+                    </Button>
 
                     <div className="modal fade" id="signUpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true" >
 
@@ -139,19 +142,43 @@ const Section1 = () => {
 
                                     <p className="text-start"> Exciting things are coming, and you don't want to miss out! </p>
                                     
-                                    <form onSubmit={handleSubmit} className="needs-validation" noValidate >
+                                    <Form onSubmit={handleSubmit} className="needs-validation" noValidate >
 
-                                        <input type="text" placeholder="Full Name" className="form-control col-md-12 mb-3" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value }) } required />
-                                        <input type="email" placeholder="Email" className="form-control col-md-12 mb-3" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value }) } required />
-                                        <input type="text" placeholder="Username" className="form-control col-md-12 mb-3" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value }) } required />
-                                        <input type="password" placeholder="Enter Password" className="form-control col-md-12 mb-3" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value }) } required minLength={8} />
-                                        <input type="password" placeholder="Confirm Password" className="form-control col-md-12 mb-3" value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value, }) } required minLength={8} />
+                                        <Form.Group as={Col} sm={12} controlId="formGridFullName">
+
+                                            <Form.Control value={formData.fullName}  onChange={(e) => setFormData({ ...formData, fullName: e.target.value }) } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
+
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} xs={12} controlId="formGridEmail">
+
+                                            <Form.Control value={formData.email}  onChange={(e) => setFormData({ ...formData, email: e.target.value }) } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
+
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} xs={12} controlId="formGridUsername">
+
+                                            <Form.Control value={formData.username}  onChange={(e) => setFormData({ ...formData, username: e.target.value }) } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
+
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} xs={12} controlId="formGridPassword">
+
+                                            <Form.Control value={formData.password}  onChange={(e) => setFormData({ ...formData, password: e.target.value }) } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
+
+                                        </Form.Group>
+
+                                        <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
+
+                                            <Form.Control value={formData.confirmPassword}  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value }) } className="mb-3" name="confirmpassword" type="password" placeholder="Confirm password" required minLength={8}/>
+
+                                        </Form.Group>
                                         
-                                        <button className="btn btn-success col-md-12 w-100 main-submit" disabled={isSigningUp} type="submit" >
+                                        <Button xs={12} variant="success" className="w-100 main-submit" disabled={isSigningUp} type="submit" >
                                             {isSigningUp ? "Joining..." : "Join"}
-                                        </button>
+                                        </Button>
 
-                                    </form>
+                                    </Form>
 
                                 </div>
 
@@ -165,9 +192,9 @@ const Section1 = () => {
 
                 <img src="/Images/icons/Mouse.png" alt="scroll mouse" className={`img-fluid ${styles.mouseIcon}`} onClick={() => scrollToSectionCover(".cover-section")} />
 
-            </div>
+            </Col>
 
-            <div className="col-lg-5 flex-column d-flex align-items-center justify-content-center">
+            <Col xs={12} lg={5} className="flex-column d-flex align-items-center justify-content-center">
 
                 <div className="d-lg-block d-none px-5">
 
@@ -339,11 +366,11 @@ const Section1 = () => {
 
                 </div>
                 
-            </div>
+            </Col>
 
-        </div>
+        </Row>
 
-    </section>
+    </Container>
 
   );
   
