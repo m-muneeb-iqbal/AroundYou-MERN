@@ -1,20 +1,24 @@
+import { Container, Row, Col } from "react-bootstrap";
+
 import styles from "../../../styles/LandingPage/Main/Section2.module.css";
 
 const Section2 = () => {
 
     return (
 
-        <section className={`container-fluid ${styles.section2} pt-5`}>
+        <Container fluid="xs" className={`pt-5 ${styles.section2}`}>
 
-            <div className="row">
+            <Row>
 
-                <div className="col-12 d-flex justify-content-center cover-section">
+                <Col xs={12} className="d-flex justify-content-center cover-section">
+
                     <img src="../Images/notIcons/cover-brand-picture.png" className="img-fluid pt-5" alt="cover brand picture"/>
-                </div>
 
-            </div>
+                </Col>
 
-        </section>
+            </Row>
+
+        </Container>
 
     );
 
