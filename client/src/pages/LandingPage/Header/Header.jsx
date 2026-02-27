@@ -17,7 +17,7 @@ function VerticallyCenteredModal({
 
     <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
 
-        <Modal.Title id="contained-modal-title-vcenter" className="p-1">
+        <Modal.Title id="contained-modal-title-vcenter" className="p-2">
 
             <ArrowLeftCircle role="button" onClick={onHide}  aria-label="Close" className="border-0" color="#000000"  title="Close Button" size={35}/>
 
