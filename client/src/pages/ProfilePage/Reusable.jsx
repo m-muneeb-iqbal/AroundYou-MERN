@@ -1,3 +1,5 @@
+import { Container } from "react-bootstrap";
+
 import Layout from "./Layout/Layout"
 
 import Header from "./Header/Header";
@@ -12,7 +14,7 @@ const Reusable = () => {
 
     return(
 
-        <div className="container">
+        <Container>
 
             <Header />
 
@@ -21,7 +23,7 @@ const Reusable = () => {
                 middle={<Middle />}
             />
 
-        </div>
+        </Container>
 
     );
 };
