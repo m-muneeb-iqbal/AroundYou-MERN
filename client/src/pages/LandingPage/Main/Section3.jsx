@@ -97,11 +97,11 @@ const Section3 = () => {
 
             </Row>
 
-            <div className="row">
+            <Row>
 
-                <div className="col-2"></div>
+                <Col xs={2}></Col>
 
-                <div className="col-md-4 col-sm-4 col-8 d-flex flex-column justify-content-center section mt-5">
+                <Col xs={8} sm={4} className="d-flex flex-column justify-content-center section mt-5">
 
                     <p className="h1 text-success">U Communities</p>
                     <p>U can set up any type of group, whether it is with two people or establish a new community for the everyone, it's up to U.</p>
@@ -109,23 +109,23 @@ const Section3 = () => {
 
                     <img src="../Images/notIcons/Cafe.png" className="img-fluid image" />
 
-                </div>
+                </Col>
 
-            </div>
+            </Row>
 
-            <div className="row">
+            <Row>
 
-                <div className="col-2"></div>
+                <Col xs={2}></Col>
 
-                <div className="col-md-4 col-sm-4 col-8 d-flex flex-column justify-content-center mt-5 section">
+                <Col xs={8} sm={4} className="d-flex flex-column justify-content-center section mt-5">
 
                     <p className="h1 text-success">Stories</p>
                     <p>U can stay connected with your college friends and easily share your college memories and experiences all at once!</p>
 
                     <img src="../Images/notIcons/Story.png" className="img-fluid story"/>
-                </div>
+                </Col>
 
-            </div>
+            </Row>
 
         </Container>
     );
