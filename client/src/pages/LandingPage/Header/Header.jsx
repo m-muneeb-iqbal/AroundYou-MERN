@@ -1,16 +1,14 @@
-import { Container, Row, Col, Button, Offcanvas, Modal, Form } from "react-bootstrap";
-import { ArrowLeftCircle} from "lucide-react";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useAuthStore } from "../../../store/useAuthStore"
-import axios from "axios";
+import { Container, Row, Col, Button, Offcanvas, Modal, Form, Toast, ToastContainer } from "react-bootstrap";
+import { ArrowLeftCircle} from "lucide-react";
 
+import { useAuthStore } from "../../../store/useAuthStore"
 import styles from "../../../styles/LandingPage/Header/Header.module.css";
 
 function VerticallyCenteredModal({
-    show, onHide, formData, handleChange, handleLogin, loading
+    show, onHide, formData, handleChange, handleLogin, isLoggingIn
 }) {
 
   return (
@@ -29,7 +27,7 @@ function VerticallyCenteredModal({
             <p className={`fw-bolder text-start ${styles.signIn}`}> Sign In to Your Account</p>
             <p className="text-start">  Welcome back! Please sign in to continue.</p>
 
-            <Form className="needs-validation" onSubmit={handleLogin}>
+            <Form className="needs-validation" onSubmit={handleLogin} noValidate>
 
                 <Form.Group as={Col} xs={12} controlId="formGridEmail">
 
@@ -43,8 +41,8 @@ function VerticallyCenteredModal({
                     
                 </Form.Group>
 
-                <Button variant="success" className="w-100" type="submit" disabled={loading}>
-                    {loading ? "Signing In..." : "Sign In"}
+                <Button variant="success" className="w-100" type="submit" disabled={isLoggingIn}>
+                    {isLoggingIn ? "Signing In..." : "Sign In"}
                 </Button>
 
             </Form>
@@ -57,6 +55,22 @@ function VerticallyCenteredModal({
 
 const Header = () => {
 
+    const [position] = useState('top-end');
+    const showToast = (message, variant = "success") => {
+        setToast({ show: true, message, variant });
+
+        // auto-hide after 4 seconds
+        setTimeout(() => {
+            setToast(prev => ({ ...prev, show: false }));
+        }, 7000);
+    };
+
+    const [toast, setToast] = useState({
+        show: false,
+        message: "",
+        variant: "",   // "success" or "danger"
+    });
+
     const [modalShow, setModalShow] = useState(false);
 
     const [show, setShow] = useState(false);
@@ -67,18 +81,20 @@ const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { setAuthUser } = useAuthStore(); // <-- Zustand action to set user
+    const { login, isLoggingIn } = useAuthStore();
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
 
-    const [loading, setLoading] = useState(false);
-
     useEffect(() => {
 
+        if (location.pathname === "/login"){
+            setModalShow(true);
+        }
 
-    }, [location, navigate]);
+    }, [location.pathname]);
 
     const handleChange = (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -88,7 +104,6 @@ const Header = () => {
 
         e.preventDefault();
         const form = e.target;
-        setLoading(true);
 
         if (!form.checkValidity()) {
             e.stopPropagation();
@@ -97,153 +112,190 @@ const Header = () => {
         }
 
         try {
-            const res = await axios.post(
-                "http://localhost:5000/api/auth/login",
-                formData,
-                {
-                    withCredentials: true, // important so JWT cookie gets stored
-                }
-            );
 
-            // save user in Zustand store
-            setAuthUser(res.data.user);
+            await login (formData);
+            console.log("Signup successful");
 
             form.classList.remove("was-validated");
+            showToast("Logged in successfully!", "success");
 
             // close modal
             setModalShow(false);
+
             // navigate to home
             navigate("/home");
 
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
-            alert(err.response?.data?.message || "Login failed");
+            showToast("Login failed", "danger");
 
-        } finally {
-            setLoading(false);
         }
     }
 
     return (
 
-        <header className={styles.header}>
+        <>
+            <ToastContainer className='p-3' position={position} style={{ zIndex: 1055 }}>
 
-            <Container fluid="xs">
+                <Toast onClose={() => setToast(prev => ({ ...prev, show: false }))} show={toast.show} bg={toast.variant === "success" ? "success" : "danger"} delay={4000} autohide >
 
-                <Row className="pt-5 align-items-center">
+                    <Toast.Header>
 
-                    {/* Left: Menu Button */}
-                    <Col xs={4}>
-                        <Button onClick={handleShow} className={`${styles.menuBtn} border-0 bg-transparent p-0`}>
-                            <img src="/Images/icons/menu-button.png" alt="menu button" className="img-fluid"/>
-                        </Button>
-                    </Col>
+                        <strong className="me-auto">
+                            {toast.variant === "success" ? "Success" : "Error"}
+                        </strong>
+                        <small>Just now</small>
 
-                    {/* Center: Logo */}
-                    <Col xs={4} className="text-center">
-                        <img src="/Images/notIcons/aroundyou-main-heading.png" alt="Edyou logo" className="img-fluid"/>
-                    </Col>
+                    </Toast.Header>
 
-                    {/* Right: Log In Button */}
-                    <Col xs={4} className="d-flex justify-content-center">
-                        <Button variant="success" className={`${styles.signinBtn} btn-sm`} onClick={() => setModalShow(true)} >
-                            Log In
-                        </Button>
-                    </Col>
+                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
 
-                    <VerticallyCenteredModal show={modalShow} onHide={() => setModalShow(false)} formData={formData} handleChange={handleChange} handleLogin={handleLogin} loading={loading} />
+                </Toast>
 
-                </Row>
+            </ToastContainer>
 
-            </Container>
+            <header className={styles.header}>
 
-            {/* --- Offcanvas Sidebar --- */}
-            <Offcanvas show={show} onHide={handleClose} backdrop="static" className="bg-light border" style={{ width: "1000px" }}>
+                <Container fluid="xs">
 
-                <Offcanvas.Header>
+                    <Row className="pt-5 align-items-center">
 
-                    <Offcanvas.Title>
-
-                        <img src="/Images/notIcons/edyou-sidebar.svg" alt="Aroundyou Sidebar Logo" className="img-fluid"/>
-
-                    </Offcanvas.Title>
-
-                    <Button className="border-0 bg-transparent ms-auto" onClick={handleClose} aria-label="Close">
-
-                        <img src="/Images/icons/sidebar-close-button.svg" alt="close" className="img-fluid" />
-
-                    </Button>
-
-                </Offcanvas.Header>
-
-                <Offcanvas.Body>
-
-                    {/* Menu Items */}
-                    <Col xs={12}>
-                        <h4 className="text-black-50">Menu</h4>
-                    </Col>
-
-                    {/* Desktop Menu */}
-                    <div className="d-lg-flex d-none justify-content-between mt-5" style={{ height: "200px" }}>
-
-                        <Col lg={4} className="d-flex flex-column justify-content-between">
-                            <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Features</h3>
-                            <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>About Us</h3>
-                            <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Schools</h3>
+                        {/* Left: Menu Button */}
+                        <Col xs={4}>
+                            <Button onClick={handleShow} className={`${styles.menuBtn} border-0 bg-transparent p-0`}>
+                                <img src="/Images/icons/menu-button.png" alt="menu button" className="img-fluid"/>
+                            </Button>
                         </Col>
 
-                        <Col lg={8} className="d-flex flex-column justify-content-between">
-                            <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Wishlist</h3>
-                            <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Contact Us</h3>
-                            <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Privacy Policy</h3>
+                        {/* Center: Logo */}
+                        <Col xs={4} className="text-center">
+                            <img src="/Images/notIcons/aroundyou-main-heading.png" alt="Edyou logo" className="img-fluid"/>
+                        </Col>
+
+                        {/* Right: Log In Button */}
+                        <Col xs={4} className="d-flex justify-content-center">
+
+                            <Button 
+                                variant="success" 
+                                className={`${styles.signinBtn} btn-sm`} 
+                                onClick={() => {
+                                    setModalShow(true);
+                                    navigate("/login");
+                                }} 
+                            >
+                                Log In
+                            </Button>
 
                         </Col>
 
-                    </div>
+                        <VerticallyCenteredModal 
 
-                    {/* Mobile Menu */}
-                    <div className="d-lg-none d-flex flex-column mt-5">
+                            show={modalShow} 
+                            onHide={() => {
+                                setModalShow(false);
+                                if (location.pathname === "/login") 
+                                    navigate("/");  
+                            }} 
+                            formData={formData} 
+                            handleChange={handleChange} 
+                            handleLogin={handleLogin} 
+                            isLoggingIn={isLoggingIn} 
+                        />
 
-                        {[ "Features", "About Us", "Schools", "Wishlist", "Contact Us", "Privacy Policy",].map((item, idx) => (
-                            <h3 key={idx} className={`fw-bold ${styles.sidebarMenuItemsColor}`}>
-                                {item}
-                            </h3>
-                        ))}
-                    </div>
+                    </Row>
 
-                    {/* Contact Info */}
-                    <div className="mt-5">
+                </Container>
 
-                        <Row>
+                {/* --- Offcanvas Sidebar --- */}
+                <Offcanvas show={show} onHide={handleClose} backdrop="static" className="bg-light border" style={{ width: "1000px" }}>
 
-                            <Col xs={12} md={6} className="mb-3">
-                                <label className="fw-bold text-black-50">Email</label>
-                                <p className="fw-bold text-black-50">supportme@aroundyou.com</p>
+                    <Offcanvas.Header>
+
+                        <Offcanvas.Title>
+
+                            <img src="/Images/notIcons/edyou-sidebar.svg" alt="Aroundyou Sidebar Logo" className="img-fluid"/>
+
+                        </Offcanvas.Title>
+
+                        <Button className="border-0 bg-transparent ms-auto" onClick={handleClose} aria-label="Close">
+
+                            <img src="/Images/icons/sidebar-close-button.svg" alt="close" className="img-fluid" />
+
+                        </Button>
+
+                    </Offcanvas.Header>
+
+                    <Offcanvas.Body>
+
+                        {/* Menu Items */}
+                        <Col xs={12}>
+                            <h4 className="text-black-50">Menu</h4>
+                        </Col>
+
+                        {/* Desktop Menu */}
+                        <div className="d-lg-flex d-none justify-content-between mt-5" style={{ height: "200px" }}>
+
+                            <Col lg={4} className="d-flex flex-column justify-content-between">
+                                <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Features</h3>
+                                <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>About Us</h3>
+                                <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Schools</h3>
                             </Col>
 
-                            <Col xs={12} md={6} className="mb-3">
-                                <label className="fw-bold text-black-50">Phone</label>
-                                <p className="fw-bold text-black-50">+1 607 254 4636</p>
+                            <Col lg={8} className="d-flex flex-column justify-content-between">
+                                <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Wishlist</h3>
+                                <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Contact Us</h3>
+                                <h3 className={`fw-bold ${styles.sidebarMenuItemsColor}`}>Privacy Policy</h3>
+
                             </Col>
 
-                            <Col xs={12} md={6}>
-                                <label className="fw-bold text-black-50">Address</label>
-                                <p className="fw-bold text-black-50"> Ithaca, NY 14850, United States </p>
-                            </Col>
-
-                        </Row>
-
-                        <div className="mt-3">
-                            <img src="/Images/notIcons/apple-button-sidebar-footer.svg" alt="apple button sidebar"/>
                         </div>
 
-                    </div>
+                        {/* Mobile Menu */}
+                        <div className="d-lg-none d-flex flex-column mt-5">
 
-                </Offcanvas.Body>
+                            {[ "Features", "About Us", "Schools", "Wishlist", "Contact Us", "Privacy Policy",].map((item, idx) => (
+                                <h3 key={idx} className={`fw-bold ${styles.sidebarMenuItemsColor}`}>
+                                    {item}
+                                </h3>
+                            ))}
+                        </div>
 
-            </Offcanvas>
+                        {/* Contact Info */}
+                        <div className="mt-5">
 
-        </header>
+                            <Row>
+
+                                <Col xs={12} md={6} className="mb-3">
+                                    <label className="fw-bold text-black-50">Email</label>
+                                    <p className="fw-bold text-black-50">supportme@aroundyou.com</p>
+                                </Col>
+
+                                <Col xs={12} md={6} className="mb-3">
+                                    <label className="fw-bold text-black-50">Phone</label>
+                                    <p className="fw-bold text-black-50">+1 607 254 4636</p>
+                                </Col>
+
+                                <Col xs={12} md={6}>
+                                    <label className="fw-bold text-black-50">Address</label>
+                                    <p className="fw-bold text-black-50"> Ithaca, NY 14850, United States </p>
+                                </Col>
+
+                            </Row>
+
+                            <div className="mt-3">
+                                <img src="/Images/notIcons/apple-button-sidebar-footer.svg" alt="apple button sidebar"/>
+                            </div>
+
+                        </div>
+
+                    </Offcanvas.Body>
+
+                </Offcanvas>
+
+            </header>
+
+        </>
+
     );
 };
 

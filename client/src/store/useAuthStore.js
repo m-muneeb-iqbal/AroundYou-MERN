@@ -52,6 +52,7 @@ export const useAuthStore = create((set) => ({
             });
             console.log("Login response:", res.data);
             await useAuthStore.getState().checkAuth();
+            set({ authUser: res.data.user });
             return res.data;
 
         } catch (error) {

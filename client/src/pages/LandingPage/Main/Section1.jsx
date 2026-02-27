@@ -1,14 +1,97 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {Container, Row, Col, Form, Button} from "react-bootstrap";
+
+import { Container, Row, Col, Form, Button, Modal, Toast, ToastContainer } from "react-bootstrap";
+import { ArrowLeftCircle} from "lucide-react";
 
 import { useScrollToSectionCover } from "../../../hooks/useScrollToSectionCover";
 import { useAuthStore } from "../../../store/useAuthStore";
 
-import bootstrap from "bootstrap/dist/js/bootstrap.bundle";
 import styles from "../../../styles/LandingPage/Main/Section1.module.css";
 
+function VerticallyCenteredModal({
+    show, onHide, formData, handleChange, handleSubmit, isSigningUp
+}) {
+
+  return (
+
+    <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
+
+        <Modal.Title id="contained-modal-title-vcenter" className="p-2">
+
+            <ArrowLeftCircle role="button" onClick={onHide}  aria-label="Close" className="border-0" color="#000000"  title="Close Button" size={35}/>
+
+        </Modal.Title>
+
+
+        <Modal.Body className="p-5">
+
+            <p className={`fw-bolder text-start ${styles.waitingList}`}> Join the Waiting List and Secure Your Spot!</p>
+            <p className="text-start"> Exciting things are coming, and you don't want to miss out!</p>
+
+            <Form onSubmit={handleSubmit} className="needs-validation" noValidate>
+
+                <Form.Group as={Col} sm={12} controlId="formGridFullName">
+
+                    <Form.Control value={formData.fullName}  onChange={ handleChange } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
+
+                </Form.Group>
+
+                <Form.Group as={Col} xs={12} controlId="formGridEmail">
+
+                    <Form.Control value={formData.email}  onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
+
+                </Form.Group>
+
+                <Form.Group as={Col} xs={12} controlId="formGridUsername">
+
+                    <Form.Control value={formData.username}  onChange={ handleChange } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
+
+                </Form.Group>
+
+                <Form.Group as={Col} xs={12} controlId="formGridPassword">
+
+                    <Form.Control value={formData.password}  onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
+
+                </Form.Group>
+
+                <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
+
+                    <Form.Control value={formData.confirmPassword}  onChange={ handleChange } className="mb-3" name="confirmPassword" type="password" placeholder="Confirm password" required minLength={8}/>
+
+                </Form.Group>
+
+                <Button variant="success" className="w-100 main-submit" type="submit" disabled={isSigningUp}>
+                    {isSigningUp ? "Joining..." : "Join"}
+                </Button>
+
+            </Form>
+
+        </Modal.Body>
+
+    </Modal>
+  );
+}
+
 const Section1 = () => {
+
+    const [position] = useState('top-end');
+    const showToast = (message, variant = "success") => {
+        setToast({ show: true, message, variant });
+
+        // auto-hide after 4 seconds
+        setTimeout(() => {
+            setToast(prev => ({ ...prev, show: false }));
+        }, 7000);
+    };
+
+    const [toast, setToast] = useState({
+        show: false,
+        message: "",
+        variant: "",   // "success" or "danger"
+    });
+
+    const [modalShow, setModalShow] = useState(false);
 
     const scrollToSectionCover = useScrollToSectionCover();
 
@@ -25,160 +108,300 @@ const Section1 = () => {
         password: "",
         confirmPassword: "",
     });
-
+    
     useEffect(() => {
-
-        const modalEl = document.getElementById("signUpModal");
-
-        if (!modalEl) return;
-
-        const modalInstance = new bootstrap.Modal(modalEl);
-
+    
         if (location.pathname === "/signup"){
-            modalInstance.show();
+            setModalShow(true);
+        }
+    
+    },[location]);
+
+    const handleChange = (e) => {
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+        const form = e.target;
+
+        if (!form.checkValidity()) {
+            e.stopPropagation();
+            form.classList.add("was-validated");
+            return;
         }
 
-        const handleHidden = () => {
-            document.body.classList.remove("modal-open");
-            const backdrop = document.querySelector(".modal-backdrop");
-            if (backdrop) backdrop.remove();
-            navigate("/"); // 👈 back to home
-        };
+        try {
 
-        modalEl.addEventListener("hidden.bs.modal", handleHidden);
+            await signup(formData);
+            console.log("Signup successful");
 
-        return () => {
-            modalEl.removeEventListener("hidden.bs.modal", handleHidden);
-        };
-    }, [location, navigate]);
+            // Reset form
+            setFormData({
+                fullName: "",
+                email: "",
+                username: "",
+                password: "",
+                confirmPassword: "",
+            });
 
-  const handleSubmit = async (e) => {
+            form.classList.remove("was-validated");
+            showToast("Registered successfully!", "success");
+            
+            // close modal
+            setModalShow(false);
 
-    e.preventDefault();
-    const form = e.target;
-
-    if (!form.checkValidity()) {
-        e.stopPropagation();
-        form.classList.add("was-validated");
-        return;
-    }
-
-    try {
-        await signup(formData);
-        console.log("Signup successful ✅");
-
-        // Reset form
-        setFormData({
-            fullName: "",
-            email: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-        });
-        form.classList.remove("was-validated");
-
-        // Close signup modal and clean up
-        const modalEl = document.getElementById("signUpModal");
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        modalInstance.hide();
-      
-        modalEl.addEventListener("hidden.bs.modal", () => {
+            // navigate to login
             navigate("/login");
-        });
 
-    } catch (err) {
-        console.error("Signup failed ❌", err);
-        alert(err.response?.data?.message || "Signup failed");
-    }
+        } catch (err) {
+            console.error("Signup failed ❌", err);
+            showToast("Registration failed", "danger");
+        }
 
-  };
-  return (
+    };
 
-    <Container fluid="xs" className={`mt-0 ${styles.section1}`}>
+    return (
 
-        <Row>
+        <>
 
-            <Col xs={12} lg={7} className="d-flex flex-column align-items-center text-center mt-3 pt-3">
+            <ToastContainer className='p-3' position={position} style={{ zIndex: 1055 }}>
 
-                <p className={`text-white fw-bold ${styles.privateSocialText} mt-5 pt-5`}>
+                <Toast onClose={() => setToast(prev => ({ ...prev, show: false }))} show={toast.show} bg={toast.variant === "success" ? "success" : "danger"} delay={4000} autohide >
 
-                    The private social app made for
-                    <span className={`d-inline-block ${styles.collegeLifeText}`}>
-                        college life
-                    </span>
-                    .
-                </p>
+                    <Toast.Header>
 
-                <img src="/Images/notIcons/line_home.png" alt="main heading underline" className={`img-fluid ${styles.line}`} />
+                        <strong className="me-auto">
+                            {toast.variant === "success" ? "Success" : "Error"}
+                        </strong>
+                        <small>Just now</small>
 
-                <div className="mt-5 pt-5 pb-1 mt-md-3 pt-md-3 pb-md-0 ">
+                    </Toast.Header>
 
-                    <Button variant="success" className={`btn btn-success ${styles.joinBtn}`} onClick = {() => navigate("/signup")} >
+                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
 
-                        Sign up Now
-                        <img src="/Images/icons/arrow-icon.png" className="img-fluid" />
+                </Toast>
 
-                    </Button>
+            </ToastContainer>
+        
+            <Container fluid="xs" className={`mt-0 ${styles.section1}`}>
 
-                    <div className="modal fade" id="signUpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true" >
+                <Row>
 
-                        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <Col xs={12} lg={7} className="d-flex flex-column align-items-center text-center mt-3 pt-3">
 
-                            <div className="modal-content">
+                        <p className={`text-white fw-bold ${styles.privateSocialText} mt-5 pt-5`}>
 
-                                <svg type="button" data-bs-dismiss="modal" aria-label="Close" viewBox="0 0 16 16" width="2em" height="2em" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="mx-5 mt-3 bi-arrow-left-circle b-icon bi" >
+                            The private social app made for
+                            <span className={`d-inline-block ${styles.collegeLifeText}`}>
+                                college life
+                            </span>
+                            .
+                        </p>
 
-                                    <g>
-                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" ></path>
-                                    </g>
+                        <img src="/Images/notIcons/line_home.png" alt="main heading underline" className={`img-fluid ${styles.line}`} />
 
-                                </svg>
+                        <div className="mt-5 pt-5 pb-1 mt-md-3 pt-md-3 pb-md-0 ">
 
-                                <div className="modal-body p-5">
+                            <Button 
+                                variant="success" 
+                                className={styles.joinBtn} 
+                                onClick={() => {
+                                    setModalShow(true);
+                                    navigate("/signup");
+                                }} 
+                            >
 
-                                    <p className={`modal-title fw-bolder text-start ${styles.waitingList}`} id="signUpModalLabel">
-                                        Join the Waiting List and Secure Your Spot!
-                                    </p>
+                                Sign up Now
+                                <img src="/Images/icons/arrow-icon.png" className="img-fluid" />
 
-                                    <p className="text-start"> Exciting things are coming, and you don't want to miss out! </p>
+                            </Button>
+
+                            <VerticallyCenteredModal 
+                                show={modalShow} 
+                                onHide={() => {
+                                    setModalShow(false);
+                                    if (location.pathname === "/signup") 
+                                        navigate("/");  
+                                }} 
+                                formData={formData} 
+                                handleChange={handleChange} 
+                                handleSubmit={handleSubmit} 
+                                isSigningUp={isSigningUp} 
+                            />
+
+                        </div>
+
+                        <img src="/Images/icons/Mouse.png" alt="scroll mouse" className={`img-fluid ${styles.mouseIcon}`} onClick={() => scrollToSectionCover(".cover-section")} />
+
+                    </Col>
+
+                    <Col xs={12} lg={5} className="flex-column d-flex align-items-center justify-content-center">
+
+                        <div className="d-lg-block d-none px-5">
+
+                            <div className={`d-flex justify-content-center align-items-center rounded-circle ${styles.outer1}`}>
+
+                                <div className={`${styles.mainImage} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Mobile logo Style.png" alt="aroundyou logo" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image1} position-absolute`}>
+
+                                    <img src="/Images/notIcons/image 22.png" alt="icon 1" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage1} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-1.png" alt="check icon 1" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image2} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Group 494.png" alt="icon 2" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image3} position-absolute`}>
+
+                                    <img src="/Images/notIcons/image 23.png" alt="icon 3" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage3} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-3.png" alt="check icon 3" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image4} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Rectangle 163.png" alt="icon 4" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage4} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-4.png" alt="check icon 4" className="img-fluid" />
                                     
-                                    <Form onSubmit={handleSubmit} className="needs-validation" noValidate >
+                                </div>
 
-                                        <Form.Group as={Col} sm={12} controlId="formGridFullName">
+                                <div className={`${styles.image5} position-absolute`}>
 
-                                            <Form.Control value={formData.fullName}  onChange={(e) => setFormData({ ...formData, fullName: e.target.value }) } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
+                                    <img src="/Images/notIcons/Group 497.png" alt="icon 5" className="img-fluid" />
 
-                                        </Form.Group>
+                                </div>
 
-                                        <Form.Group as={Col} xs={12} controlId="formGridEmail">
+                                <div className={`${styles.image6} position-absolute`}>
 
-                                            <Form.Control value={formData.email}  onChange={(e) => setFormData({ ...formData, email: e.target.value }) } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
+                                    <img src="/Images/notIcons/Rectangle 168.png" alt="icon 6" className="img-fluid" />
 
-                                        </Form.Group>
+                                </div>
 
-                                        <Form.Group as={Col} xs={12} controlId="formGridUsername">
+                                <div className={`${styles.checkImage6} position-absolute`}>
 
-                                            <Form.Control value={formData.username}  onChange={(e) => setFormData({ ...formData, username: e.target.value }) } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
+                                    <img src="/Images/notIcons/check-image-6.png" alt="check icon 6" className="img-fluid" />
 
-                                        </Form.Group>
+                                </div>
 
-                                        <Form.Group as={Col} xs={12} controlId="formGridPassword">
+                                <div className={`${styles.image7} position-absolute`}>
 
-                                            <Form.Control value={formData.password}  onChange={(e) => setFormData({ ...formData, password: e.target.value }) } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
+                                    <img src="/Images/notIcons/image 21.png"  alt="icon 7" className="img-fluid" />
 
-                                        </Form.Group>
+                                </div>
 
-                                        <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
+                                <div className={`${styles.checkImage7} position-absolute`}>
 
-                                            <Form.Control value={formData.confirmPassword}  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value }) } className="mb-3" name="confirmpassword" type="password" placeholder="Confirm password" required minLength={8}/>
+                                    <img src="/Images/notIcons/check-image-7.png" alt="check icon 7" className="img-fluid" />
 
-                                        </Form.Group>
-                                        
-                                        <Button xs={12} variant="success" className="w-100 main-submit" disabled={isSigningUp} type="submit" >
-                                            {isSigningUp ? "Joining..." : "Join"}
-                                        </Button>
+                                </div>
 
-                                    </Form>
+                                <div className={`${styles.image8} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Group 493.png" alt="icon 8" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image9} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Avatar 16 1.png" alt="icon 9" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage9} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-9.png" alt="check icon 9" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image10} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Rectangle 169.png" alt="icon 10" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage10} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-10.png" alt="check icon 10" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image11} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Group 495.png" alt="icon 11" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image12} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Rectangle 167.png" alt="icon 12" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage12} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-12.png" alt="check icon 12" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.image13} position-absolute`}>
+
+                                    <img src="/Images/notIcons/Rectangle 165.png" alt="icon 13" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.checkImage13} position-absolute`}>
+
+                                    <img src="/Images/notIcons/check-image-13.png" alt="check icon 13" className="img-fluid" />
+
+                                </div>
+
+                                <div className={`${styles.line1} position-absolute`}></div>
+                                <div className={`${styles.line2} position-absolute`}></div>
+                                <div className={`${styles.line3} position-absolute`}></div>
+                                <div className={`${styles.line4} position-absolute`}></div>
+                                <div className={`${styles.line5} position-absolute`}></div>
+                                <div className={`${styles.line6} position-absolute`}></div>
+                                <div className={`${styles.line7} position-absolute`}></div>
+                                <div className={`${styles.line8} position-absolute`}></div>
+                                <div className={`${styles.line9} position-absolute`}></div>
+                                <div className={`${styles.line10} position-absolute`}></div>
+                                <div className={`${styles.line11} position-absolute`}></div>
+                                <div className={`${styles.line12} position-absolute`}></div>
+                                <div className={`${styles.line13} position-absolute`}></div>
+
+                                <div className={`${styles.outer2} d-flex justify-content-center align-items-center rounded-circle`}>
+
+                                    <div className={`${styles.outer3} d-flex justify-content-center align-items-center rounded-circle`}>
+
+                                        <div className={`${styles.outer4} d-flex justify-content-center align-items-center rounded-circle`}></div>
+
+                                    </div>
 
                                 </div>
 
@@ -186,193 +409,15 @@ const Section1 = () => {
 
                         </div>
                         
-                    </div>
+                    </Col>
 
-                </div>
+                </Row>
 
-                <img src="/Images/icons/Mouse.png" alt="scroll mouse" className={`img-fluid ${styles.mouseIcon}`} onClick={() => scrollToSectionCover(".cover-section")} />
+            </Container>
+        
+        </>    
 
-            </Col>
-
-            <Col xs={12} lg={5} className="flex-column d-flex align-items-center justify-content-center">
-
-                <div className="d-lg-block d-none px-5">
-
-                    <div className={`d-flex justify-content-center align-items-center rounded-circle ${styles.outer1}`}>
-
-                        <div className={`${styles.mainImage} position-absolute`}>
-
-                            <img src="/Images/notIcons/Mobile logo Style.png" alt="aroundyou logo" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image1} position-absolute`}>
-
-                            <img src="/Images/notIcons/image 22.png" alt="icon 1" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage1} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-1.png" alt="check icon 1" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image2} position-absolute`}>
-
-                            <img src="/Images/notIcons/Group 494.png" alt="icon 2" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image3} position-absolute`}>
-
-                            <img src="/Images/notIcons/image 23.png" alt="icon 3" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage3} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-3.png" alt="check icon 3" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image4} position-absolute`}>
-
-                            <img src="/Images/notIcons/Rectangle 163.png" alt="icon 4" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage4} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-4.png" alt="check icon 4" className="img-fluid" />
-                            
-                        </div>
-
-                        <div className={`${styles.image5} position-absolute`}>
-
-                            <img src="/Images/notIcons/Group 497.png" alt="icon 5" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image6} position-absolute`}>
-
-                            <img src="/Images/notIcons/Rectangle 168.png" alt="icon 6" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage6} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-6.png" alt="check icon 6" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image7} position-absolute`}>
-
-                            <img src="/Images/notIcons/image 21.png"  alt="icon 7" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage7} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-7.png" alt="check icon 7" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image8} position-absolute`}>
-
-                            <img src="/Images/notIcons/Group 493.png" alt="icon 8" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image9} position-absolute`}>
-
-                            <img src="/Images/notIcons/Avatar 16 1.png" alt="icon 9" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage9} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-9.png" alt="check icon 9" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image10} position-absolute`}>
-
-                            <img src="/Images/notIcons/Rectangle 169.png" alt="icon 10" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage10} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-10.png" alt="check icon 10" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image11} position-absolute`}>
-
-                            <img src="/Images/notIcons/Group 495.png" alt="icon 11" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image12} position-absolute`}>
-
-                            <img src="/Images/notIcons/Rectangle 167.png" alt="icon 12" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage12} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-12.png" alt="check icon 12" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.image13} position-absolute`}>
-
-                            <img src="/Images/notIcons/Rectangle 165.png" alt="icon 13" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.checkImage13} position-absolute`}>
-
-                            <img src="/Images/notIcons/check-image-13.png" alt="check icon 13" className="img-fluid" />
-
-                        </div>
-
-                        <div className={`${styles.line1} position-absolute`}></div>
-                        <div className={`${styles.line2} position-absolute`}></div>
-                        <div className={`${styles.line3} position-absolute`}></div>
-                        <div className={`${styles.line4} position-absolute`}></div>
-                        <div className={`${styles.line5} position-absolute`}></div>
-                        <div className={`${styles.line6} position-absolute`}></div>
-                        <div className={`${styles.line7} position-absolute`}></div>
-                        <div className={`${styles.line8} position-absolute`}></div>
-                        <div className={`${styles.line9} position-absolute`}></div>
-                        <div className={`${styles.line10} position-absolute`}></div>
-                        <div className={`${styles.line11} position-absolute`}></div>
-                        <div className={`${styles.line12} position-absolute`}></div>
-                        <div className={`${styles.line13} position-absolute`}></div>
-
-                        <div className={`${styles.outer2} d-flex justify-content-center align-items-center rounded-circle`}>
-
-                            <div className={`${styles.outer3} d-flex justify-content-center align-items-center rounded-circle`}>
-
-                                <div className={`${styles.outer4} d-flex justify-content-center align-items-center rounded-circle`}></div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-                
-            </Col>
-
-        </Row>
-
-    </Container>
-
-  );
+    );
   
 };
 
