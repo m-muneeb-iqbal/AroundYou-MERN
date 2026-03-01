@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema (
         },
         age: {
             type: Number,
-            default: 18,
         },
         location: {
             type: String,
@@ -39,7 +38,6 @@ const userSchema = new mongoose.Schema (
         education: {
             type: String,
             enum: ["Matriculation/O-Level", "Intermediate/A-Level", "DAE", "Bachelors", "Masters", "PHD/Doctorate", "ACCA", "CA", "CMA"],
-            default: "Matriculation/O-Level",
         },
 
         field: {
@@ -48,7 +46,6 @@ const userSchema = new mongoose.Schema (
         },
         passingYear: {
             type: Number,
-            default: 1900,
             validate: {
                 validator: function (value) {
                     const currentYear = new Date().getFullYear();
@@ -62,7 +59,6 @@ const userSchema = new mongoose.Schema (
             type: Number,
             min: 0.0,
             max: 4.0,
-            default: 0.0,
             validate: {
                 validator: function (value) {
                     return Number.isFinite(value) && /^\d(\.\d{1,2})?$/.test(value.toString());

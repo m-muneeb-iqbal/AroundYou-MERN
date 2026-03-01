@@ -12,6 +12,110 @@ import styles from "../../../../styles/UI/Buttons.module.css";
     
 const EducationForm = () => {
 
+    const fieldOptions = {
+        "Matriculation/O-Level": [
+            "Arts", 
+            "Biology", 
+            "Computer Science"
+        ],
+        "Intermediate/A-Level": [
+            "Pre-Medical", 
+            "Pre-Engineering", 
+            "ICS", 
+            "Commerce", 
+            "Arts"
+        ],
+        "DAE": [
+            "Electrical Technologoy", 
+            "Mechanical Technology", 
+            "Civil Technology",
+            "Electronics Technology",
+            "Computer Technologoy", 
+            "Chemical Technologoy", 
+            "Automotive Technology",
+            "Architecture Technology",
+            "1st Year", 
+            "2nd Year", 
+            "3rd Year", 
+        ],
+        "Bachelors": [
+            "BA/BSc",
+            "BSCS (Bachelor of Science in Computer Science)",
+            "BSSE (Bachelor of Science in Software Engineering)",
+            "B.Com (Bachelor of Commerce)",
+            "BBA (Bachelor of Business Administration)",
+            "B.E.(Bachelor of Engineering)",
+            "BSc Engineering (Bachelor of Science in Engineering)",
+            "MBBS (Bachelor of Medicine, Bachelor of Surgery)"
+        ],
+        "Masters": [
+            "MA/MSc",
+            "M.Com (Master of Commerce)",
+            "MBA (Master of Business Administration)",
+            "MS (Master of Science)",
+            "MSCA (Master of Science in Computer Applications)",
+            "MS (Data Science)",
+            "MS (Artificial Intelligence)",
+        ],
+        "PHD/Doctorate": [
+            "PhD Computer Science", 
+            "PhD Management Sciences",
+            "Course Work", 
+            "Research Proposal", 
+            "Research and Dissertation", 
+        ],
+        "ACCA": ["Accounting & Finance"],
+        "CA": ["Chartered Accountancy"],
+        "CMA": ["Cost & Management Accounting"]
+    };
+
+    const handleDeleteEducation = async () => {
+        try {
+            const res = await axios.delete(
+                "http://localhost:5000/api/auth/delete-education",
+                { withCredentials: true }
+            );
+
+            console.log("Education deleted:", res.data);
+
+            // Reset form after deletion
+            setFormData({
+                education: "",
+                field: "",
+                passingYear: "",
+                cgpa: "",
+                institute: ""
+            });
+
+            showToast("Education deleted successfully!", "success");
+        } catch (err) {
+            console.error("Delete failed:", err.response?.data || err.message);
+            showToast("Failed to delete education", "danger");
+        }
+    };
+
+    const handleDeleteCertification = async () => {
+        try {
+            const res = await axios.delete(
+                "http://localhost:5000/api/auth/delete-certification",
+                { withCredentials: true }
+            );
+
+            console.log("Education deleted:", res.data);
+
+            // Reset form after deletion
+            setFormData({
+                certificate: "",
+                provider: ""
+            });
+
+            showToast("Certification deleted successfully!", "success");
+        } catch (err) {
+            console.error("Delete failed:", err.response?.data || err.message);
+            showToast("Failed to delete education", "danger");
+        }
+    };
+
     const [position] = useState('top-end');
     const showToast = (message, variant = "success") => {
         setToast({ show: true, message, variant });
@@ -47,7 +151,7 @@ const EducationForm = () => {
     useEffect(() => {
         if (!authUser) {
             navigate("/");
-                return;
+            return;
         }
     
         setFormData({
@@ -63,10 +167,19 @@ const EducationForm = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
+
+    if (name === "education") {
+        setFormData(prev => ({
             ...prev,
-            [name]: value,
+            education: value,
+            field: "" 
         }));
+    } else {
+        setFormData(prev => ({
+        ...prev,
+        [name]: value
+        }));
+    }
     };
 
     const handleSubmit = async (e) => {
@@ -116,34 +229,34 @@ const EducationForm = () => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridEducationalLevel">
+
                         <Form.Label>Educational Level</Form.Label>
+
                         <Form.Select value={formData.education} onChange={ handleChange } name="education" >
-                            <option disabled >-- Choose Any --</option>
-                            <option>Matriculation/O-Level</option>
-                            <option>Intermediate/A-Level</option>
-                            <option>DAE</option>
-                            <option>Bachelors</option>
-                            <option>Masters</option>
-                            <option>PHD/Doctorate</option>
-                            <option>ACCA</option>
-                            <option>CA</option>
-                            <option>CMA</option>
+
+                            <option value="" disabled>-- Choose Any --</option>
+                            {Object.keys(fieldOptions).map((level) => (
+                                <option key={level} value={level}>{level}</option>
+                            ))}
+
                         </Form.Select>
+
                     </Form.Group>
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridFieldofStudy">
+
                         <Form.Label>Field of Study</Form.Label>
-                        <Form.Select value={formData.field} onChange={ handleChange } name="field" >
-                            <option disabled >-- Choose Any --</option>
-                            <option>BA/BSc</option>
-                            <option>BSCS (Bachelor of Science in Computer Science)</option>
-                            <option>BSCS (Bachelor of Science in Software Engineering)</option>
-                            <option>B.Com (Bachelor of Commerce)</option>
-                            <option>BBA (Bachelor of Business Administration)</option>
-                            <option>BE (Bachelor of Engineering)</option>
-                            <option>BSc Engineering (Bachelor of Science in Engineering)</option>
-                            <option>MBBS (Bachelor of Medicine, Bachelor of Surgery)</option>
+
+                        <Form.Select value={formData.field} onChange={ handleChange } name="field" disabled={!formData.education}>
+
+                            <option value="" disabled>-- Choose Any --</option>
+
+                            {formData.education && fieldOptions[formData.education]?.map((field) => (
+                                <option key={field} value={field}>{field}</option>
+                            ))}
+
                         </Form.Select>
+
                     </Form.Group>
 
                 </Row>
@@ -151,13 +264,17 @@ const EducationForm = () => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridPassingYear">
+
                         <Form.Label>Passing Year</Form.Label>
                         <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" />
+                        
                     </Form.Group>
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridCGPA">
+
                         <Form.Label>CGPA</Form.Label>
                         <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" />
+
                     </Form.Group>
 
                 </Row>
@@ -165,6 +282,7 @@ const EducationForm = () => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridInstitue">
+
                         <Form.Label>Institute</Form.Label>
                         <Form.Select value={formData.institute} onChange={ handleChange } name="institute" >
                             <option disabled >-- Choose Any --</option>
@@ -175,6 +293,7 @@ const EducationForm = () => {
                             <option>FAST University</option>
                             <option>Habib University</option>
                             <option>Hamdard University</option>
+                            <option>Jinnah University for Women</option>
                             <option>MAJU University</option>
                             <option>Metropolitan University</option>
                             <option>NED University</option>
@@ -191,7 +310,7 @@ const EducationForm = () => {
                     <Form.Group as={Col} sm={12} md={6} className='gap-3 d-flex align-items-end justify-content-end'>
 
                         <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
-                        <Trash color="#04263D" size={30} role="button" title="Delete" />
+                        <Trash color="#04263D" size={30} role="button" title="Delete" onClick={ handleDeleteEducation }/>
                         
                     </Form.Group>
 
@@ -200,13 +319,17 @@ const EducationForm = () => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridCertificate">
+
                         <Form.Label>Certificate/License</Form.Label>
                         <Form.Control value={formData.certificate} onChange={ handleChange } name="certificate" type="text" placeholder="Certificate or License" />
+
                     </Form.Group>
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridProvider">
+
                         <Form.Label>Provider</Form.Label>
                         <Form.Control value={formData.provider} onChange={ handleChange } name="provider" type="text" placeholder="Provider" />
+
                     </Form.Group>
 
                 </Row>
@@ -216,7 +339,7 @@ const EducationForm = () => {
                     <Form.Group as={Col} className='gap-3 d-flex align-items-end justify-content-end'>
 
                         <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
-                        <Trash color="#04263D" size={30} role="button" title="Delete" />
+                        <Trash color="#04263D" size={30} role="button" title="Delete"  onClick={ handleDeleteCertification }/>
                         
                     </Form.Group>
 
