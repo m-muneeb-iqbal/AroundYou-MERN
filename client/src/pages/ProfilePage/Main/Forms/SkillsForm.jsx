@@ -1,10 +1,12 @@
-import { Col, Form, Row, Button, Toast, ToastContainer } from 'react-bootstrap';
+import { Col, Form, Row, Button } from 'react-bootstrap';
 import { X } from 'lucide-react';
 
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/useAuthStore";
 import { useProfileStore } from "../../../../store/useProfileStore";
 
 import { useState, useEffect } from 'react';
+import { useToast } from "../../../../context/ToastContext";
 
 import styles from "../../../../styles/UI/Buttons.module.css";
 
@@ -21,36 +23,25 @@ const skillOptions = [
     
 const SkillsForm = () => {
 
-    const [addActive, setAddActive] = useState(false);
-
-    const [position] = useState('top-end');
-    const showToast = (message, variant = "success") => {
-        setToast({ show: true, message, variant });
-
-        // auto-hide after 4 seconds
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, show: false }));
-        }, 7000);
-    };
-
-    const [toast, setToast] = useState({
-        show: false,
-        message: "",
-        variant: "",   // "success" or "danger"
-    });
+    const { showToast } = useToast();   
 
     const { authUser } = useAuthStore();
-    const { updateSkills } = useProfileStore();
-
     const [skills, setSkills] = useState([]);
-    const [selectedSkill, setSelectedSkill] = useState("");
-
+    const navigate = useNavigate();
+   
     useEffect(() => {
+        if (!authUser) {
+            navigate("/");
+            return;
+        }
         if (authUser?.skills) {
             setSkills(authUser.skills);
         }
-    }, [authUser]);
+    }, [authUser, navigate]);
 
+    const [selectedSkill, setSelectedSkill] = useState("");
+    const [addActive, setAddActive] = useState(false);
+    
     const handleAddSkill = (e) => {
 
         if (!selectedSkill) {
@@ -79,6 +70,7 @@ const SkillsForm = () => {
         setSkills(prev => prev.filter(skill => skill !== skillToRemove));
     };
 
+    const { updateSkills } = useProfileStore();
     const handleUpdateSkill = async (e) => {
         e.preventDefault();
 
@@ -95,26 +87,6 @@ const SkillsForm = () => {
     return (
 
         <>
-        
-            <ToastContainer className='p-3' position={position} style={{ zIndex: 1 }}>
-
-                <Toast
-                    onClose={() => setToast(prev => ({ ...prev, show: false }))}
-                    show={toast.show}
-                    bg={toast.variant === "success" ? "success" : "danger"}
-                    delay={4000}
-                    autohide
-                >
-                    <Toast.Header>
-                    <strong className="me-auto">
-                        {toast.variant === "success" ? "Success" : "Error"}
-                    </strong>
-                    <small>Just now</small>
-                    </Toast.Header>
-                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
-                </Toast>
-
-            </ToastContainer>
 
             <Form onSubmit={ handleUpdateSkill }>
             

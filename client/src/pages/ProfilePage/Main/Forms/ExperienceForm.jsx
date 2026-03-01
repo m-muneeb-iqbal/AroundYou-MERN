@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Row, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
+import { Col, Row, Form, Button } from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { useAuthStore } from "../../../../store/useAuthStore";
 import { useProfileStore } from "../../../../store/useProfileStore"
 
 import { useEffect, useState } from "react";
+import { useToast } from "../../../../context/ToastContext";
 
 import styles from "../../../../styles/UI/Buttons.module.css";
 
@@ -17,21 +18,7 @@ const toDateInputValue = (date) => {
     
 const ExperienceForm = () => {
 
-    const [position] = useState('top-end');
-    const showToast = (message, variant = "success") => {
-        setToast({ show: true, message, variant });
-
-        // auto-hide after 4 seconds
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, show: false }));
-        }, 7000);
-    };
-
-    const [toast, setToast] = useState({
-        show: false,
-        message: "",
-        variant: "",   // "success" or "danger"
-    });
+    const { showToast } = useToast();
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -141,26 +128,6 @@ const ExperienceForm = () => {
     return (
 
         <>
-
-            <ToastContainer className='p-3' position={position} style={{ zIndex: 1 }}>
-
-                <Toast
-                    onClose={() => setToast(prev => ({ ...prev, show: false }))}
-                    show={toast.show}
-                    bg={toast.variant === "success" ? "success" : "danger"}
-                    delay={4000}
-                    autohide
-                >
-                    <Toast.Header>
-                    <strong className="me-auto">
-                        {toast.variant === "success" ? "Success" : "Error"}
-                    </strong>
-                    <small>Just now</small>
-                    </Toast.Header>
-                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
-                </Toast>
-
-            </ToastContainer>
 
             <Form onSubmit={ handleUpdateExperience } noValidate>
 
