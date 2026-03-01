@@ -4,9 +4,9 @@ import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/useAuthStore";
+import { useProfileStore } from "../../../../store/useProfileStore";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 import styles from "../../../../styles/UI/Buttons.module.css";
     
@@ -67,53 +67,6 @@ const EducationForm = () => {
         "ACCA": ["Accounting & Finance"],
         "CA": ["Chartered Accountancy"],
         "CMA": ["Cost & Management Accounting"]
-    };
-
-    const handleDeleteEducation = async () => {
-        try {
-            const res = await axios.delete(
-                "http://localhost:5000/api/auth/delete-education",
-                { withCredentials: true }
-            );
-
-            console.log("Education deleted:", res.data);
-
-            // Reset form after deletion
-            setFormData({
-                education: "",
-                field: "",
-                passingYear: "",
-                cgpa: "",
-                institute: ""
-            });
-
-            showToast("Education deleted successfully!", "success");
-        } catch (err) {
-            console.error("Delete failed:", err.response?.data || err.message);
-            showToast("Failed to delete education", "danger");
-        }
-    };
-
-    const handleDeleteCertification = async () => {
-        try {
-            const res = await axios.delete(
-                "http://localhost:5000/api/auth/delete-certification",
-                { withCredentials: true }
-            );
-
-            console.log("Education deleted:", res.data);
-
-            // Reset form after deletion
-            setFormData({
-                certificate: "",
-                provider: ""
-            });
-
-            showToast("Certification deleted successfully!", "success");
-        } catch (err) {
-            console.error("Delete failed:", err.response?.data || err.message);
-            showToast("Failed to delete education", "danger");
-        }
     };
 
     const [position] = useState('top-end');
@@ -182,21 +135,62 @@ const EducationForm = () => {
     }
     };
 
-    const handleSubmit = async (e) => {
+    const { updateEducation } = useProfileStore();
+    const { deleteEducation } = useProfileStore();
+    const { deleteCertification } = useProfileStore();
+
+    const handleUpdateEducation = async (e) => {
         e.preventDefault();
 
         try {
-            const res = await axios.put(
-                "http://localhost:5000/api/auth/update-education",
-                formData,
-                { withCredentials: true }
-            );
+            await updateEducation(formData);
 
-            console.log("Education updated:", res.data);
+            console.log("Education updated.");
             showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
+        }
+    };
+
+        const handleDeleteEducation = async () => {
+        try {
+            
+            await deleteEducation();
+            console.log("Education deleted.");
+
+            // Reset form after deletion
+            setFormData({
+                education: "",
+                field: "",
+                passingYear: "",
+                cgpa: "",
+                institute: ""
+            });
+
+            showToast("Education deleted successfully!", "success");
+        } catch (err) {
+            console.error("Delete failed:", err.response?.data || err.message);
+            showToast("Failed to delete education", "danger");
+        }
+    };
+
+    const handleDeleteCertification = async () => {
+        try {
+            await deleteCertification();
+
+            console.log("Education deleted.");
+
+            // Reset form after deletion
+            setFormData({
+                certificate: "",
+                provider: ""
+            });
+
+            showToast("Certification deleted successfully!", "success");
+        } catch (err) {
+            console.error("Delete failed:", err.response?.data || err.message);
+            showToast("Failed to delete education", "danger");
         }
     };
 
@@ -224,7 +218,7 @@ const EducationForm = () => {
 
             </ToastContainer>
 
-            <Form onSubmit={ handleSubmit }>
+            <Form onSubmit={ handleUpdateEducation }>
 
                 <Row className="mb-3">
 

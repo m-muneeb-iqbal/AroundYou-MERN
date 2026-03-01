@@ -3,9 +3,9 @@ import { Col, Row, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/useAuthStore";
+import { useProfileStore } from "../../../../store/useProfileStore";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 import styles from "../../../../styles/UI/Buttons.module.css";
 
@@ -36,6 +36,7 @@ const PersonalInformationForm = () => {
     const navigate = useNavigate();
 
     if(!authUser) return <navigate to = "/" />;
+    const { updatePersonalInformation } = useProfileStore();
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -73,17 +74,13 @@ const PersonalInformationForm = () => {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleUpdatePersonalInformation = async (e) => {
         e.preventDefault();
 
         try {
-            const res = await axios.put(
-                "http://localhost:5000/api/auth/update-personal-info",
-                formData,
-                { withCredentials: true }
-            );
+            await updatePersonalInformation(formData);
 
-            console.log("Personal info updated:", res.data);
+            console.log("Personal info updated.");
             showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
@@ -115,7 +112,7 @@ const PersonalInformationForm = () => {
 
             </ToastContainer>
 
-            <Form onSubmit={ handleSubmit }>
+            <Form onSubmit={ handleUpdatePersonalInformation }>
 
                 <Row className="mb-3">
 

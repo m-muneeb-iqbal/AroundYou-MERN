@@ -4,15 +4,15 @@ import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../../store/useAuthStore";
+import { useProfileStore } from "../../../../store/useProfileStore"
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 import styles from "../../../../styles/UI/Buttons.module.css";
 
 const toDateInputValue = (date) => {
-  if (!date) return "";
-  return new Date(date).toISOString().split("T")[0];
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
 };
     
 const ExperienceForm = () => {
@@ -68,17 +68,15 @@ const ExperienceForm = () => {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const { updateExperience } = useProfileStore();
+
+    const handleUpdateExperience = async (e) => {
         e.preventDefault();
 
         try {
-            const res = await axios.put(
-                "http://localhost:5000/api/auth/update-experience",
-                formData,
-                { withCredentials: true }
-            );
 
-            console.log("Experience updated:", res.data);
+            await updateExperience(formData);
+            console.log("Experience updated.");
             showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
@@ -109,7 +107,7 @@ const ExperienceForm = () => {
 
             </ToastContainer>
 
-            <Form onSubmit={ handleSubmit }>
+            <Form onSubmit={ handleUpdateExperience }>
 
                 <Row className="mb-3">
 
