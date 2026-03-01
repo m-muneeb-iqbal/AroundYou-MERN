@@ -22,3 +22,35 @@
     border: 2px solid #FFFFFF !important;
     font-weight: bold;
 }
+
+:global(.btn-outline-primary).addButton {
+    background-color: #04263D; 
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+:global(.btn-outline-primary).addButton:hover {
+    background-color: #FFFFFF;
+    color: #04263D;
+    border: 2px solid #04263D;
+    font-weight: bold;
+}
+
+:global(.btn-outline-primary:focus).addButton,
+:global(.btn-outline-primary:active).addButton,
+:global(.btn-outline-primary.active).addButton,
+:global(.btn-check:checked) + .addButton {
+    background-color: #021624 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FFFFFF !important;
+    font-weight: bold;
+}
+
+.addButtonActive {
+    background-color: #021624 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FFFFFF !important;
+    font-weight: bold;
+}

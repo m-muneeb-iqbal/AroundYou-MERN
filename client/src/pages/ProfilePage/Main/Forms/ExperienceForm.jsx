@@ -64,7 +64,7 @@ const ExperienceForm = () => {
 
     const handleChange = (e) => {
 
-    const { name, type, value, checked } = e.target;
+        const { name, type, value, checked } = e.target;
 
         if (name === "currentlyWorking" && checked && !formData.joiningDate) {
             showToast("You must enter Joining Date before marking as Currently working", "danger");

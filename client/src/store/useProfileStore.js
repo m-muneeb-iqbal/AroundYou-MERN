@@ -133,4 +133,24 @@ export const useProfileStore = create ((set) => ({
         }
     },
 
+    updateSkills: async (data) => {
+        set({ isUpdating: true });
+
+        try {
+            const res = await axiosInstance.put("/auth/update-skills", data,
+                { withCredentials: true }
+            );
+
+            useAuthStore.getState().setAuthUser(res.data);
+
+            return res.data;
+
+        } catch (error) {
+            console.error("Update skills error:", error.response?.data || error.message);
+            throw error;
+        } finally {
+            set({ isUpdating: false });
+        }
+    },
+
 }));
