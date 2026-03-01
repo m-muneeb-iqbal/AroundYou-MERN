@@ -1,6 +1,6 @@
 import { checkAuth, signup, login, logout } from "../controllers/auth.core.controller.js";
 import { updateProfilePicture, updatePersonalInformation, updateEducation, updateExperience, updateSkills } from "../controllers/auth.update.controller.js";
-import { deleteEducation, deleteCertification } from "../controllers/auth.delete.controller.js";
+import { deleteEducation, deleteCertification, deleteExperience } from "../controllers/auth.delete.controller.js";
 
 import { protectRoute } from "../middleware/auth.middleware.js";
 import express from "express";
@@ -26,6 +26,8 @@ router.delete("/delete-education", protectRoute, deleteEducation);
 router.delete("/delete-certification", protectRoute, deleteCertification);
 
 router.put("/update-experience", protectRoute,  updateExperience);
+
+router.delete("/delete-experience", protectRoute, deleteExperience);
 
 router.put("/update-skills", protectRoute,  updateSkills);
 

@@ -43,6 +43,7 @@ const ExperienceForm = () => {
         jobTitle: "",
         joiningDate: "",
         resignationDate: "",
+        currentlyWorking: false,
     });
 
     // Redirect + prefill form
@@ -57,25 +58,59 @@ const ExperienceForm = () => {
             jobTitle: authUser.jobTitle || "",
             joiningDate: toDateInputValue(authUser.joiningDate),
             resignationDate: toDateInputValue(authUser.resignationDate),
+            currentlyWorking: authUser.currentlyWorking ?? false, // important
         });
     }, [authUser, navigate]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
+
+    const { name, type, value, checked } = e.target;
+
+        if (name === "currentlyWorking" && checked && !formData.joiningDate) {
+            showToast("You must enter Joining Date before marking as Currently working", "danger");
+            return;
+        }
+
+        if (name === "resignationDate" && value && !formData.joiningDate) {
+            showToast("You must enter Joining Date before entering Resignation Date", "danger");
+            return;
+        }
+
+        setFormData(prev => ({
             ...prev,
-            [name]: value,
+            [name]: type === "checkbox" ? checked : value,
+            ...(name === "currentlyWorking" && checked ? { resignationDate: "" } : {})
         }));
     };
 
     const { updateExperience } = useProfileStore();
+    const { deleteExperience } = useProfileStore();
 
     const handleUpdateExperience = async (e) => {
+
         e.preventDefault();
+        if (!formData.joiningDate) {
+            showToast("Joining Date is required.", "danger");
+            return;
+        }
+
+        if (!formData.currentlyWorking && !formData.resignationDate) {
+            showToast("Either tick 'Currently working' or enter Resignation Date", "danger");
+            return;
+        }
 
         try {
 
-            await updateExperience(formData);
+            const updated = await updateExperience(formData);
+
+            setFormData({
+                company: updated.company ?? "",
+                jobTitle: updated.jobTitle ?? "",
+                joiningDate: toDateInputValue(updated.joiningDate),
+                resignationDate: toDateInputValue(updated.resignationDate),
+                currentlyWorking: updated.currentlyWorking ?? false,
+            });
+
             console.log("Experience updated.");
             showToast("Profile updated successfully!", "success");
         } catch (err) {
@@ -83,6 +118,26 @@ const ExperienceForm = () => {
             showToast("Profile update failed", "danger");
         }
     };
+
+    const handleDeleteExperience = async () => {
+        try {
+            await deleteExperience();
+
+            console.log("Experience deleted.");
+
+            // Reset form after deletion
+            setFormData({
+                certificate: "",
+                provider: ""
+            });
+
+            showToast("Experience deleted successfully!", "success");
+        } catch (err) {
+            console.error("Delete failed:", err.response?.data || err.message);
+            showToast("Failed to delete education", "danger");
+        }
+    };
+
     return (
 
         <>
@@ -107,7 +162,7 @@ const ExperienceForm = () => {
 
             </ToastContainer>
 
-            <Form onSubmit={ handleUpdateExperience }>
+            <Form onSubmit={ handleUpdateExperience } noValidate>
 
                 <Row className="mb-3">
 
@@ -132,8 +187,8 @@ const ExperienceForm = () => {
 
                     <Form.Group as={Col} sm={12} md={6} controlId="formGridResignationDate">
                         <Form.Label>Resignation Date</Form.Label>
-                        <Form.Control value={formData.resignationDate} onChange={ handleChange } name="resignationDate" type="date" />
-                        <Form.Check type="checkbox" id="currentlyWorking" label="Currently working here" className="mt-2" />
+                        <Form.Control value={formData.resignationDate ?? ""} onChange={ handleChange } name="resignationDate" type="date" disabled={formData.currentlyWorking}/>
+                        <Form.Check type="checkbox" id="currentlyWorking" label="Currently working" name="currentlyWorking" className="mt-2" checked={formData.currentlyWorking} onChange={handleChange}/>
                     </Form.Group>
 
                 </Row>
@@ -143,7 +198,7 @@ const ExperienceForm = () => {
                     <Form.Group as={Col} xs={12} className='gap-3 d-flex align-items-end justify-content-end'>
 
                         <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
-                        <Trash color="#04263D" size={30} role="button" title="Delete" />
+                        <Trash color="#04263D" size={30} role="button" title="Delete"  onClick={ handleDeleteExperience }/>
                         
                     </Form.Group>
 

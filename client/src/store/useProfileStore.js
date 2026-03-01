@@ -112,4 +112,25 @@ export const useProfileStore = create ((set) => ({
         }
     },
 
+    deleteExperience: async () => {
+        set({ isDeleting: true });
+
+        try {
+            const res = await axiosInstance.delete("/auth/delete-experience",
+                { withCredentials: true }
+            );
+
+            useAuthStore.getState().setAuthUser(res.data.user);
+
+            return res.data;
+
+        } catch (error) {
+            console.error("Delete certification error:", error.response?.data || error.message);
+            throw error;
+
+        } finally {
+            set({ isDeleting: false });
+        }
+    },
+
 }));

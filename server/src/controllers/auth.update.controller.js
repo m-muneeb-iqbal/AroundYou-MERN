@@ -133,30 +133,25 @@ export const updateExperience = async (req, res) => {
             "jobTitle",
             "joiningDate",
             "resignationDate",
+            "currentlyWorking"
         ];
-        const updates = {};
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: "User not found." });
+
+        let hasUpdates = false;
         allowedFields.forEach((field) => {
             if (req.body[field] !== undefined) {
-                updates[field] = req.body[field];
+                user[field] = req.body[field];
+                hasUpdates = true;
             }
         });
-        if (Object.keys(updates).length === 0) {
+        if (!hasUpdates) {
             return res.status(400).json({ message: "No valid fields provided to update." });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            updates,
-            {
-                new: true,          // return updated document
-                runValidators: true // run schema validators
-            }
-            ).select("-password");
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found." });
-        }
-        res.status(200).json(updatedUser);
+        await user.save();
+        res.status(200).json(user);
     } catch (error) {
         console.error("Error in updateExperience:", error.message);
         res.status(500).json({ message: "Internal Server Error" });

@@ -92,6 +92,20 @@ const userSchema = new mongoose.Schema (
         },
         resignationDate: {
             type: Date,
+            set: v => v === "" ? null : v,
+            validate: {
+            validator: function(value) {
+                if (this.currentlyWorking) {
+                    return value === null || value === undefined;
+                } else {
+                    return value instanceof Date || !isNaN(value);
+                }
+            }
+        }
+        },
+        currentlyWorking: {
+            type: Boolean,
+            default: false
         },
 
         //Skills
