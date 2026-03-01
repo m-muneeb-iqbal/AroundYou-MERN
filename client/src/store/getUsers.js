@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 
-export const useUserStore = create((set, get) => ({
+export const useUserStore = create((set) => ({
 
     users: [],
     isFetching: false,

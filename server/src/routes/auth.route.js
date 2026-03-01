@@ -1,4 +1,7 @@
-import { checkAuth, login, logout, signup, updateProfilePicture, updatePersonalInformation, updateEducation, deleteEducation, deleteCertification, updateExperience, updateSkills } from "../controllers/auth.controller.js";
+import { checkAuth, signup, login, logout } from "../controllers/auth.core.controller.js";
+import { updateProfilePicture, updatePersonalInformation, updateEducation, updateExperience, updateSkills } from "../controllers/auth.update.controller.js";
+import { deleteEducation, deleteCertification } from "../controllers/auth.delete.controller.js";
+
 import { protectRoute } from "../middleware/auth.middleware.js";
 import express from "express";
 import multer from "multer";
