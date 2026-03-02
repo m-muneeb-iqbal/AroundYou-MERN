@@ -41,6 +41,7 @@ export const updatePersonalInformation = async (req, res) => {
 
         const allowedFields = [
             
+            "description",
             "fullName",
             "email",
             "dob",

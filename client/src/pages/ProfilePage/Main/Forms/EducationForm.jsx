@@ -99,8 +99,8 @@ const EducationForm = () => {
         const formattedData = {
             education: authUser.education || "",
             field: authUser.field || "",
-            passingYear: authUser.passingYear || "",
-            cgpa: authUser.cgpa || "",
+            passingYear: authUser.passingYear != null ? String(authUser.passingYear) : "",
+            cgpa: authUser.cgpa != null ? String(authUser.cgpa) : "",
             institute: authUser.institute || "",
             certificate: authUser.certificate || "",
             provider: authUser.provider || "",
@@ -144,7 +144,12 @@ const EducationForm = () => {
             console.log("Education updated.");
             showToast("Profile updated successfully!", "success");
 
-            setOriginalData(formData);
+            setOriginalData({
+                ...formData,
+                passingYear: formData.passingYear != null ? String(formData.passingYear) : "",
+                cgpa: formData.cgpa != null ? String(formData.cgpa) : ""
+            });
+
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");

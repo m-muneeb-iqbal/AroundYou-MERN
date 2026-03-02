@@ -24,6 +24,7 @@ const PersonalInformationForm = () => {
     if(!authUser) return <navigate to = "/" />;
     
     const [formData, setFormData] = useState({
+        description: "",
         fullName: "",
         email: "",
         dob: "",
@@ -35,7 +36,7 @@ const PersonalInformationForm = () => {
 
     const [originalData, setOriginalData] = useState(null);
 
-    // Redirect + prefill form
+    // Redirect + prefill formx
     useEffect(() => {
         if (!authUser) {
             navigate("/");
@@ -43,11 +44,12 @@ const PersonalInformationForm = () => {
         }
     
         const formattedData = {
+            description: authUser.description || "",
             fullName: authUser.fullName || "",
             email: authUser.email || "",
             dob: toDateInputValue(authUser.dob),
             phoneNumber: authUser.phoneNumber || "",
-            age: authUser.age || "",
+            age: authUser.age != null ? String(authUser.age) : "",
             location: authUser.location || "",
             website: authUser.website || "",
         };
@@ -80,7 +82,11 @@ const PersonalInformationForm = () => {
             console.log("Personal info updated.");
             showToast("Profile updated successfully!", "success");
             
-            setOriginalData(formData);
+            setOriginalData({
+                ...formData,
+                age: formData.age != null ? String(formData.age) : "",
+            });
+            
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
@@ -94,12 +100,21 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridFullName">
+                    <Form.Group as={Col} xs={12} controlId="formGridDescription">
+                        <Form.Label>Bio</Form.Label>
+                        <Form.Control as="textarea" value={formData.description} onChange={ handleChange } name="description" type="text" placeholder="Tell us about yourself" />
+                    </Form.Group>
+
+                </Row>
+
+                <Row className="mb-3">
+
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridFullName">
                         <Form.Label>Full Name</Form.Label>
                         <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" />
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridEmail">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridEmail">
                         <Form.Label>Email</Form.Label>
                         <Form.Control value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
                     </Form.Group>
@@ -108,12 +123,12 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridDob">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridDob">
                         <Form.Label>Date of birth</Form.Label>
                         <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridNumber">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridNumber">
                         <Form.Label>Phone</Form.Label>
                         <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
                     </Form.Group>
@@ -122,12 +137,12 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridAge">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridAge">
                         <Form.Label>Age</Form.Label>
                         <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" />
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridCity">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridCity">
                         <Form.Label>City</Form.Label>
                         <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" />
                     </Form.Group>
@@ -144,7 +159,7 @@ const PersonalInformationForm = () => {
                 </Row>
 
                 <Row className='d-flex justify-content-end'>
-                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
+                    <Col xs={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
                         Save & Next
                     </Col>
                 </Row>

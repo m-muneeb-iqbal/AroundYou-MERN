@@ -28,7 +28,7 @@ const LeftPanel = () => {
                     </p>
                     
                     <Card.Text className="text-muted">
-                        Computer Science graduate with experience in Flutter, MERN Stack and Laravel.
+                       {authUser?.description}
                     </Card.Text>
     
                 </Card.Body>
