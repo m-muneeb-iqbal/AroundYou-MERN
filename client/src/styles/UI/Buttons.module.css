@@ -23,6 +23,14 @@
     font-weight: bold;
 }
 
+:global(.btn-outline-primary:disabled).submitButton {
+    background-color: #FFFFFF !important;
+    color: #666666 !important;
+    border: 2px solid #FFFFFF !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+}
+
 :global(.btn-outline-primary).addButton {
     background-color: #04263D; 
     color: #FFFFFF;
