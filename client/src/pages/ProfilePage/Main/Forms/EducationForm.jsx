@@ -205,7 +205,7 @@ const EducationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridEducationalLevel">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridEducationalLevel">
 
                         <Form.Label>Educational Level</Form.Label>
 
@@ -220,7 +220,7 @@ const EducationForm = () => {
 
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridFieldofStudy">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridFieldofStudy">
 
                         <Form.Label>Field of Study</Form.Label>
 
@@ -240,14 +240,14 @@ const EducationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridPassingYear">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridPassingYear">
 
                         <Form.Label>Passing Year</Form.Label>
                         <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" />
                         
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridCGPA">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridCGPA">
 
                         <Form.Label>CGPA</Form.Label>
                         <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" />
@@ -258,7 +258,7 @@ const EducationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridInstitue">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridInstitue">
 
                         <Form.Label>Institute</Form.Label>
                         <Form.Select value={formData.institute} onChange={ handleChange } name="institute" >
@@ -285,7 +285,7 @@ const EducationForm = () => {
                         </Form.Select>
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} className='gap-3 d-flex align-items-end justify-content-end'>
+                    <Form.Group as={Col} xs={12} md={6} className='gap-3 d-flex align-items-end justify-content-end'>
 
                         <SquarePlus color="#04263D" size={30} role="button" title="Add more" />
                         <Trash color="#04263D" size={30} role="button" title="Delete" onClick={ handleDeleteEducation }/>
@@ -296,14 +296,14 @@ const EducationForm = () => {
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridCertificate">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridCertificate">
 
                         <Form.Label>Certificate/License</Form.Label>
                         <Form.Control value={formData.certificate} onChange={ handleChange } name="certificate" type="text" placeholder="Certificate or License" />
 
                     </Form.Group>
 
-                    <Form.Group as={Col} sm={12} md={6} controlId="formGridProvider">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridProvider">
 
                         <Form.Label>Provider</Form.Label>
                         <Form.Control value={formData.provider} onChange={ handleChange } name="provider" type="text" placeholder="Provider" />
@@ -324,7 +324,7 @@ const EducationForm = () => {
                 </Row>
 
                 <Row className='d-flex justify-content-end'>
-                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
+                    <Col xs={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
                         Save & Next
                     </Col>
                 </Row>

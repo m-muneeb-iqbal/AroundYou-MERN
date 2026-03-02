@@ -32,7 +32,7 @@ function VerticallyCenteredModal({
 
                 <Form onSubmit={handleSubmit} className="needs-validation" noValidate>
 
-                    <Form.Group as={Col} sm={12} controlId="formGridFullName">
+                    <Form.Group as={Col} xs={12} controlId="formGridFullName">
 
                         <Form.Control value={formData.fullName}  onChange={ handleChange } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
 

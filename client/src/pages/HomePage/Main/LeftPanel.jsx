@@ -16,7 +16,7 @@ const LeftPanel = () => {
 
     return (
         <>
-            <Card style={{ width: '18rem' }} className="mb-4">
+            <Card style={{ width: '18rem' }} className="d-none d-md-block mb-4">
                 <Card.Body>
 
                     <Card.Title className="text-center">{authUser.fullName}</Card.Title>
@@ -34,7 +34,7 @@ const LeftPanel = () => {
                 </Card.Body>
             </Card>
 
-            <Card style={{ width: '18rem' }}>
+            <Card style={{ width: '18rem' }} className="d-none d-md-block">
                 <ListGroup variant="flush">
 
                     <ListGroup.Item className="px-3 text-start">
