@@ -280,6 +280,7 @@ const EducationForm = () => {
                             <option>University of Haripur</option>
                             <option>University of Karachi</option>
                             <option>University of Wah</option>
+                            <option>Wah Medical College</option>
                             
                         </Form.Select>
                     </Form.Group>

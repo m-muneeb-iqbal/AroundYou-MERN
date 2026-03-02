@@ -1,92 +1,74 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 
-import { Container, Row, Col, Button, Offcanvas, Modal, Form, Toast, ToastContainer } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Offcanvas, Modal } from "react-bootstrap";
 import { ArrowLeftCircle} from "lucide-react";
 
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore"
+
+import { useState, useEffect } from "react";
+import { useToast } from "../../../context/ToastContext";
+
 import styles from "../../../styles/LandingPage/Header/Header.module.css";
 
 function VerticallyCenteredModal({
     show, onHide, formData, handleChange, handleLogin, isLoggingIn
 }) {
 
-  return (
+    return (
 
-    <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
+        <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
 
-        <Modal.Title id="contained-modal-title-vcenter" className="p-2">
+            <Modal.Title id="contained-modal-title-vcenter" className="p-2">
 
-            <ArrowLeftCircle role="button" onClick={onHide}  aria-label="Close" className="border-0" color="#000000"  title="Close Button" size={35}/>
+                <ArrowLeftCircle role="button" onClick={onHide}  aria-label="Close" className="border-0" color="#000000"  title="Close Button" size={35}/>
 
-        </Modal.Title>
+            </Modal.Title>
 
 
-        <Modal.Body className="p-5">
+            <Modal.Body className="p-5">
 
-            <p className={`fw-bolder text-start ${styles.signIn}`}> Sign In to Your Account</p>
-            <p className="text-start">  Welcome back! Please sign in to continue.</p>
+                <p className={`fw-bolder text-start ${styles.signIn}`}> Sign In to Your Account</p>
+                <p className="text-start">  Welcome back! Please sign in to continue.</p>
 
-            <Form className="needs-validation" onSubmit={handleLogin} noValidate>
+                <Form className="needs-validation" onSubmit={handleLogin} noValidate>
 
-                <Form.Group as={Col} xs={12} controlId="formGridEmail">
+                    <Form.Group as={Col} xs={12} controlId="formGridEmail">
 
-                    <Form.Control value={formData.email} onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
+                        <Form.Control value={formData.email} onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
 
-                </Form.Group>
+                    </Form.Group>
 
-                <Form.Group as={Col} xs={12} controlId="formGridPassword">
+                    <Form.Group as={Col} xs={12} controlId="formGridPassword">
 
-                    <Form.Control value={formData.password} onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter your password" required/>
-                    
-                </Form.Group>
+                        <Form.Control value={formData.password} onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter your password" required/>
+                        
+                    </Form.Group>
 
-                <Button variant="success" className="w-100" type="submit" disabled={isLoggingIn}>
-                    {isLoggingIn ? "Signing In..." : "Sign In"}
-                </Button>
+                    <Button variant="success" className="w-100" type="submit" disabled={isLoggingIn}>
+                        {isLoggingIn ? "Signing In..." : "Sign In"}
+                    </Button>
 
-            </Form>
+                </Form>
 
-        </Modal.Body>
+            </Modal.Body>
 
-    </Modal>
-  );
+        </Modal>
+    );
 }
 
 const Header = () => {
-
-    const [position] = useState('top-end');
-    const showToast = (message, variant = "success") => {
-        setToast({ show: true, message, variant });
-
-        // auto-hide after 4 seconds
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, show: false }));
-        }, 7000);
-    };
-
-    const [toast, setToast] = useState({
-        show: false,
-        message: "",
-        variant: "",   // "success" or "danger"
-    });
-
-    const [modalShow, setModalShow] = useState(false);
-
-    const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const { login, isLoggingIn } = useAuthStore();
 
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
+    
+    const location = useLocation();
+    const [modalShow, setModalShow] = useState(false);
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     useEffect(() => {
 
@@ -99,6 +81,10 @@ const Header = () => {
     const handleChange = (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
+
+    const { login, isLoggingIn } = useAuthStore();
+    const { showToast } = useToast();
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
 
@@ -135,24 +121,6 @@ const Header = () => {
     return (
 
         <>
-            <ToastContainer className='p-3' position={position} style={{ zIndex: 1055 }}>
-
-                <Toast onClose={() => setToast(prev => ({ ...prev, show: false }))} show={toast.show} bg={toast.variant === "success" ? "success" : "danger"} delay={4000} autohide >
-
-                    <Toast.Header>
-
-                        <strong className="me-auto">
-                            {toast.variant === "success" ? "Success" : "Error"}
-                        </strong>
-                        <small>Just now</small>
-
-                    </Toast.Header>
-
-                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
-
-                </Toast>
-
-            </ToastContainer>
 
             <header className={styles.header}>
 

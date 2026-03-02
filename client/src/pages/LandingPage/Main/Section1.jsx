@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
-import { Container, Row, Col, Form, Button, Modal, Toast, ToastContainer } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import { ArrowLeftCircle} from "lucide-react";
 
-import { useScrollToSectionCover } from "../../../hooks/useScrollToSectionCover";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore";
+
+import { useState, useEffect } from "react";
+import { useScrollToSectionCover } from "../../../hooks/useScrollToSectionCover";
+import { useToast } from "../../../context/ToastContext";
 
 import styles from "../../../styles/LandingPage/Main/Section1.module.css";
 
@@ -13,92 +14,70 @@ function VerticallyCenteredModal({
     show, onHide, formData, handleChange, handleSubmit, isSigningUp
 }) {
 
-  return (
+    return (
 
-    <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
+        <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
 
-        <Modal.Title id="contained-modal-title-vcenter" className="p-2">
+            <Modal.Title id="contained-modal-title-vcenter" className="p-2">
 
-            <ArrowLeftCircle role="button" onClick={onHide}  aria-label="Close" className="border-0" color="#000000"  title="Close Button" size={35}/>
+                <ArrowLeftCircle role="button" onClick={onHide}  aria-label="Close" className="border-0" color="#000000"  title="Close Button" size={35}/>
 
-        </Modal.Title>
+            </Modal.Title>
 
 
-        <Modal.Body className="p-5">
+            <Modal.Body className="p-5">
 
-            <p className={`fw-bolder text-start ${styles.waitingList}`}> Join the Waiting List and Secure Your Spot!</p>
-            <p className="text-start"> Exciting things are coming, and you don't want to miss out!</p>
+                <p className={`fw-bolder text-start ${styles.waitingList}`}> Join the Waiting List and Secure Your Spot!</p>
+                <p className="text-start"> Exciting things are coming, and you don't want to miss out!</p>
 
-            <Form onSubmit={handleSubmit} className="needs-validation" noValidate>
+                <Form onSubmit={handleSubmit} className="needs-validation" noValidate>
 
-                <Form.Group as={Col} sm={12} controlId="formGridFullName">
+                    <Form.Group as={Col} sm={12} controlId="formGridFullName">
 
-                    <Form.Control value={formData.fullName}  onChange={ handleChange } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
+                        <Form.Control value={formData.fullName}  onChange={ handleChange } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
 
-                </Form.Group>
+                    </Form.Group>
 
-                <Form.Group as={Col} xs={12} controlId="formGridEmail">
+                    <Form.Group as={Col} xs={12} controlId="formGridEmail">
 
-                    <Form.Control value={formData.email}  onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
+                        <Form.Control value={formData.email}  onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
 
-                </Form.Group>
+                    </Form.Group>
 
-                <Form.Group as={Col} xs={12} controlId="formGridUsername">
+                    <Form.Group as={Col} xs={12} controlId="formGridUsername">
 
-                    <Form.Control value={formData.username}  onChange={ handleChange } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
+                        <Form.Control value={formData.username}  onChange={ handleChange } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
 
-                </Form.Group>
+                    </Form.Group>
 
-                <Form.Group as={Col} xs={12} controlId="formGridPassword">
+                    <Form.Group as={Col} xs={12} controlId="formGridPassword">
 
-                    <Form.Control value={formData.password}  onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
+                        <Form.Control value={formData.password}  onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
 
-                </Form.Group>
+                    </Form.Group>
 
-                <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
+                    <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
 
-                    <Form.Control value={formData.confirmPassword}  onChange={ handleChange } className="mb-3" name="confirmPassword" type="password" placeholder="Confirm password" required minLength={8}/>
+                        <Form.Control value={formData.confirmPassword}  onChange={ handleChange } className="mb-3" name="confirmPassword" type="password" placeholder="Confirm password" required minLength={8}/>
 
-                </Form.Group>
+                    </Form.Group>
 
-                <Button variant="success" className="w-100 main-submit" type="submit" disabled={isSigningUp}>
-                    {isSigningUp ? "Joining..." : "Join"}
-                </Button>
+                    <Button variant="success" className="w-100 main-submit" type="submit" disabled={isSigningUp}>
+                        {isSigningUp ? "Joining..." : "Join"}
+                    </Button>
 
-            </Form>
+                </Form>
 
-        </Modal.Body>
+            </Modal.Body>
 
-    </Modal>
-  );
+        </Modal>
+    );
 }
 
 const Section1 = () => {
 
-    const [position] = useState('top-end');
-    const showToast = (message, variant = "success") => {
-        setToast({ show: true, message, variant });
-
-        // auto-hide after 4 seconds
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, show: false }));
-        }, 7000);
-    };
-
-    const [toast, setToast] = useState({
-        show: false,
-        message: "",
-        variant: "",   // "success" or "danger"
-    });
-
-    const [modalShow, setModalShow] = useState(false);
-
     const scrollToSectionCover = useScrollToSectionCover();
-
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const { signup, isSigningUp } = useAuthStore();
+    
     const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -109,6 +88,9 @@ const Section1 = () => {
         confirmPassword: "",
     });
     
+    const location = useLocation();
+    const [modalShow, setModalShow] = useState(false);
+
     useEffect(() => {
     
         if (location.pathname === "/signup"){
@@ -121,6 +103,10 @@ const Section1 = () => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    const { signup, isSigningUp } = useAuthStore();
+    const { showToast } = useToast();
+    const navigate = useNavigate();
+    
     const handleSubmit = async (e) => {
 
         e.preventDefault();
@@ -165,25 +151,6 @@ const Section1 = () => {
     return (
 
         <>
-
-            <ToastContainer className='p-3' position={position} style={{ zIndex: 1055 }}>
-
-                <Toast onClose={() => setToast(prev => ({ ...prev, show: false }))} show={toast.show} bg={toast.variant === "success" ? "success" : "danger"} delay={4000} autohide >
-
-                    <Toast.Header>
-
-                        <strong className="me-auto">
-                            {toast.variant === "success" ? "Success" : "Error"}
-                        </strong>
-                        <small>Just now</small>
-
-                    </Toast.Header>
-
-                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
-
-                </Toast>
-
-            </ToastContainer>
         
             <Container fluid="xs" className={`mt-0 ${styles.section1}`}>
 

@@ -86,7 +86,7 @@ const PersonalInformationForm = () => {
                 ...formData,
                 age: formData.age != null ? String(formData.age) : "",
             });
-            
+
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
@@ -101,7 +101,7 @@ const PersonalInformationForm = () => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} xs={12} controlId="formGridDescription">
-                        <Form.Label>Bio</Form.Label>
+                        <Form.Label>About</Form.Label>
                         <Form.Control as="textarea" value={formData.description} onChange={ handleChange } name="description" type="text" placeholder="Tell us about yourself" />
                     </Form.Group>
 
