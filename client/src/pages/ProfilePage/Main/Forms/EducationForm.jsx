@@ -8,6 +8,7 @@ import { useProfileStore } from "../../../../store/useProfileStore";
 
 import { useEffect, useState } from "react";
 import { useToast } from "../../../../context/ToastContext";
+import { useFormDirty } from "../../../../hooks/useFormDirty"
 
 import styles from "../../../../styles/UI/Buttons.module.css";
     
@@ -68,9 +69,7 @@ const EducationForm = () => {
         "ACCA": ["Accounting & Finance"],
         "CA": ["Chartered Accountancy"],
         "CMA": ["Cost & Management Accounting"]
-    };
-
-    const { showToast } = useToast();  
+    }; 
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -87,6 +86,9 @@ const EducationForm = () => {
         provider: "",
     });
 
+    const [originalData, setOriginalData] = useState(null);
+    const isFormChanged = useFormDirty(originalData, formData);
+
     // Redirect + prefill form
     useEffect(() => {
         if (!authUser) {
@@ -94,7 +96,7 @@ const EducationForm = () => {
             return;
         }
     
-        setFormData({
+        const formattedData = {
             education: authUser.education || "",
             field: authUser.field || "",
             passingYear: authUser.passingYear || "",
@@ -102,7 +104,11 @@ const EducationForm = () => {
             institute: authUser.institute || "",
             certificate: authUser.certificate || "",
             provider: authUser.provider || "",
-        });
+        };
+
+        setFormData(formattedData);
+        setOriginalData(formattedData);
+
     }, [authUser, navigate]);
 
     const handleChange = (e) => {
@@ -126,14 +132,19 @@ const EducationForm = () => {
     const { deleteEducation } = useProfileStore();
     const { deleteCertification } = useProfileStore();
 
+    const { showToast } = useToast(); 
+
     const handleUpdateEducation = async (e) => {
         e.preventDefault();
 
         try {
+
             await updateEducation(formData);
 
             console.log("Education updated.");
             showToast("Profile updated successfully!", "success");
+
+            setOriginalData(formData);
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
@@ -307,7 +318,7 @@ const EducationForm = () => {
                 </Row>
 
                 <Row className='d-flex justify-content-end'>
-                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} type="submit">
+                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
                         Save & Next
                     </Col>
                 </Row>

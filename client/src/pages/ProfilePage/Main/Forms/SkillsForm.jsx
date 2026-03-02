@@ -23,8 +23,6 @@ const skillOptions = [
     
 const SkillsForm = () => {
 
-    const { showToast } = useToast();   
-
     const { authUser } = useAuthStore();
     const [skills, setSkills] = useState([]);
     const navigate = useNavigate();
@@ -41,6 +39,7 @@ const SkillsForm = () => {
 
     const [selectedSkill, setSelectedSkill] = useState("");
     const [addActive, setAddActive] = useState(false);
+    const { showToast } = useToast();  
     
     const handleAddSkill = (e) => {
 

@@ -7,6 +7,7 @@ import { useProfileStore } from "../../../../store/useProfileStore";
 
 import { useEffect, useState } from "react";
 import { useToast } from "../../../../context/ToastContext";
+import { useFormDirty } from "../../../../hooks/useFormDirty"
 
 import styles from "../../../../styles/UI/Buttons.module.css";
 
@@ -16,8 +17,6 @@ const toDateInputValue = (date) => {
 };
     
 const PersonalInformationForm = () => {
-
-    const { showToast } = useToast();
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -34,6 +33,8 @@ const PersonalInformationForm = () => {
         website: "",
     });
 
+    const [originalData, setOriginalData] = useState(null);
+
     // Redirect + prefill form
     useEffect(() => {
         if (!authUser) {
@@ -41,7 +42,7 @@ const PersonalInformationForm = () => {
             return;
         }
     
-        setFormData({
+        const formattedData = {
             fullName: authUser.fullName || "",
             email: authUser.email || "",
             dob: toDateInputValue(authUser.dob),
@@ -49,8 +50,14 @@ const PersonalInformationForm = () => {
             age: authUser.age || "",
             location: authUser.location || "",
             website: authUser.website || "",
-        });
+        };
+
+        setFormData(formattedData);
+        setOriginalData(formattedData);
+
     }, [authUser, navigate]);
+
+    const isFormChanged = useFormDirty(originalData, formData);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,15 +68,19 @@ const PersonalInformationForm = () => {
     };
 
     const { updatePersonalInformation } = useProfileStore();
+    const { showToast } = useToast();
 
     const handleUpdatePersonalInformation = async (e) => {
         e.preventDefault();
 
         try {
+
             await updatePersonalInformation(formData);
 
             console.log("Personal info updated.");
             showToast("Profile updated successfully!", "success");
+            
+            setOriginalData(formData);
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
@@ -133,7 +144,7 @@ const PersonalInformationForm = () => {
                 </Row>
 
                 <Row className='d-flex justify-content-end'>
-                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} type="submit">
+                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
                         Save & Next
                     </Col>
                 </Row>

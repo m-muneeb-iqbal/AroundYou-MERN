@@ -8,6 +8,7 @@ import { useProfileStore } from "../../../../store/useProfileStore"
 
 import { useEffect, useState } from "react";
 import { useToast } from "../../../../context/ToastContext";
+import { useFormDirty } from "../../../../hooks/useFormDirty"
 
 import styles from "../../../../styles/UI/Buttons.module.css";
 
@@ -17,8 +18,6 @@ const toDateInputValue = (date) => {
 };
     
 const ExperienceForm = () => {
-
-    const { showToast } = useToast();
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
@@ -33,6 +32,9 @@ const ExperienceForm = () => {
         currentlyWorking: false,
     });
 
+    const [originalData, setOriginalData] = useState(null);
+    const isFormChanged = useFormDirty(originalData, formData);
+
     // Redirect + prefill form
     useEffect(() => {
         if (!authUser) {
@@ -40,14 +42,20 @@ const ExperienceForm = () => {
             return;
         }
     
-        setFormData({
+        const formattedData = {
             company: authUser.company || "",
             jobTitle: authUser.jobTitle || "",
             joiningDate: toDateInputValue(authUser.joiningDate),
             resignationDate: toDateInputValue(authUser.resignationDate),
             currentlyWorking: authUser.currentlyWorking ?? false, // important
-        });
+        };
+
+        setFormData(formattedData);
+        setOriginalData(formattedData);
+
     }, [authUser, navigate]);
+
+    const { showToast } = useToast();
 
     const handleChange = (e) => {
 
@@ -88,18 +96,12 @@ const ExperienceForm = () => {
 
         try {
 
-            const updated = await updateExperience(formData);
-
-            setFormData({
-                company: updated.company ?? "",
-                jobTitle: updated.jobTitle ?? "",
-                joiningDate: toDateInputValue(updated.joiningDate),
-                resignationDate: toDateInputValue(updated.resignationDate),
-                currentlyWorking: updated.currentlyWorking ?? false,
-            });
+            await updateExperience(formData);
 
             console.log("Experience updated.");
             showToast("Profile updated successfully!", "success");
+
+            setOriginalData(formData);
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
@@ -172,7 +174,7 @@ const ExperienceForm = () => {
                 </Row>
 
                 <Row className='d-flex justify-content-end'>
-                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} type="submit">
+                    <Col sm={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
                         Save & Next
                     </Col>
                 </Row>
