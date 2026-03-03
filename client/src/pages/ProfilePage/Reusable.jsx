@@ -3,8 +3,8 @@ import { Container } from "react-bootstrap";
 import Layout from "./Layout/Layout"
 
 import Header from "./Header/Header";
-import Top from "./Main/Top";
-import Bottom from "./Main/Bottom";
+import Top from "./Main/Top/Top";
+import Bottom from "./Main/Bottom/Bottom";
 
 import { useAuthStore} from "../../store/useAuthStore";
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 
 import { Row, Col, Dropdown } from "react-bootstrap";
@@ -6,21 +5,16 @@ import { Users, BriefcaseBusiness, Bell, MessageCircleMore, UserRound, LogOut } 
 
 import { useAuthStore } from "../../../store/useAuthStore";
 
-import MessagesPopup from "../../MessagePopup/MessagesPopup";
 import styles from "../../../styles/UI/DropDownItems.module.css";
 
 const Header = () => {
 
     const { authUser, logout } = useAuthStore ();
     const navigate = useNavigate();
-    const [showChat, setShowChat] = useState(false);
-
+    
     if (!authUser) return <Navigate to="/" />;
 
-    
-
     return (
-        <>
             <Row className="pt-5 align-items-center">
 
                 <Col xs={3}>
@@ -38,7 +32,6 @@ const Header = () => {
                     <Users color="#04263D" size={30} role="button" />
                     <BriefcaseBusiness color="#04263D" size={30} role="button" />
                     <Bell color="#04263D" size={30} role="button" />
-                    <MessageCircleMore color="#04263D" size={30} role="button" onClick={() => setShowChat(true)} />
 
                     <Dropdown align="end">
 
@@ -70,12 +63,6 @@ const Header = () => {
 
             </Row>
 
-            {/* Chat Popup */}
-            {showChat && (
-                <MessagesPopup onClose={() => setShowChat(false)} />
-            )}
-
-        </>
     );
 
 };

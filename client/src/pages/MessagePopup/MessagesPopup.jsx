@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { useState, useRef, useEffect } from "react";
 
 import { Card, Form, Button, ListGroup } from "react-bootstrap";
-import { X } from "lucide-react";
+import { SendHorizonal, X } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
@@ -140,11 +140,11 @@ const MessagesPopup = ({ onClose }) => {
 
     return (
 
-        <Card style={styles.chatContainer}>
+        <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "320px", height: "450px", zIndex: "1000", }}>
 
-            <Card.Header style={styles.header}>
+            <Card.Header className="d-flex justify-content-between align-items-center fw-bold" >
 
-                <span>{selectedUser ? selectedUser.fullName : "Select a user"}</span>
+                <span>{selectedUser ? selectedUser.fullName : "AroundYou"}</span>
                 <X role="button" onClick={onClose} />
 
             </Card.Header>
@@ -171,11 +171,11 @@ const MessagesPopup = ({ onClose }) => {
             ) : (
 
                 <>
-                    <Card.Body style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "8px", padding: "8px"}} >
+                    <Card.Body className="d-flex flex-column p-2" style={{ flex: 1, overflowY: "auto", gap: "0.5rem", }} >
 
                         {messages.map((msg) => (
 
-                            <div key={msg._id} style={{ padding: "8px 12px", borderRadius: "15px",  maxWidth: "75%", alignSelf: msg.senderId === authUser._id ? "flex-end" : "flex-start", backgroundColor: msg.senderId === authUser._id ? "#0d6efd" : "#e9ecef", color: msg.senderId === authUser._id ? "white" : "black", fontSize: "0.9rem", }} >
+                            <div key={msg._id} style={{ padding: "8px 12px", borderRadius: "15px",  maxWidth: "75%", alignSelf: msg.senderId === authUser._id ? "flex-end" : "flex-start", backgroundColor: msg.senderId === authUser._id ? "#04263D" : "#302A2A", color: msg.senderId === authUser._id ? "#FFFFFF" : "#FFFFFF", fontSize: "0.9rem", }} >
                                 {msg.text}
                             </div>
 
@@ -190,8 +190,10 @@ const MessagesPopup = ({ onClose }) => {
                         <Form onSubmit={handleSend} className="d-flex gap-2">
 
                             <Form.Control type="text" placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} />
-                            <Button type="submit">Send</Button>
-                            
+                            <Button type="submit"     style={{ background: "none", border: "none", padding: 0, cursor: "pointer", }}> 
+                                <SendHorizonal color="#04263D" size={30} /> 
+                            </Button>
+
                         </Form>
 
                     </Card.Footer>
@@ -203,27 +205,6 @@ const MessagesPopup = ({ onClose }) => {
 
     );
 
-};
-
-const styles = {
-    chatContainer: {
-        position: "fixed",
-        bottom: "20px",
-        right: "20px",
-        width: "320px",
-        height: "450px",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 1000,
-        boxShadow: "0 5px 20px rgba(0,0,0,0.2)",
-    },
-
-    header: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        fontWeight: "bold",
-    },
 };
 
 export default MessagesPopup;
