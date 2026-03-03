@@ -39,7 +39,18 @@ export const initSocket = (server) => {
                 // Emit to receiver if online
                 const receiverSocketId = onlineUsers.get(receiverId);
 
-                if (receiverSocketId) io.to(receiverSocketId).emit("receiveMessage", newMessage);
+                if (receiverSocketId) { 
+
+                    io.to(receiverSocketId).emit("receiveMessage", newMessage);
+
+                    io.to(receiverId).emit("updateUnread", {
+
+                        conversationId: newMessage.conversationId,
+                        increment: 1
+
+                    })
+
+                }
 
                 // Emit to sender for instant update
                 socket.emit("receiveMessage", newMessage);

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { getIO, onlineUsers } from "../socket.js";
 
 import User from "../models/user.model.js";
@@ -13,33 +12,44 @@ export const getUsersForSidebar = async (req, res) => {
 
         const userId = req.user._id;
 
-        const users = await User.find({
-            _id: { $ne: userId }
-        }).select("-password");
+        // Fetch all other users (for the sidebar)
+        const users = await User.find({ _id: { $ne: userId } }).select("-password");
 
+        // Fetch conversations that include the current user
         const conversations = await Conversation.find({
             participants: userId
         }).populate("lastMessage");
 
         const usersWithConversation = users.map((user) => {
+
+            // Find the conversation between this user and the logged-in user
             const conversation = conversations.find((conv) =>
-                conv.participants.some(
-                    (p) => p.toString() === user._id.toString()
-                )
+                conv.participants.some((p) => p.toString() === user._id.toString())
             );
 
+            let unreadCount = 0;
+
+            if (conversation) {
+
+                // unreadCount is the number of messages NOT read by this user
+                // Assuming conversation.unreadCount is a Map<UserId, Number>
+                unreadCount = conversation.unreadCount?.get(userId.toString()) || 0;
+            }
+
             return {
-                ...user.toObject(),
-                conversationId: conversation?._id || null,
+                _id: user._id,
+                fullName: user.fullName,
+                conversationId: conversation?._id || null, // important
                 lastMessage: conversation?.lastMessage || null,
-                unreadCount:
-                    conversation?.unreadCount?.get(userId.toString()) || 0,
+                unreadCount,
             };
+
         });
 
         res.status(200).json(usersWithConversation);
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Internal server error" });
     }
 };

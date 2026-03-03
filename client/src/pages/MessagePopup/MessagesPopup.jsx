@@ -38,6 +38,8 @@ const MessagesPopup = ({ onClose }) => {
     const { authUser } = useAuthStore();
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
+
+    const [openConversationId, setOpenConversationId] = useState(null);
     
     // Mark user online & listen for messages
     useEffect(() => {
@@ -47,22 +49,29 @@ const MessagesPopup = ({ onClose }) => {
         socket.emit("userOnline", authUser._id);
         
         const handleReceiveMessage = (msg) => {
-            if ( selectedUser && (msg.senderId === selectedUser._id || msg.senderId === authUser._id) ) {
 
-                setMessages((prev) => {
-                    if (prev.some((m) => m._id === msg._id)) return prev;
-                    return [...prev, msg];
-                });
+            // Update message list if active conversation
+            if (openConversationId === msg.conversationId) {
 
+                setMessages(prev => [...prev, msg]);
+
+                // tell server it's read
+                socket.emit("markAsRead", { conversationId: msg.conversationId });
             }
 
-            setUsers((prev) =>
-                prev.map((conv) =>
-                    conv._id === msg.conversationId
-                        ? { ...conv, lastMessage: msg }
-                        : conv
+            // Update lastMessage and unreadCount in sidebar
+            setUsers(prev =>
+                prev.map(u =>
+                    u.conversationId === msg.conversationId
+                        ? {
+                            ...u,
+                            lastMessage: msg,
+                            unreadCount: openConversationId === msg.conversationId ? 0 : (u.unreadCount || 0) + 1
+                        }
+                        : u
                 )
             );
+            
         };
         
         const handleMessagesRead = (conversationId) => {
@@ -77,15 +86,31 @@ const MessagesPopup = ({ onClose }) => {
 
         };
 
+        const handleUpdateUnread = ({ conversationId, increment }) => {
+
+            setUsers(prev =>
+                prev.map(u =>
+                    u.conversationId === conversationId
+                        ? {
+                            ...u,
+                            unreadCount: openConversationId === conversationId ? 0 : (u.unreadCount || 0) + increment
+                        }
+                        : u
+                )
+            );
+        };
+
         socket.on("receiveMessage", handleReceiveMessage);
         socket.on("messagesRead", handleMessagesRead);
+        socket.on("updateUnread", handleUpdateUnread);
 
         return () => {
             socket.off("receiveMessage", handleReceiveMessage);
             socket.off("messagesRead", handleMessagesRead);
+            socket.off("updateUnread", handleUpdateUnread);
         };
 
-    }, [authUser, selectedUser]);
+    }, [authUser, selectedUser, openConversationId]);
 
     // Load messages for selected user
     useEffect(() => {
@@ -104,19 +129,26 @@ const MessagesPopup = ({ onClose }) => {
 
             if (data.length > 0 && data[0].conversationId) {
 
+                const convId = data[0].conversationId;
+
+                // Mark messages as read on the server
                 await fetch(
-                    `http://localhost:5000/api/message/read/${data[0].conversationId}`,
-                    {
-                        method: "PUT",
-                        credentials: "include",
-                    }
+                    `http://localhost:5000/api/message/read/${convId}`,
+                    { method: "PUT", credentials: "include" }
                 );
 
+                // Tell server to reset unread badge for this conversation
+                socket.emit("markAsRead", { conversationId: convId });
+
+                setOpenConversationId(convId);
+
             }
+
         };
 
         loadMessages();
-    }, [selectedUser]);
+
+    }, [selectedUser]);;
 
     const [message, setMessage] = useState("");
 
@@ -164,7 +196,18 @@ const MessagesPopup = ({ onClose }) => {
 
                     {users.map((user) => (
 
-                        <ListGroup.Item key={user._id} action onClick={() => setSelectedUser(user)}>
+                        <ListGroup.Item key={user._id} action onClick={() => {
+                            setSelectedUser(user);
+                            setOpenConversationId(user.conversationId); // immediate
+                            // reset unread locally
+                            setUsers(prev =>
+                                prev.map(u =>
+                                    u.conversationId === user.conversationId
+                                        ? { ...u, unreadCount: 0 }
+                                        : u
+                                )
+                            );
+                        }}>
 
                             <div style={{ fontWeight: "bold" }}>{user.fullName}</div>
                             <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>
