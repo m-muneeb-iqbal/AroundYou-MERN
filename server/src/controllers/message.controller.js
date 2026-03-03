@@ -20,31 +20,27 @@ export const getUsersForSidebar = async (req, res) => {
             participants: userId
         }).populate("lastMessage");
 
-        const usersWithConversation = users.map((user) => {
+const usersWithConversation = users.map((user) => {
+    const conversation = conversations.find((conv) =>
+        conv.participants.some((p) => p.toString() === user._id.toString())
+    );
 
-            // Find the conversation between this user and the logged-in user
-            const conversation = conversations.find((conv) =>
-                conv.participants.some((p) => p.toString() === user._id.toString())
-            );
+    let unreadCount = 0;
 
-            let unreadCount = 0;
+    if (conversation) {
+        // Convert Map/Object to plain object safely
+        const unreadObj = conversation.unreadCount?.toObject?.() || conversation.unreadCount || {};
+        unreadCount = unreadObj[userId.toString()] || 0;
+    }
 
-            if (conversation) {
-
-                // unreadCount is the number of messages NOT read by this user
-                // Assuming conversation.unreadCount is a Map<UserId, Number>
-                unreadCount = conversation.unreadCount?.get(userId.toString()) || 0;
-            }
-
-            return {
-                _id: user._id,
-                fullName: user.fullName,
-                conversationId: conversation?._id || null, // important
-                lastMessage: conversation?.lastMessage || null,
-                unreadCount,
-            };
-
-        });
+    return {
+        _id: user._id,
+        fullName: user.fullName,
+        conversationId: conversation?._id || null,
+        lastMessage: conversation?.lastMessage || null,
+        unreadCount,
+    };
+});
 
         res.status(200).json(usersWithConversation);
 
@@ -169,11 +165,18 @@ export const markAsRead = async (req, res) => {
         // Emit to other users safely
         conversation.participants.forEach((participantId) => {
 
-            if (participantId.toString() !== userId.toString()) {
-                const socketId = onlineUsers.get(participantId.toString());
-                if (socketId) {
-                    io.to(socketId).emit("messagesRead", conversation._id.toString());
-                }
+            const socketId = onlineUsers.get(participantId.toString());
+
+            if (socketId) {
+
+                // Notify read receipt
+                io.to(socketId).emit("messagesRead", conversation._id.toString());
+
+                // Force unread badge update for everyone
+                io.to(socketId).emit("updateUnread", {
+                    conversationId: conversation._id.toString(),
+                    increment: 0
+                });
             }
             
         });

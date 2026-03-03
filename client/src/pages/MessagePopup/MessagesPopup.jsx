@@ -87,16 +87,23 @@ const MessagesPopup = ({ onClose }) => {
         };
 
         const handleUpdateUnread = ({ conversationId, increment }) => {
-
             setUsers(prev =>
-                prev.map(u =>
-                    u.conversationId === conversationId
-                        ? {
-                            ...u,
-                            unreadCount: openConversationId === conversationId ? 0 : (u.unreadCount || 0) + increment
-                        }
-                        : u
-                )
+                prev.map(u => {
+                    if (u.conversationId !== conversationId) return u;
+
+                    // If increment is 0 → force reset
+                    if (increment === 0) {
+                        return { ...u, unreadCount: 0 };
+                    }
+
+                    return {
+                        ...u,
+                        unreadCount:
+                            openConversationId === conversationId
+                                ? 0
+                                : (u.unreadCount || 0) + increment
+                    };
+                })
             );
         };
 
@@ -111,6 +118,20 @@ const MessagesPopup = ({ onClose }) => {
         };
 
     }, [authUser, selectedUser, openConversationId]);
+
+    const handleClose = () => {
+    if (selectedUser) {
+        setUsers(prev =>
+            prev.map(u =>
+                u.conversationId === selectedUser.conversationId
+                    ? { ...u, unreadCount: 0 }
+                    : u
+            )
+        );
+    }
+    setSelectedUser(null);
+    onClose?.();
+};
 
     // Load messages for selected user
     useEffect(() => {
@@ -186,7 +207,7 @@ const MessagesPopup = ({ onClose }) => {
             <Card.Header className="d-flex justify-content-between align-items-center fw-bold" >
 
                 <span>{selectedUser ? selectedUser.fullName : "AroundYou"}</span>
-                <X role="button" onClick={onClose} />
+                <X role="button" onClick={handleClose} />
 
             </Card.Header>
         
