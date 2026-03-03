@@ -3,11 +3,14 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import { connectDB } from "./lib/db.js";
-
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import messageRoutes from "./routes/message.route.js";
+
+import { initSocket } from "./socket.js";
+
+import { createServer } from "http";
+import { connectDB } from "./lib/db.js";
 
 dotenv.config();
 const app = express();
@@ -28,7 +31,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/message", messageRoutes);
 
-app.listen(PORT, () => {
-    console.log("Server is running on PORT:" + PORT);
+const server = createServer (app);
+
+initSocket (server);
+
+server.listen (PORT, () => {
+
+    console.log("Server (with Socket.io) is running on PORT:" + PORT);
     connectDB();
-});
+
+})
