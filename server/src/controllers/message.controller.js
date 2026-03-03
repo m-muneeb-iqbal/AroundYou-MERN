@@ -29,8 +29,12 @@ const usersWithConversation = users.map((user) => {
 
     if (conversation) {
         // Convert Map/Object to plain object safely
-        const unreadObj = conversation.unreadCount?.toObject?.() || conversation.unreadCount || {};
-        unreadCount = unreadObj[userId.toString()] || 0;
+// Convert Map to object safely
+const unreadCountMap = conversation.unreadCount instanceof Map
+  ? Object.fromEntries(conversation.unreadCount)
+  : conversation.unreadCount || {};
+
+unreadCount = unreadCountMap[userId.toString()] || 0;
     }
 
     return {

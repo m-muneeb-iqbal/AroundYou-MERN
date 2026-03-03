@@ -56,7 +56,7 @@ const MessagesPopup = ({ onClose }) => {
                 setMessages(prev => [...prev, msg]);
 
                 // tell server it's read
-                socket.emit("markAsRead", { conversationId: msg.conversationId });
+                
             }
 
             // Update lastMessage and unreadCount in sidebar
@@ -134,42 +134,37 @@ const MessagesPopup = ({ onClose }) => {
 };
 
     // Load messages for selected user
-    useEffect(() => {
+useEffect(() => {
+    if (!selectedUser || !selectedUser.conversationId) return;
 
-        const loadMessages = async () => {
+    const loadMessages = async () => {
 
-            if (!selectedUser) return;
+        const res = await fetch(
+            `http://localhost:5000/api/message/${selectedUser._id}?page=1&limit=20`,
+            { credentials: "include" }
+        );
 
-            const res = await fetch(
-                `http://localhost:5000/api/message/${selectedUser._id}?page=1&limit=20`,
-                { credentials: "include" }
+        const data = await res.json();
+        setMessages(data);
+
+        const convId = selectedUser.conversationId;
+
+        // ONLY mark as read if unreadCount > 0
+        if (selectedUser.unreadCount > 0) {
+            await fetch(
+                `http://localhost:5000/api/message/read/${convId}`,
+                { method: "PUT", credentials: "include" }
             );
 
-            const data = await res.json();
-            setMessages(data);
+            socket.emit("markAsRead", { conversationId: convId });
+        }
 
-            if (data.length > 0 && data[0].conversationId) {
+        setOpenConversationId(convId);
+    };
 
-                const convId = data[0].conversationId;
+    loadMessages();
 
-                // Mark messages as read on the server
-                await fetch(
-                    `http://localhost:5000/api/message/read/${convId}`,
-                    { method: "PUT", credentials: "include" }
-                );
-
-                // Tell server to reset unread badge for this conversation
-                socket.emit("markAsRead", { conversationId: convId });
-
-                setOpenConversationId(convId);
-
-            }
-
-        };
-
-        loadMessages();
-
-    }, [selectedUser]);;
+}, [selectedUser]);
 
     const [message, setMessage] = useState("");
 
@@ -219,7 +214,7 @@ const MessagesPopup = ({ onClose }) => {
 
                         <ListGroup.Item key={user._id} action onClick={() => {
                             setSelectedUser(user);
-                            setOpenConversationId(user.conversationId); // immediate
+
                             // reset unread locally
                             setUsers(prev =>
                                 prev.map(u =>
