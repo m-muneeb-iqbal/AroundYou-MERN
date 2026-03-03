@@ -6,7 +6,6 @@ import { Card, Form, Button, ListGroup } from "react-bootstrap";
 import { SendHorizonal, X } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
-import { useMessageStore } from "../../store/useMessageStore";
 
 const socket = io ("http://localhost:5000", {
 
@@ -16,7 +15,6 @@ const socket = io ("http://localhost:5000", {
 
 const MessagesPopup = ({ onClose }) => {
 
-    const { getUsers } = useMessageStore();
     const [users, setUsers] = useState([]);
 
     // Fetch users with last message
@@ -24,30 +22,17 @@ const MessagesPopup = ({ onClose }) => {
 
         const fetchUsers = async () => {
 
-            const usersData = await getUsers();
-
-            const usersWithLastMessage = await Promise.all(
-
-                usersData.map(async (user) => {
-
-                    const res = await fetch(
-                        `http://localhost:5000/api/message/${user._id}`,
-                        { credentials: "include" }
-                    );
-
-                    const msgs = await res.json();
-                    const lastMessage = msgs[msgs.length - 1]?.text || "";
-                    return { ...user, lastMessage };
-                })
-
+            const res = await fetch(
+            "http://localhost:5000/api/message/users",
+            { credentials: "include" }
             );
 
-            setUsers(usersWithLastMessage);
+            const data = await res.json();
+            setUsers(data); // now this is conversations
 
         };
 
         fetchUsers();
-
     }, []);
 
     const { authUser } = useAuthStore();
@@ -62,29 +47,43 @@ const MessagesPopup = ({ onClose }) => {
         socket.emit("userOnline", authUser._id);
         
         const handleReceiveMessage = (msg) => {
-
-            // Update chat if selected user is involved
-            if ( selectedUser && (msg.senderId === selectedUser._id || msg.receiverId === selectedUser._id )) {
+            if ( selectedUser && (msg.senderId === selectedUser._id || msg.senderId === authUser._id) ) {
 
                 setMessages((prev) => {
-
                     if (prev.some((m) => m._id === msg._id)) return prev;
                     return [...prev, msg];
-
                 });
+
             }
-        
-            // Update last message in sidebar
-            const otherUserId = msg.senderId === authUser._id ? msg.receiverId : msg.senderId;
 
             setUsers((prev) =>
-                prev.map((u) => (u._id === otherUserId ? { ...u, lastMessage: msg.text } : u))
+                prev.map((conv) =>
+                    conv._id === msg.conversationId
+                        ? { ...conv, lastMessage: msg }
+                        : conv
+                )
+            );
+        };
+        
+        const handleMessagesRead = (conversationId) => {
+
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.conversationId === conversationId
+                        ? { ...msg, readBy: [...new Set([...msg.readBy, selectedUser?._id])] }
+                        : msg
+                )
             );
 
         };
-        
+
         socket.on("receiveMessage", handleReceiveMessage);
-        return () => socket.off("receiveMessage", handleReceiveMessage);
+        socket.on("messagesRead", handleMessagesRead);
+
+        return () => {
+            socket.off("receiveMessage", handleReceiveMessage);
+            socket.off("messagesRead", handleMessagesRead);
+        };
 
     }, [authUser, selectedUser]);
 
@@ -96,17 +95,27 @@ const MessagesPopup = ({ onClose }) => {
             if (!selectedUser) return;
 
             const res = await fetch(
-                `http://localhost:5000/api/message/${selectedUser._id}`,
+                `http://localhost:5000/api/message/${selectedUser._id}?page=1&limit=20`,
                 { credentials: "include" }
             );
 
             const data = await res.json();
             setMessages(data);
 
+            if (data.length > 0 && data[0].conversationId) {
+
+                await fetch(
+                    `http://localhost:5000/api/message/read/${data[0].conversationId}`,
+                    {
+                        method: "PUT",
+                        credentials: "include",
+                    }
+                );
+
+            }
         };
 
         loadMessages();
-
     }, [selectedUser]);
 
     const [message, setMessage] = useState("");
@@ -159,7 +168,19 @@ const MessagesPopup = ({ onClose }) => {
 
                             <div style={{ fontWeight: "bold" }}>{user.fullName}</div>
                             <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>
-                                {user.lastMessage || "No messages yet"}
+
+                                <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>
+
+                                    {user.lastMessage?.text || "Start conversation"}
+
+                                </div>
+
+                                {user.unreadCount > 0 && (
+                                    <span className="badge bg-danger">
+                                        {user.unreadCount}
+                                    </span>
+                                )}
+
                             </div>
 
                         </ListGroup.Item>

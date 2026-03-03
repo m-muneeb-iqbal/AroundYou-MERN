@@ -1,11 +1,12 @@
 import { Server } from "socket.io";
 import { saveMessage } from "./services/message.service.js";
 
-const onlineUsers = new Map();
+let io;
+export const onlineUsers = new Map();
 
 export const initSocket = (server) => {
 
-    const io = new Server (server, {
+    io = new Server (server, {
 
         cors: {
             origin: "http://localhost:5173",
@@ -38,9 +39,7 @@ export const initSocket = (server) => {
                 // Emit to receiver if online
                 const receiverSocketId = onlineUsers.get(receiverId);
 
-                if (receiverSocketId) {
-                    io.to(receiverSocketId).emit("receiveMessage", newMessage);
-                }
+                if (receiverSocketId) io.to(receiverSocketId).emit("receiveMessage", newMessage);
 
                 // Emit to sender for instant update
                 socket.emit("receiveMessage", newMessage);
@@ -53,17 +52,22 @@ export const initSocket = (server) => {
         // Disconnect
         socket.on("disconnect", () => {
 
-            for (const [userId, id] of onlineUsers.entries()) {
+            console.log("User disconnected:", socket.id);
+            
+           for (const [key, value] of onlineUsers.entries()) {
 
-                if (id === socket.id) {
-                    onlineUsers.delete(userId);
-                    break;
-                }
+                if (value === socket.id) onlineUsers.delete(key);
+
             }
 
-            console.log("User disconnected: ", socket.id);
+            console.log("Online users: ", Array.from(onlineUsers.keys()));
         });
     });
 
+    return { io };
+};
+
+export const getIO = () => {
+    if (!io) throw new Error("Socket.io not initialized");
     return io;
 };

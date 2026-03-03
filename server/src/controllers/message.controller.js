@@ -1,48 +1,97 @@
+import mongoose from "mongoose";
+import { getIO, onlineUsers } from "../socket.js";
+
 import User from "../models/user.model.js";
+import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+
 import { saveMessage } from "../services/message.service.js";
 
-export const getUsersForSidebar = async(req, res) => {
+export const getUsersForSidebar = async (req, res) => {
 
     try {
 
-        const loggedInUserId = req.user._id;
-        const filteredUsers = await User.find({_id: {$ne:loggedInUserId}}).select("-password");
+        const userId = req.user._id;
 
-        res.status(200).json(filteredUsers);
+        const users = await User.find({
+            _id: { $ne: userId }
+        }).select("-password");
+
+        const conversations = await Conversation.find({
+            participants: userId
+        }).populate("lastMessage");
+
+        const usersWithConversation = users.map((user) => {
+            const conversation = conversations.find((conv) =>
+                conv.participants.some(
+                    (p) => p.toString() === user._id.toString()
+                )
+            );
+
+            return {
+                ...user.toObject(),
+                conversationId: conversation?._id || null,
+                lastMessage: conversation?.lastMessage || null,
+                unreadCount:
+                    conversation?.unreadCount?.get(userId.toString()) || 0,
+            };
+        });
+
+        res.status(200).json(usersWithConversation);
 
     } catch (error) {
-
-        console.error("Error in getUsersForSidebar: ", error.message);
-        res.status(500).json({error: "Internal server error"});
-
+        res.status(500).json({ error: "Internal server error" });
     }
-
 };
 
-export const getMessages = async(req, res) => {
+export const getConversations = async (req, res) => {
 
     try {
 
-        const { id: userToCharId } = req.params;
-        const senderId = req.user._id;
+        const userId = req.user._id;
 
-        const messages = await Message.find({
-            $or: [
-                {senderId: senderId, receiverId: userToCharId },
-                {senderId: userToCharId, receiverId: senderId }
-            ]
+        const conversations = await Conversation.find({
+            participants: userId,
         })
+        .populate("participants", "-password")
+        .populate("lastMessage")
+        .sort({ updatedAt: -1 });
 
-        res.status(200).json(messages);
+        res.status(200).json(conversations);
 
     } catch (error) {
-
-        console.error("Error in getMessages controller: ", error.message);
-        res.status(500).json({error: "Internal server error"});
-
+        res.status(500).json({ error: "Internal server error" });
     }
+};
 
+export const getMessages = async (req, res) => {
+
+    try {
+
+        const { id: receiverId } = req.params;
+        const senderId = req.user._id;
+
+        const conversation = await Conversation.findOne({
+            participants: { $all: [senderId, receiverId] },
+        });
+
+        if (!conversation) return res.status(200).json([]);
+
+        const messages = await Message.find({
+            conversationId: conversation._id,
+        }).sort({ createdAt: 1 });
+
+        // Convert to plain JS objects and attach conversationId explicitly
+        const messagesWithConvId = messages.map((msg) => ({
+            ...msg.toObject(),
+            conversationId: conversation._id.toString(),
+        }));
+
+        res.status(200).json(messagesWithConvId);
+
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
 };
 
 export const sendMessages = async (req, res) => {
@@ -71,6 +120,57 @@ export const sendMessages = async (req, res) => {
 
     } catch (error) {
         console.error("Error in sendMessages controller: ", error.message);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const markAsRead = async (req, res) => {
+
+    try {
+
+        const { conversationId } = req.params;
+        const userId = req.user._id;
+        const io = getIO();
+
+        // Validate conversationId string length first
+        if (!conversationId || conversationId.length !== 24) {
+            return res.status(400).json({ error: "Invalid conversationId" });
+        }
+
+        // Mark all messages as read
+        await Message.updateMany(
+
+            {
+                conversationId: conversationId, // string is fine
+                readBy: { $ne: userId },
+            },
+            { $addToSet: { readBy: userId } }
+
+        );
+
+        // Reset unread count
+        await Conversation.updateOne(
+            { _id: conversationId },
+            { $set: { [`unreadCount.${userId}`]: 0 } }
+        );
+
+        const conversation = await Conversation.findById(conversationId);
+
+        // Emit to other users safely
+        conversation.participants.forEach((participantId) => {
+
+            if (participantId.toString() !== userId.toString()) {
+                const socketId = onlineUsers.get(participantId.toString());
+                if (socketId) {
+                    io.to(socketId).emit("messagesRead", conversation._id.toString());
+                }
+            }
+            
+        });
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("markAsRead error:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };

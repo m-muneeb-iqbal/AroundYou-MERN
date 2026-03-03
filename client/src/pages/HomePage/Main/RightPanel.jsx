@@ -12,6 +12,23 @@ const RightPanel = () => {
         fetchUsers();
     }, []);
 
+    const handleAddFriend = async (recipientId) => {
+        try {
+            await fetch("http://localhost:5000/api/friends/request", {
+
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ recipientId }),
+                
+            });
+
+            alert("Friend request sent");
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         
         <>
@@ -35,7 +52,7 @@ const RightPanel = () => {
                                     
                                 </div>
 
-                                <UserRoundPlus size={20} color="#04263D" role="button" title="Add friend" />
+                                <UserRoundPlus size={20} color="#04263D" role="button" title="Add friend" onClick={() => handleAddFriend(user._id)}/>
 
                             </ListGroup.Item>
                         ))}
