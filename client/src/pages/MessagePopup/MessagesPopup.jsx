@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 
 import { useState, useRef, useEffect } from "react";
 
-import { Card, Form, Button, ListGroup } from "react-bootstrap";
+import { Card, Form, Button, ListGroup, Col } from "react-bootstrap";
 import { SendHorizonal, X } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
@@ -23,8 +23,8 @@ const MessagesPopup = ({ onClose }) => {
         const fetchUsers = async () => {
 
             const res = await fetch(
-            "http://localhost:5000/api/message/users",
-            { credentials: "include" }
+                "http://localhost:5000/api/message/users",
+                { credentials: "include" }
             );
 
             const data = await res.json();
@@ -54,8 +54,6 @@ const MessagesPopup = ({ onClose }) => {
             if (openConversationId === msg.conversationId) {
 
                 setMessages(prev => [...prev, msg]);
-
-                // tell server it's read
                 
             }
 
@@ -87,8 +85,10 @@ const MessagesPopup = ({ onClose }) => {
         };
 
         const handleUpdateUnread = ({ conversationId, increment }) => {
+
             setUsers(prev =>
                 prev.map(u => {
+
                     if (u.conversationId !== conversationId) return u;
 
                     // If increment is 0 → force reset
@@ -120,51 +120,57 @@ const MessagesPopup = ({ onClose }) => {
     }, [authUser, selectedUser, openConversationId]);
 
     const handleClose = () => {
-    if (selectedUser) {
-        setUsers(prev =>
-            prev.map(u =>
-                u.conversationId === selectedUser.conversationId
-                    ? { ...u, unreadCount: 0 }
-                    : u
-            )
-        );
-    }
-    setSelectedUser(null);
-    onClose?.();
-};
 
-    // Load messages for selected user
-useEffect(() => {
-    if (!selectedUser || !selectedUser.conversationId) return;
+        if (selectedUser) {
 
-    const loadMessages = async () => {
-
-        const res = await fetch(
-            `http://localhost:5000/api/message/${selectedUser._id}?page=1&limit=20`,
-            { credentials: "include" }
-        );
-
-        const data = await res.json();
-        setMessages(data);
-
-        const convId = selectedUser.conversationId;
-
-        // ONLY mark as read if unreadCount > 0
-        if (selectedUser.unreadCount > 0) {
-            await fetch(
-                `http://localhost:5000/api/message/read/${convId}`,
-                { method: "PUT", credentials: "include" }
+            setUsers(prev =>
+                prev.map(u =>
+                    u.conversationId === selectedUser.conversationId
+                        ? { ...u, unreadCount: 0 }
+                        : u
+                )
             );
 
-            socket.emit("markAsRead", { conversationId: convId });
+            
         }
 
-        setOpenConversationId(convId);
+        setSelectedUser(null);
+        onClose?.();
     };
 
-    loadMessages();
+    // Load messages for selected user
+    useEffect(() => {
 
-}, [selectedUser]);
+        if (!selectedUser || !selectedUser.conversationId) return;
+
+        const loadMessages = async () => {
+
+            const res = await fetch(
+                `http://localhost:5000/api/message/${selectedUser._id}?page=1&limit=20`,
+                { credentials: "include" }
+            );
+
+            const data = await res.json();
+            setMessages(data);
+
+            const convId = selectedUser.conversationId;
+
+            // ONLY mark as read if unreadCount > 0
+            if (selectedUser.unreadCount > 0) {
+                await fetch(
+                    `http://localhost:5000/api/message/read/${convId}`,
+                    { method: "PUT", credentials: "include" }
+                );
+
+                socket.emit("markAsRead", { conversationId: convId });
+            }
+
+            setOpenConversationId(convId);
+        };
+
+        loadMessages();
+
+    }, [selectedUser]);
 
     const [message, setMessage] = useState("");
 
@@ -212,36 +218,49 @@ useEffect(() => {
 
                     {users.map((user) => (
 
-                        <ListGroup.Item key={user._id} action onClick={() => {
-                            setSelectedUser(user);
+                        <ListGroup.Item 
 
-                            // reset unread locally
-                            setUsers(prev =>
-                                prev.map(u =>
-                                    u.conversationId === user.conversationId
+                            key={user._id} 
+                            action
+                            style={{ padding: "0.5rem 1rem" }}
+                            onClick={() => {
+
+                                setSelectedUser(user);
+
+                                // reset unread locally
+                                setUsers(prev =>
+                                    prev.map(u =>
+                                        u.conversationId === user.conversationId
                                         ? { ...u, unreadCount: 0 }
                                         : u
-                                )
-                            );
-                        }}>
+                                    )
+                                );
+                            }}
 
-                            <div style={{ fontWeight: "bold" }}>{user.fullName}</div>
-                            <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>
+                        >
+                            <Col xs={12} style={{ padding: 0 }}>
 
-                                <div style={{ fontSize: "0.8rem", color: "#6c757d" }}>
+                                <span style={{ fontSize: "0.9rem", color: "#000000", fontWeight: user.unreadCount > 0 ? "bold" : "normal", }}>
+                                    {user.fullName}
+                                </span>
 
-                                    {user.lastMessage?.text || "Start conversation"}
+                                <div className="d-flex justify-content-between align-items-center">
 
+                                    <span style={{fontSize: "0.7rem", color: user.unreadCount > 0 ? "#000000" : "#898C8F", fontWeight: user.unreadCount > 0 ? "bold" : "normal",}}>
+                                        {user.lastMessage?.text || "Start conversation"}
+                                    </span>
+
+                                    {user.unreadCount > 0 && (
+
+                                        <span className="badge" style={{ backgroundColor: "#04263D", fontSize: "0.6rem", borderRadius: "50%" }} >
+                                            {user.unreadCount}
+                                        </span>
+
+                                    )}
                                 </div>
 
-                                {user.unreadCount > 0 && (
-                                    <span className="badge bg-danger">
-                                        {user.unreadCount}
-                                    </span>
-                                )}
-
-                            </div>
-
+                            </Col>
+                        
                         </ListGroup.Item>
 
                     ))}
