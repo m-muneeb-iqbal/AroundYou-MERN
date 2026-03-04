@@ -1,66 +1,218 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:5000", {
+  transports: ["websocket", "polling"],
+});
 
 export const useMessageStore = create((set, get) => ({
-    
+
     users: [],
-    messages: [],
     selectedUser: null,
-    isLoading: false,
+    messages: [],
+    authUser: null,
+    openConversationId: null,
+    messageInput: "",
 
-    setSelectedUser: (user) => set({ selectedUser: user }),
+    setAuthUser: (user) => set({ authUser: user }),
 
-    getUsers: async () => {
+    // Fetch users
+    fetchUsers: async () => {
 
-        try {
-
-            const res = await axiosInstance.get("/message/users", {
-                withCredentials: true,
-            });
-
-            set({ users: res.data });
-            return res.data;
-
-        } catch (error) {
-            console.error(error);
-        }
+        const res = await axiosInstance.get("/message/users", 
+            { withCredentials: true }
+        );
+        set({ users: res.data });
 
     },
 
-    getMessages: async (id) => {
+    // Initialize socket
+    initializeSocket: (authUserId) => {
 
-        try {
+        if (!authUserId) return;
 
-            const res = await axiosInstance.get(`/message/${id}`, {
-                withCredentials: true,
-            });
+        socket.emit("userOnline", authUserId);
 
-            set({ messages: res.data });
-            return res.data;
+        const handleReceiveMessage = (msg) => {
 
-        } catch (error) {
-            console.error(error);
-        }
+            const { openConversationId } = get();
+
+            // Update messages if conversation is open
+            if (openConversationId === msg.conversationId) {
+
+                set((state) => ({
+
+                    messages: [...state.messages, msg].filter(
+                        (v, i, a) => a.findIndex(m => m._id === v._id) === i
+                    )
+
+                }));
+
+            }
+
+            // Update users list with last message & unread count
+            set((state) => ({
+
+                users: state.users.map((u) =>
+                    
+                u.conversationId === msg.conversationId
+                    ? { ...u, lastMessage: msg }
+                    : u
+                ),
+
+            }));
+
+        };
+
+        const handleMessagesRead = (conversationId) => {
+
+            const { selectedUser } = get();
+
+            set((state) => ({
+
+                users: state.users.map((u) =>
+
+                u.conversationId === conversationId
+                    ? {
+                        ...u,
+                        readBy: [...new Set([...(u.readBy || []), selectedUser?._id])],
+                    }
+                    : u
+                ),
+
+            }));
+
+        };
+
+        const handleUpdateUnread = ({ conversationId, unreadCount }) => {
+
+            set(state => ({
+
+                users: state.users.map(u =>
+
+                u.conversationId === conversationId
+                    ? { ...u, unreadCount } // overwrite for other participants
+                    : u
+                )
+
+            }));
+
+        };
+
+        socket.on("receiveMessage", handleReceiveMessage);
+        socket.on("messagesRead", handleMessagesRead);
+        socket.on("updateUnread", handleUpdateUnread);
+
+        return () => {
+            socket.off("receiveMessage", handleReceiveMessage);
+            socket.off("messagesRead", handleMessagesRead);
+            socket.off("updateUnread", handleUpdateUnread);
+        };
+    },
+
+    // Close conversation
+    handleCloseConversation: () => {
+
+        const { selectedUser } = get();
+
+        if (!selectedUser) return;
+
+        set((state) => ({
+
+            selectedUser: null,
+            messages: [],
+            openConversationId: null,
+
+            users: state.users.map((u) =>
+
+                u.conversationId === selectedUser.conversationId
+                ? { ...u, unreadCount: 0 }
+                : u
+            ),
+
+        }));
 
     },
 
-    sendMessage: async (text) => {
+    // Load messages
+    loadMessages: async (user) => {
 
-        const { selectedUser, messages } = get();
-        try {
+        const selected = user || get().selectedUser;
+        if (!selected?.conversationId) return;
 
-            const res = await axiosInstance.post(
-                `/message/send/${selectedUser._id}`,
-                { text },
-                { withCredentials: true }
-            );
+        const res = await axiosInstance.get(
+            `/message/${selected._id}?page=1&limit=20`,
+            { withCredentials: true }
+        );
 
-            set({ messages: [...messages, res.data] });
-            return res.data;
+        set(() => ({
 
-        } catch (error) {
-            console.error(error);
+            messages: res.data,
+            openConversationId: selected.conversationId,
+
+        }));
+
+        get().markMessagesAsRead(selected.conversationId);
+
+        // Mark messages as read on server
+        if (selected.unreadCount > 0) {
+
+            try {
+
+                await axiosInstance.put(
+                    `/message/read/${selected.conversationId}`,
+                    { withCredentials: true }
+                );
+                socket.emit("markAsRead", { conversationId: selected.conversationId });
+
+            } catch (err) {
+                console.error("Error marking messages as read:", err);
+            }
         }
+    },
+
+    selectUser: (user) => {
+
+        set((state) => ({
+
+            selectedUser: user,
+            openConversationId: user.conversationId,
+
+            users: state.users.map((u) =>
+
+            u.conversationId === user.conversationId
+                ? { ...u, unreadCount: 0 }
+                : u
+            ),
+
+        }));
+
+        // Notify server
+        socket.emit("markAsRead", { conversationId: user.conversationId });
+
+        // Load messages
+        get().loadMessages(user);
 
     },
+
+    markMessagesAsRead: (conversationId) => {
+
+        set((state) => ({
+
+            users: state.users.map((u) =>
+            u.conversationId === conversationId
+                ? { ...u, unreadCount: 0 }
+                : u
+            ),
+
+        }));
+
+    },
+
+    // Send message
+    sendMessage: (payload) => {
+        socket.emit("sendMessage", payload);
+    },
+    
 }));

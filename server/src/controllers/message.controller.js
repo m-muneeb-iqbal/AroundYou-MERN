@@ -20,31 +20,32 @@ export const getUsersForSidebar = async (req, res) => {
             participants: userId
         }).populate("lastMessage");
 
-const usersWithConversation = users.map((user) => {
-    const conversation = conversations.find((conv) =>
-        conv.participants.some((p) => p.toString() === user._id.toString())
-    );
+        const usersWithConversation = users.map((user) => {
+            
+            const conversation = conversations.find((conv) =>
+                conv.participants.some((p) => p.toString() === user._id.toString())
+            );
 
-    let unreadCount = 0;
+            let unreadCount = 0;
 
-    if (conversation) {
-        // Convert Map/Object to plain object safely
-// Convert Map to object safely
-const unreadCountMap = conversation.unreadCount instanceof Map
-  ? Object.fromEntries(conversation.unreadCount)
-  : conversation.unreadCount || {};
+            if (conversation) {
 
-unreadCount = unreadCountMap[userId.toString()] || 0;
-    }
+                // Convert Map to plain object
+                const unreadCountMap = conversation.unreadCount instanceof Map
+                ? Object.fromEntries(conversation.unreadCount)
+                : conversation.unreadCount || {};
 
-    return {
-        _id: user._id,
-        fullName: user.fullName,
-        conversationId: conversation?._id || null,
-        lastMessage: conversation?.lastMessage || null,
-        unreadCount,
-    };
-});
+                unreadCount = unreadCountMap[userId.toString()] || 0;
+            }
+
+            return {
+                _id: user._id,
+                fullName: user.fullName,
+                conversationId: conversation?._id || null,
+                lastMessage: conversation?.lastMessage || null,
+                unreadCount,
+            };
+        });
 
         res.status(200).json(usersWithConversation);
 
@@ -126,6 +127,24 @@ export const sendMessages = async (req, res) => {
             image: imageUrl,
         });
 
+        const receiverSocketId = onlineUsers.get(receiverId.toString());
+        if (receiverSocketId) {
+
+            const conv = await Conversation.findById(newMessage.conversationId);
+
+            const unreadCountMap = conv.unreadCount instanceof Map
+                ? Object.fromEntries(conv.unreadCount)
+                : conv.unreadCount || {};
+
+            const count = unreadCountMap[receiverId.toString()] || 0;
+
+            io.to(receiverSocketId).emit("updateUnread", {
+                conversationId: conv._id.toString(),
+                unreadCount: count,   
+            });
+
+        }
+
         res.status(201).json(newMessage);
 
     } catch (error) {
@@ -142,23 +161,17 @@ export const markAsRead = async (req, res) => {
         const userId = req.user._id;
         const io = getIO();
 
-        // Validate conversationId string length first
         if (!conversationId || conversationId.length !== 24) {
             return res.status(400).json({ error: "Invalid conversationId" });
         }
 
         // Mark all messages as read
         await Message.updateMany(
-
-            {
-                conversationId: conversationId, // string is fine
-                readBy: { $ne: userId },
-            },
+            { conversationId, readBy: { $ne: userId } },
             { $addToSet: { readBy: userId } }
-
         );
 
-        // Reset unread count
+        // Reset unread count for this user
         await Conversation.updateOne(
             { _id: conversationId },
             { $set: { [`unreadCount.${userId}`]: 0 } }
@@ -166,26 +179,33 @@ export const markAsRead = async (req, res) => {
 
         const conversation = await Conversation.findById(conversationId);
 
-        // Emit to other users safely
-        conversation.participants.forEach((participantId) => {
+        // Emit to all participants
+        for (const participantId of conversation.participants) {
 
             const socketId = onlineUsers.get(participantId.toString());
+            if (!socketId) continue;
 
-            if (socketId) {
+            // Notify read receipt
+            io.to(socketId).emit("messagesRead", conversation._id.toString());
 
-                // Notify read receipt
-                io.to(socketId).emit("messagesRead", conversation._id.toString());
+            // Refetch conversation to get fresh unread count
+            const convFresh = await Conversation.findById(conversationId);
 
-                // Force unread badge update for everyone
-                io.to(socketId).emit("updateUnread", {
-                    conversationId: conversation._id.toString(),
-                    increment: 0
-                });
-            }
-            
-        });
+            const unreadCountMap =
+                convFresh.unreadCount instanceof Map
+                ? Object.fromEntries(convFresh.unreadCount)
+                : convFresh.unreadCount || {};
 
-        res.status(200).json({ success: true });
+            const unreadCount = unreadCountMap[participantId.toString()] || 0;
+
+            io.to(socketId).emit("updateUnread", {
+                conversationId: conversation._id.toString(),
+                unreadCount,
+            });
+        }
+
+    res.status(200).json({ success: true });
+    
     } catch (error) {
         console.error("markAsRead error:", error);
         res.status(500).json({ error: "Internal server error" });
