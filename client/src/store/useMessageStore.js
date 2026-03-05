@@ -85,12 +85,14 @@ export const useMessageStore = create((set, get) => ({
 
         const handleUpdateUnread = ({ conversationId, unreadCount }) => {
 
+            const { openConversationId } = get();
+
             set(state => ({
 
                 users: state.users.map(u =>
 
                 u.conversationId === conversationId
-                    ? { ...u, unreadCount } // overwrite for other participants
+                    ? { ...u, unreadCount: openConversationId === conversationId ? 0 : unreadCount  } // overwrite for other participants
                     : u
                 )
 
@@ -110,11 +112,23 @@ export const useMessageStore = create((set, get) => ({
     },
 
     // Close conversation
-    handleCloseConversation: () => {
+    handleCloseConversation: async () => {
 
         const { selectedUser } = get();
 
         if (!selectedUser) return;
+
+        if (selectedUser.conversationId) {
+            try {
+                await axiosInstance.put(
+                    `/message/read/${selectedUser.conversationId}`,
+                    {},
+                    { withCredentials: true }
+                );
+            } catch (err) {
+                console.error("Error marking as read on close:", err);
+            }
+        }
 
         set((state) => ({
 
@@ -155,6 +169,11 @@ export const useMessageStore = create((set, get) => ({
 
         // Mark messages as read on server
         if (selected.unreadCount > 0) {
+
+            await axiosInstance.put(
+                    `/message/read/${selected.conversationId}`,
+                    { withCredentials: true }
+            );
 
             try {
 
