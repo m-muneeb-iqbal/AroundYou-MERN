@@ -6,6 +6,27 @@ import { SendHorizonal, X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
 
+const formatMessageTime = (dateStr) => {
+
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    if (isToday) {
+        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } else if (isYesterday) {
+        return "Yesterday";
+    } else {
+        return date.toLocaleDateString([], { day: "2-digit", month: "short" });
+    }
+
+};
+
 const MessagesPopup = ({ onClose }) => {
 
     const {
@@ -103,15 +124,27 @@ const MessagesPopup = ({ onClose }) => {
 
                             <Col xs={12} style={{ padding: 0 }}>
 
-                                <span style={{ fontSize: "0.9rem", color: "#000000", fontWeight: user.unreadCount > 0 ? "bold" : "normal",}}>
+                                <div className="d-flex justify-content-between align-items-center">
 
-                                    {user.fullName}
+                                    <span style={{ fontSize: "0.9rem", color: "#000000", fontWeight: user.unreadCount > 0 ? "bold" : "normal",}}>
 
-                                </span>
+                                        {user.fullName}
+
+                                    </span>
+
+                                    <span style={{ fontSize: "0.65rem", color: user.unreadCount > 0 ? "#04263D" : "#898C8F", fontWeight: user.unreadCount > 0 ? "bold" : "normal", whiteSpace: "nowrap" }}>
+
+                                            {formatMessageTime(user.lastMessage?.createdAt)}
+
+                                    </span>
+
+
+                                </div>
+
 
                                 <div className="d-flex justify-content-between align-items-center">
 
-                                    <span style={{ fontSize: "0.7rem", color: user.unreadCount > 0 ? "#000000" : "#898C8F", fontWeight: user.unreadCount > 0 ? "bold" : "normal"}}>
+                                    <span style={{ fontSize: "0.7rem", color: user.unreadCount > 0 ? "#000000" : "#898C8F", fontWeight: user.unreadCount > 0 ? "bold" : "normal", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "200px"}} >
 
                                         {user.lastMessage?.text || "Start conversation"}
 
