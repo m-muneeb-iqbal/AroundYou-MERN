@@ -22,7 +22,7 @@ const Header = ({ showMessages = false }) => {
 
         <Row className="pt-5 align-items-center">
 
-            <Col xs={3}>
+            <Col xs={2}>
 
                 <div className="d-flex justify-content-center">
 
@@ -38,7 +38,7 @@ const Header = ({ showMessages = false }) => {
 
             </Col>
 
-            <Col xs={9} className="d-flex justify-content-around align-items-center">
+            <Col xs={10} className="d-flex justify-content-around align-items-center">
 
                 <Users color="#04263D" size={30} role="button" />
                 <BriefcaseBusiness color="#04263D" size={30} role="button" />
