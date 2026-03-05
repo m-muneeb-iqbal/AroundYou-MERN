@@ -8,31 +8,41 @@ export const saveMessage = async ({ senderId, receiverId, text, image }) => {
     });
 
     if (!conversation) {
+
+        // Initialize unreadCounts subdocument for both participants
         conversation = await Conversation.create({
+
             participants: [senderId, receiverId],
+            unreadCounts: [
+                { userId: senderId, count: 0 },
+                { userId: receiverId, count: 0 },
+            ],
+
         });
+
     }
 
     const newMessage = await Message.create({
+
         conversationId: conversation._id,
         senderId,
+        receiverId,
         text,
         image,
-        readBy: [senderId], // sender has read it
+        readBy: [senderId],
+
     });
 
-    //Update unread count
-    conversation.participants.forEach((participantId) => {
-        const id = participantId.toString();
+    // Increment unreadCount for receiver using subdocument array
+    await Conversation.updateOne(
 
-        if (id !== senderId.toString()) {
-        const current = conversation.unreadCount.get(id) || 0;
-        conversation.unreadCount.set(id, current + 1);
+        { _id: conversation._id, "unreadCounts.userId": receiverId },
+        {
+            $inc: { "unreadCounts.$.count": 1 },
+            $set: { lastMessage: newMessage._id },
         }
-    });
 
-    conversation.lastMessage = newMessage._id;
-    await conversation.save();
+    );
 
     return newMessage;
 };

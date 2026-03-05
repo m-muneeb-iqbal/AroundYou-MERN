@@ -15,6 +15,12 @@ const messageSchema = new mongoose.Schema(
             required: true,
         },
 
+        receiverId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+
         readBy: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -22,13 +28,17 @@ const messageSchema = new mongoose.Schema(
             },
         ],
 
-        text: String,
+        text: {
+            type: String,
+            trim: true,
+        },
+
         image: String,
     },
     { timestamps: true }
 );
 
 messageSchema.index({ conversationId: 1, createdAt: -1 });
-const Message = mongoose.model("Message", messageSchema);
 
+const Message = mongoose.model("Message", messageSchema);
 export default Message;

@@ -14,11 +14,20 @@ const conversationSchema = new mongoose.Schema(
             ref: "Message",
         },
 
-        unreadCount: {
-            type: Map,
-            of: Number,
-            default: {},
-        },
+        unreadCounts: [
+            {
+                userId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User",
+                    required: true,
+                },
+                count: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+            }
+        ],
     },
 
     { timestamps: true }
@@ -26,6 +35,7 @@ const conversationSchema = new mongoose.Schema(
 );
 
 conversationSchema.index({ participants: 1 });
-const Conversation = mongoose.model("Conversation", conversationSchema);
+conversationSchema.index({ participants: 1 }, { unique: true, sparse: true });
 
+const Conversation = mongoose.model("Conversation", conversationSchema);
 export default Conversation;

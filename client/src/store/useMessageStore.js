@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:5000", {
-  transports: ["websocket", "polling"],
+    transports: ["websocket", "polling"],
 });
 
 export const useMessageStore = create((set, get) => ({
@@ -19,12 +19,8 @@ export const useMessageStore = create((set, get) => ({
 
     // Fetch users
     fetchUsers: async () => {
-
-        const res = await axiosInstance.get("/message/users", 
-            { withCredentials: true }
-        );
+        const res = await axiosInstance.get("/message/users", { withCredentials: true });
         set({ users: res.data });
-
     },
 
     // Initialize socket
@@ -35,32 +31,55 @@ export const useMessageStore = create((set, get) => ({
         socket.emit("userOnline", authUserId);
 
         const handleReceiveMessage = (msg) => {
+            const { openConversationId, authUser } = get();
 
-            const { openConversationId } = get();
+            // receiverId now exists on the message model — no more workarounds
+            const isSender = msg.senderId.toString() === authUser?._id.toString();
+            
+            const otherUserId = isSender
+                ? msg.receiverId.toString()
+                : msg.senderId.toString();
 
-            if (openConversationId === msg.conversationId) {
+            const isCurrentConversation =
+                openConversationId === msg.conversationId ||
+                (openConversationId === null && get().selectedUser?._id?.toString() === otherUserId);
+
+            if (isCurrentConversation) {
+
                 set((state) => ({
+
+                    openConversationId: msg.conversationId,
                     messages: [...state.messages, msg].filter(
                         (v, i, a) => a.findIndex((m) => m._id === v._id) === i
                     ),
+
                 }));
+
             }
 
             set((state) => ({
-                users: state.users.map((u) =>
-                    u.conversationId === msg.conversationId
-                        ? {
-                            ...u,
-                            lastMessage: msg,
 
-                            unreadCount:
-                                openConversationId === msg.conversationId
-                                    ? u.unreadCount
-                                    : (u.unreadCount || 0) + 1,
-                        }
-                        : u
-                ),
+                users: state.users.map((u) => {
+
+                    const matchByConvId = u.conversationId === msg.conversationId;
+                    const matchByUserId = !u.conversationId && u._id.toString() === otherUserId;
+
+                    if (!matchByConvId && !matchByUserId) return u;
+
+                    return {
+
+                        ...u,
+                        conversationId: msg.conversationId,
+                        lastMessage: msg,
+                        unreadCount: isCurrentConversation
+                            ? 0
+                            : (u.unreadCount || 0) + 1,
+                    };
+
+                }),
+
             }));
+
         };
 
         const handleMessagesRead = (conversationId) => {
@@ -70,13 +89,9 @@ export const useMessageStore = create((set, get) => ({
             set((state) => ({
 
                 users: state.users.map((u) =>
-
-                u.conversationId === conversationId
-                    ? {
-                        ...u,
-                        readBy: [...new Set([...(u.readBy || []), selectedUser?._id])],
-                    }
-                    : u
+                    u.conversationId === conversationId
+                        ? { ...u, readBy: [...new Set([...(u.readBy || []), selectedUser?._id])] }
+                        : u
                 ),
 
             }));
@@ -87,14 +102,13 @@ export const useMessageStore = create((set, get) => ({
 
             const { openConversationId } = get();
 
-            set(state => ({
+            set((state) => ({
 
-                users: state.users.map(u =>
-
-                u.conversationId === conversationId
-                    ? { ...u, unreadCount: openConversationId === conversationId ? 0 : unreadCount  } // overwrite for other participants
-                    : u
-                )
+                users: state.users.map((u) =>
+                    u.conversationId === conversationId
+                        ? { ...u, unreadCount: openConversationId === conversationId ? 0 : unreadCount }
+                        : u
+                ),
 
             }));
 
@@ -113,9 +127,7 @@ export const useMessageStore = create((set, get) => ({
 
     // Close conversation
     handleCloseConversation: async () => {
-
         const { selectedUser } = get();
-
         if (!selectedUser) return;
 
         if (selectedUser.conversationId) {
@@ -135,12 +147,10 @@ export const useMessageStore = create((set, get) => ({
             selectedUser: null,
             messages: [],
             openConversationId: null,
-
             users: state.users.map((u) =>
-
                 u.conversationId === selectedUser.conversationId
-                ? { ...u, unreadCount: 0 }
-                : u
+                    ? { ...u, unreadCount: 0 }
+                    : u
             ),
 
         }));
@@ -158,78 +168,66 @@ export const useMessageStore = create((set, get) => ({
             { withCredentials: true }
         );
 
-        set(() => ({
-
-            messages: res.data,
-            openConversationId: selected.conversationId,
-
-        }));
-
+        set({ messages: res.data, openConversationId: selected.conversationId });
         get().markMessagesAsRead(selected.conversationId);
 
-        // Mark messages as read on server
         if (selected.unreadCount > 0) {
 
             await axiosInstance.put(
-                    `/message/read/${selected.conversationId}`,
-                    { withCredentials: true }
+                `/message/read/${selected.conversationId}`,
+                { withCredentials: true }
             );
 
             try {
-
                 await axiosInstance.put(
                     `/message/read/${selected.conversationId}`,
                     { withCredentials: true }
                 );
                 socket.emit("markAsRead", { conversationId: selected.conversationId });
-
             } catch (err) {
                 console.error("Error marking messages as read:", err);
             }
+
         }
     },
 
+    // Select user
     selectUser: (user) => {
 
         set((state) => ({
 
             selectedUser: user,
             openConversationId: user.conversationId,
-
             users: state.users.map((u) =>
-
-            u.conversationId === user.conversationId
-                ? { ...u, unreadCount: 0 }
-                : u
+                u.conversationId === user.conversationId
+                    ? { ...u, unreadCount: 0 }
+                    : u
             ),
 
         }));
 
-        // Notify server
-        socket.emit("markAsRead", { conversationId: user.conversationId });
 
-        // Load messages
         get().loadMessages(user);
-
     },
 
+    // Mark as read locally
     markMessagesAsRead: (conversationId) => {
 
         set((state) => ({
 
             users: state.users.map((u) =>
-            u.conversationId === conversationId
-                ? { ...u, unreadCount: 0 }
-                : u
+                u.conversationId === conversationId
+                    ? { ...u, unreadCount: 0 }
+                    : u
             ),
 
         }));
-
+        
     },
 
     // Send message
     sendMessage: (payload) => {
         socket.emit("sendMessage", payload);
     },
-    
+
 }));

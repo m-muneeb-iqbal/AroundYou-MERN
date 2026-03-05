@@ -6,45 +6,43 @@ import Message from "../models/message.model.js";
 
 import { saveMessage } from "../services/message.service.js";
 
-export const getUsersForSidebar = async (req, res) => {
+const getUnreadCount = (conversation, userId) => {
 
+    const entry = conversation.unreadCounts?.find(
+        (u) => u.userId.toString() === userId.toString()
+    );
+
+    return entry?.count || 0;
+    
+};
+
+// ─── GET /message/users 
+export const getUsersForSidebar = async (req, res) => {
     try {
 
         const userId = req.user._id;
 
-        // Fetch all other users (for the sidebar)
-        const users = await User.find({ _id: { $ne: userId } }).select("-password");
-
-        // Fetch conversations that include the current user
-        const conversations = await Conversation.find({
-            participants: userId
-        }).populate("lastMessage");
+        const [users, conversations] = await Promise.all([
+            User.find({ _id: { $ne: userId } }).select("-password"),
+            Conversation.find({ participants: userId }).populate("lastMessage"),
+        ]);
 
         const usersWithConversation = users.map((user) => {
-            
+
             const conversation = conversations.find((conv) =>
                 conv.participants.some((p) => p.toString() === user._id.toString())
             );
 
-            let unreadCount = 0;
-
-            if (conversation) {
-
-                // Convert Map to plain object
-                const unreadCountMap = conversation.unreadCount instanceof Map
-                ? Object.fromEntries(conversation.unreadCount)
-                : conversation.unreadCount || {};
-
-                unreadCount = unreadCountMap[userId.toString()] || 0;
-            }
-
             return {
+
                 _id: user._id,
                 fullName: user.fullName,
                 conversationId: conversation?._id || null,
                 lastMessage: conversation?.lastMessage || null,
-                unreadCount,
+                unreadCount: conversation ? getUnreadCount(conversation, userId) : 0,
+
             };
+
         });
 
         res.status(200).json(usersWithConversation);
@@ -55,18 +53,17 @@ export const getUsersForSidebar = async (req, res) => {
     }
 };
 
+// ─── GET /message/conversations
 export const getConversations = async (req, res) => {
 
     try {
 
         const userId = req.user._id;
 
-        const conversations = await Conversation.find({
-            participants: userId,
-        })
-        .populate("participants", "-password")
-        .populate("lastMessage")
-        .sort({ updatedAt: -1 });
+        const conversations = await Conversation.find({ participants: userId })
+            .populate("participants", "-password")
+            .populate("lastMessage")
+            .sort({ updatedAt: -1 });
 
         res.status(200).json(conversations);
 
@@ -75,6 +72,7 @@ export const getConversations = async (req, res) => {
     }
 };
 
+// ─── GET /message/:id
 export const getMessages = async (req, res) => {
 
     try {
@@ -92,7 +90,6 @@ export const getMessages = async (req, res) => {
             conversationId: conversation._id,
         }).sort({ createdAt: 1 });
 
-        // Convert to plain JS objects and attach conversationId explicitly
         const messagesWithConvId = messages.map((msg) => ({
             ...msg.toObject(),
             conversationId: conversation._id.toString(),
@@ -105,6 +102,7 @@ export const getMessages = async (req, res) => {
     }
 };
 
+// ─── POST /message/send/:id
 export const sendMessages = async (req, res) => {
 
     try {
@@ -122,28 +120,36 @@ export const sendMessages = async (req, res) => {
         }
 
         const newMessage = await saveMessage({
+
             senderId,
             receiverId,
             text,
             image: imageUrl,
+
         });
 
+        const conv = await Conversation.findById(newMessage.conversationId);
+
+        // Emit receiveMessage to both sender and receiver so both get live updates
+        const senderSocketId = onlineUsers.get(senderId.toString());
         const receiverSocketId = onlineUsers.get(receiverId.toString());
+
+        const payload = {
+            ...newMessage.toObject(),
+            conversationId: conv._id.toString(),
+        };
+
+        if (senderSocketId) {
+            io.to(senderSocketId).emit("receiveMessage", payload);
+        }
+
         if (receiverSocketId) {
-
-            const conv = await Conversation.findById(newMessage.conversationId);
-
-            const unreadCountMap = conv.unreadCount instanceof Map
-                ? Object.fromEntries(conv.unreadCount)
-                : conv.unreadCount || {};
-
-            const count = unreadCountMap[receiverId.toString()] || 0;
+            io.to(receiverSocketId).emit("receiveMessage", payload);
 
             io.to(receiverSocketId).emit("updateUnread", {
                 conversationId: conv._id.toString(),
-                unreadCount: count,   
+                unreadCount: getUnreadCount(conv, receiverId),
             });
-
         }
 
         res.status(201).json(newMessage);
@@ -154,6 +160,7 @@ export const sendMessages = async (req, res) => {
     }
 };
 
+// ─── PUT /message/read/:conversationId
 export const markAsRead = async (req, res) => {
 
     try {
@@ -172,41 +179,30 @@ export const markAsRead = async (req, res) => {
             { $addToSet: { readBy: userId } }
         );
 
-        // Reset unread count for this user
+        // Reset unread count
         await Conversation.updateOne(
-            { _id: conversationId },
-            { $set: { [`unreadCount.${userId}`]: 0 } }
+            { _id: conversationId, "unreadCounts.userId": userId },
+            { $set: { "unreadCounts.$.count": 0 } }
         );
 
         const conversation = await Conversation.findById(conversationId);
 
-        // Emit to all participants
         for (const participantId of conversation.participants) {
 
             const socketId = onlineUsers.get(participantId.toString());
             if (!socketId) continue;
 
-            // Notify read receipt
             io.to(socketId).emit("messagesRead", conversation._id.toString());
-
-            // Refetch conversation to get fresh unread count
-            const convFresh = await Conversation.findById(conversationId);
-
-            const unreadCountMap =
-                convFresh.unreadCount instanceof Map
-                ? Object.fromEntries(convFresh.unreadCount)
-                : convFresh.unreadCount || {};
-
-            const unreadCount = unreadCountMap[participantId.toString()] || 0;
 
             io.to(socketId).emit("updateUnread", {
                 conversationId: conversation._id.toString(),
-                unreadCount,
+                unreadCount: getUnreadCount(conversation, participantId),
             });
+            
         }
 
-    res.status(200).json({ success: true });
-    
+        res.status(200).json({ success: true });
+
     } catch (error) {
         console.error("markAsRead error:", error);
         res.status(500).json({ error: "Internal server error" });
