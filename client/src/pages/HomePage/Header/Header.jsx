@@ -5,7 +5,7 @@ import { House, Users, BriefcaseBusiness, Bell, MessageCircleMore, UserRound, Se
 import { Row, Col, Dropdown } from 'react-bootstrap';
 
 import { useAuthStore} from "../../../store/useAuthStore";
-import MessagesPopup from "../../MessagePopup/MessagesPopup";
+import MessagesPopup from "../../../components/messages/MessagesPopup";
 
 import styles from "../../../styles/UI/DropDownItems.module.css";
 
