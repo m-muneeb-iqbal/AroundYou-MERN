@@ -37,5 +37,32 @@ const conversationSchema = new mongoose.Schema(
 conversationSchema.index({ participants: 1 });
 conversationSchema.index({ participants: 1 }, { unique: true, sparse: true });
 
+conversationSchema.pre("deleteOne", { document: true, query: false }, async function () {
+
+    await mongoose.model("Message").deleteMany({ conversationId: this._id });
+
+});
+
+conversationSchema.pre("findOneAndDelete", async function () {
+
+    const conversation = await this.model.findOne(this.getFilter());
+
+    if (conversation) {
+        await mongoose.model("Message").deleteMany({ conversationId: conversation._id });
+    }
+
+});
+
+conversationSchema.pre("deleteMany", async function () {
+
+    const conversations = await this.model.find(this.getFilter()).select("_id");
+    const ids = conversations.map((c) => c._id);
+    
+    if (ids.length > 0) {
+        await mongoose.model("Message").deleteMany({ conversationId: { $in: ids } });
+    }
+
+});
+
 const Conversation = mongoose.model("Conversation", conversationSchema);
 export default Conversation;
