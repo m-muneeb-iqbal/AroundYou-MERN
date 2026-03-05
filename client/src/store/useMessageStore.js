@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import { io } from "socket.io-client";
+import { normalizeSenderId } from "../lib/utils";
 
 const socket = io("http://localhost:5000", {
     transports: ["websocket", "polling"],
@@ -34,11 +35,11 @@ export const useMessageStore = create((set, get) => ({
 
             const { openConversationId, authUser } = get();
 
-            const isSender = msg.senderId.toString() === authUser?._id.toString();
+            const isSender = normalizeSenderId(msg.senderId) === authUser?._id.toString();
             
             const otherUserId = isSender
                 ? msg.receiverId.toString()
-                : msg.senderId.toString();
+                : normalizeSenderId(msg.senderId);
 
             const isCurrentConversation =
                 openConversationId === msg.conversationId ||
@@ -49,11 +50,26 @@ export const useMessageStore = create((set, get) => ({
                 set((state) => ({
 
                     openConversationId: msg.conversationId,
-                    messages: [...state.messages, msg].filter(
+
+                    messages: [
+                        ...state.messages.filter((m) => m._id !== msg.tempId),
+                        msg,
+                    ]
+                    .filter(
                         (v, i, a) => a.findIndex((m) => m._id === v._id) === i
                     ),
 
                 }));
+
+                if (!isSender && msg.conversationId) {
+
+                    axiosInstance.put(
+                        `/message/read/${msg.conversationId}`,
+                        {},
+                        { withCredentials: true }
+                    )
+                    .catch((err) => console.error("Error marking as read on receive:", err));
+                }
 
             }
 
@@ -93,6 +109,29 @@ export const useMessageStore = create((set, get) => ({
 
         };
 
+        const handleMessageDelivered = ({ messageId }) => {
+
+            set((state) => ({
+
+                messages: state.messages.map((m) =>
+                    m._id === messageId ? { ...m, status: "delivered" } : m
+                ),
+
+            }));
+
+        };
+
+        const handleMessagesSeen = ({ conversationId }) => {
+            
+            set((state) => ({
+
+                messages: state.messages.map((m) =>
+                    m.conversationId === conversationId ? { ...m, status: "seen" } : m
+                ),
+            }));
+
+        };
+
         const handleMessagesRead = (conversationId) => {
 
             const { selectedUser } = get();
@@ -126,11 +165,15 @@ export const useMessageStore = create((set, get) => ({
         };
 
         socket.on("receiveMessage", handleReceiveMessage);
+        socket.on("messageDelivered", handleMessageDelivered);
+        socket.on("messagesSeen", handleMessagesSeen);
         socket.on("messagesRead", handleMessagesRead);
         socket.on("updateUnread", handleUpdateUnread);
 
         return () => {
             socket.off("receiveMessage", handleReceiveMessage);
+            socket.off("messageDelivered", handleMessageDelivered);
+            socket.off("messagesSeen", handleMessagesSeen);
             socket.off("messagesRead", handleMessagesRead);
             socket.off("updateUnread", handleUpdateUnread);
         };
@@ -238,7 +281,30 @@ export const useMessageStore = create((set, get) => ({
 
     // Send message
     sendMessage: (payload) => {
-        socket.emit("sendMessage", payload);
-    },
+        const tempId = `temp_${Date.now()}`;
 
+        set((state) => ({
+
+            messages: [
+
+                ...state.messages,
+
+                {
+                    _id: tempId,
+                    tempId,
+                    senderId: payload.senderId,
+                    receiverId: payload.receiverId,
+                    conversationId: state.openConversationId,
+                    text: payload.text,
+                    status: "sending",
+                    createdAt: new Date().toISOString(),
+                },
+
+            ],
+            
+        }));
+
+        socket.emit("sendMessage", { ...payload, tempId });
+    },
+    
 }));

@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { saveMessage } from "./services/message.service.js";
 import Conversation from "./models/conversation.model.js";
+import Message from "./models/message.model.js";
 
 let io;
 export const onlineUsers = new Map();
@@ -25,7 +26,7 @@ export const initSocket = (server) => {
 
         socket.on("sendMessage", async (data) => {
 
-            const { senderId, receiverId, text, image } = data;
+            const { senderId, receiverId, text, image, tempId } = data;
 
             try {
 
@@ -43,6 +44,7 @@ export const initSocket = (server) => {
                 const payload = {
                     ...newMessage.toObject(),
                     conversationId: newMessage.conversationId.toString(),
+                    tempId
                 };
 
                 // Emit to sender for instant update
@@ -50,12 +52,21 @@ export const initSocket = (server) => {
 
                 // Emit to receiver using their socketId
                 const receiverSocketId = onlineUsers.get(receiverId.toString());
+
                 if (receiverSocketId) {
 
                     io.to(receiverSocketId).emit("receiveMessage", payload);
                     io.to(receiverSocketId).emit("updateUnread", {
                         conversationId: newMessage.conversationId.toString(),
                         unreadCount,
+                    });
+
+                    await Message.findByIdAndUpdate(newMessage._id, { status: "delivered" });
+                    socket.emit("messageDelivered", {
+
+                        messageId: newMessage._id.toString(),
+                        conversationId: newMessage.conversationId.toString()
+
                     });
 
                 }

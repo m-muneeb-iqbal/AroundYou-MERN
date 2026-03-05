@@ -188,6 +188,12 @@ export const markAsRead = async (req, res) => {
             { $addToSet: { readBy: userId } }
         );
 
+        // 2. Only upgrade status to "seen" on messages sent TO this user
+        await Message.updateMany(
+            { conversationId, receiverId: userId, status: { $ne: "seen" } },
+            { $set: { status: "seen" } }
+        );
+
         // Reset unread count
         await Conversation.updateOne(
             { _id: conversationId, "unreadCounts.userId": userId },
@@ -202,6 +208,11 @@ export const markAsRead = async (req, res) => {
             if (!socketId) continue;
 
             io.to(socketId).emit("messagesRead", conversation._id.toString());
+
+            io.to(socketId).emit("messagesSeen", {
+                conversationId: conversation._id.toString(),
+                seenBy: userId.toString(),
+            });
 
             io.to(socketId).emit("updateUnread", {
                 conversationId: conversation._id.toString(),
