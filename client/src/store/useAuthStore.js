@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
+import { socket } from "../lib/socket.js"
 
 export const useAuthStore = create((set) => ({
     authUser: null,
@@ -11,12 +12,18 @@ export const useAuthStore = create((set) => ({
     setAuthUser: (user) => set((state) => ({ ...state, authUser: user })),
 
     checkAuth: async () => {
+
         try {
+
             const res = await axiosInstance.get("/auth/check", {
                 withCredentials: true,
             });
+
             console.log("CheckAuth response:", res.data);
             set({ authUser: res.data });
+
+            socket.connect();
+            socket.emit("userOnline", res.data._id);
 
         } catch (error) {
             console.log("Error in checkAuth: ", error);
@@ -25,13 +32,17 @@ export const useAuthStore = create((set) => ({
         } finally {
             set({ isCheckingAuth: false });
         }
+
     },
 
     signup: async (data) => {
+
         set({ isSigningUp: true });
+
         try {
+
             const res = await axiosInstance.post("/auth/signup", data, {
-                withCredentials: true, // so JWT cookie is stored
+                withCredentials: true, //JWT cookie is stored
             });
             return res.data;
 
@@ -42,10 +53,13 @@ export const useAuthStore = create((set) => ({
         } finally {
             set({ isSigningUp: false });
         }
+
     },
 
     login: async (data) => {
+
         set({ isLoggingIn: true });
+
         try {
             const res = await axiosInstance.post("/auth/login", data, {
                 withCredentials: true,
@@ -59,10 +73,15 @@ export const useAuthStore = create((set) => ({
             throw error;
 
         }
+
     },
+
     logout: async () => {
+
         try {
+            
             await axiosInstance.post("/auth/logout", {}, { withCredentials: true });
+            socket.disconnect()
             set({ authUser: null });
 
         } catch (error) {

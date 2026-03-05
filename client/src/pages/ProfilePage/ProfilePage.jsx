@@ -1,7 +1,6 @@
 import { Container } from "react-bootstrap";
 
 import TwoRowsLayout from "../../components/layout/TwoRowsLayout"
-import Header from "../../components/layout/Header";
 
 import Top from "./Main/Top/Top";
 import Bottom from "./Main/Bottom/Bottom";

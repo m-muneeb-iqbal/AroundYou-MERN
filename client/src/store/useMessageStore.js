@@ -1,11 +1,7 @@
 import { create } from "zustand";
+import { socket } from "../lib/socket";
 import { axiosInstance } from "../lib/axios";
-import { io } from "socket.io-client";
 import { normalizeSenderId } from "../lib/utils";
-
-const socket = io("http://localhost:5000", {
-    transports: ["websocket", "polling"],
-});
 
 export const useMessageStore = create((set, get) => ({
 
@@ -28,8 +24,6 @@ export const useMessageStore = create((set, get) => ({
     initializeSocket: (authUserId) => {
 
         if (!authUserId) return;
-
-        socket.emit("userOnline", authUserId);
 
         const handleReceiveMessage = (msg) => {
 
@@ -110,11 +104,13 @@ export const useMessageStore = create((set, get) => ({
         };
 
         const handleMessageDelivered = ({ messageId }) => {
-
+            
             set((state) => ({
 
                 messages: state.messages.map((m) =>
-                    m._id === messageId ? { ...m, status: "delivered" } : m
+                    m._id?.toString() === messageId?.toString()
+                        ? { ...m, status: "delivered" }
+                        : m
                 ),
 
             }));
@@ -122,12 +118,15 @@ export const useMessageStore = create((set, get) => ({
         };
 
         const handleMessagesSeen = ({ conversationId }) => {
-            
+
             set((state) => ({
 
                 messages: state.messages.map((m) =>
-                    m.conversationId === conversationId ? { ...m, status: "seen" } : m
+                    m.conversationId?.toString() === conversationId?.toString()
+                        ? { ...m, status: "seen" }
+                        : m
                 ),
+
             }));
 
         };

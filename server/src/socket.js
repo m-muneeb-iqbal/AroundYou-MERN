@@ -19,9 +19,62 @@ export const initSocket = (server) => {
 
         console.log("A user connected:", socket.id);
 
-        socket.on("userOnline", (userId) => {
+        socket.on("userOnline", async (userId) => {
             onlineUsers.set(userId, socket.id);
             console.log("Online users:", Array.from(onlineUsers.keys()));
+
+            try {
+
+                const undeliveredMessages = await Message.find({
+                    receiverId: userId,
+                    status: "sent",
+                });
+
+                if (undeliveredMessages.length === 0) return;
+
+                // Upgrade all to delivered in DB
+                await Message.updateMany(
+                    { receiverId: userId, status: "sent" },
+                    { $set: { status: "delivered" } }
+                );
+
+                // Notify each sender whose message is now delivered
+                // Group by senderId to send one event per sender, not one per message
+                const senderMap = new Map();
+
+                for (const msg of undeliveredMessages) {
+
+                    const senderId = msg.senderId.toString();
+
+                    if (!senderMap.has(senderId)) {
+                        senderMap.set(senderId, []);
+                    }
+                    senderMap.get(senderId).push(msg._id.toString());
+                }
+
+                for (const [senderId, messageIds] of senderMap) {
+
+                    const senderSocketId = onlineUsers.get(senderId);
+                    if (!senderSocketId) continue; // sender is offline, they'll see it on next load
+
+                    for (const messageId of messageIds) {
+
+                        io.to(senderSocketId).emit("messageDelivered", {
+
+                            messageId,
+                            conversationId: undeliveredMessages
+                                .find(m => m._id.toString() === messageId)
+                                ?.conversationId.toString(),
+
+                        });
+
+                    }
+
+                }
+
+            } catch (error) {
+                console.error("Error upgrading undelivered messages:", error);
+            }
         });
 
         socket.on("sendMessage", async (data) => {
