@@ -51,15 +51,13 @@ export const useAuthStore = create((set) => ({
                 withCredentials: true,
             });
             console.log("Login response:", res.data);
-            await useAuthStore.getState().checkAuth();
+
             return res.data;
 
         } catch (error) {
             console.error("Error in login:", error.response?.data || error.message);
             throw error;
 
-        } finally {
-            set({ isLoggingIn: false });
         }
     },
     logout: async () => {

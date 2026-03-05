@@ -81,7 +81,7 @@ const Header = () => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const { login, isLoggingIn } = useAuthStore();
+    const { login, isLoggingIn, checkAuth } = useAuthStore();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
@@ -102,14 +102,13 @@ const Header = () => {
             console.log("Signup successful");
 
             form.classList.remove("was-validated");
+
             showToast("Logged in successfully!", "success");
 
-            // close modal
-            setModalShow(false);
-
-            // navigate to home
-            navigate("/home");
-
+            setTimeout(async () => {
+                await checkAuth();
+            }, 3000);
+            
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
             showToast("Login failed", "danger");
