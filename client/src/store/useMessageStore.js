@@ -31,9 +31,9 @@ export const useMessageStore = create((set, get) => ({
         socket.emit("userOnline", authUserId);
 
         const handleReceiveMessage = (msg) => {
+
             const { openConversationId, authUser } = get();
 
-            // receiverId now exists on the message model — no more workarounds
             const isSender = msg.senderId.toString() === authUser?._id.toString();
             
             const otherUserId = isSender
@@ -57,9 +57,9 @@ export const useMessageStore = create((set, get) => ({
 
             }
 
-            set((state) => ({
+            set((state) => {
 
-                users: state.users.map((u) => {
+                const updatedUsers = state.users.map ((u) => {
 
                     const matchByConvId = u.conversationId === msg.conversationId;
                     const matchByUserId = !u.conversationId && u._id.toString() === otherUserId;
@@ -71,14 +71,25 @@ export const useMessageStore = create((set, get) => ({
                         ...u,
                         conversationId: msg.conversationId,
                         lastMessage: msg,
+                        lastActivity: msg.createdAt || new Date().toISOString(),
                         unreadCount: isCurrentConversation
                             ? 0
                             : (u.unreadCount || 0) + 1,
                     };
 
-                }),
+                });
 
-            }));
+                return {
+
+                    users: updatedUsers.sort((a, b) => {
+                        if (!a.lastActivity) return 1;
+                        if (!b.lastActivity) return -1;
+                        return new Date(b.lastActivity) - new Date(a.lastActivity);
+                    }),
+
+                };
+
+            });
 
         };
 

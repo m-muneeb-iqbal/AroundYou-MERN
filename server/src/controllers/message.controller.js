@@ -18,6 +18,7 @@ const getUnreadCount = (conversation, userId) => {
 
 // ─── GET /message/users 
 export const getUsersForSidebar = async (req, res) => {
+    
     try {
 
         const userId = req.user._id;
@@ -40,10 +41,18 @@ export const getUsersForSidebar = async (req, res) => {
                 conversationId: conversation?._id || null,
                 lastMessage: conversation?.lastMessage || null,
                 unreadCount: conversation ? getUnreadCount(conversation, userId) : 0,
+                lastActivity: conversation?.updatedAt || null,
 
             };
 
-        });
+        })
+        .sort ((a, b) => {
+
+            if (!a.lastActivity) return 1;
+            if (!b.lastActivity) return -1;
+            return new Date(b.lastActivity) - new Date(a.lastActivity);
+
+        })
 
         res.status(200).json(usersWithConversation);
 
