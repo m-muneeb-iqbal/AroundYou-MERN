@@ -1,12 +1,11 @@
-import "../Reusable"
-import Reusable from "../Reusable";
+import ProfilePage from "../ProfilePage";
     
 const StudentProfile = () => {
 
     return (
         <div>
             {/* <h1>You're an admin.</h1> */}
-            <Reusable />
+            <ProfilePage />
         </div>
     );
 };

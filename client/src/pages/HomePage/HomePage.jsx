@@ -1,20 +1,19 @@
 import { Container } from "react-bootstrap";
 
-import Layout from "./Layout/Layout";
+import ThreeColumnLayout from "../../components/layout/ThreeColumnLayout";
 
-import Header from "./Header/Header";
 import LeftPanel from "./Main/LeftPanel";
 import Middle from "./Main/Middle";
-import RightPanel from "./Main/RightPanel.jsx";
+import RightPanel from "./Main/RightPanel";
 
 const HomePage = () => {
+    
     return(
 
         <Container>
 
-            <Header />
-
-            <Layout 
+            <ThreeColumnLayout
+                showMessages
                 left={<LeftPanel />}
                 middle={<Middle />}
                 right={<RightPanel />}

@@ -1,14 +1,14 @@
 import { Container } from "react-bootstrap";
 
-import Layout from "./Layout/Layout"
+import TwoRowsLayout from "../../components/layout/TwoRowsLayout"
+import Header from "../../components/layout/Header";
 
-import Header from "./Header/Header";
 import Top from "./Main/Top/Top";
 import Bottom from "./Main/Bottom/Bottom";
 
 import { useAuthStore} from "../../store/useAuthStore";
 
-const Reusable = () => {
+const ProfilePage = () => {
 
     const { authUser } = useAuthStore();
 
@@ -16,9 +16,7 @@ const Reusable = () => {
 
         <Container fluid="md">
 
-            <Header />
-
-            <Layout
+            <TwoRowsLayout
                 top={<Top authUser={authUser}/>}
                 bottom={<Bottom />}
             />
@@ -28,4 +26,4 @@ const Reusable = () => {
     );
 };
 
-export default Reusable;
+export default ProfilePage;
