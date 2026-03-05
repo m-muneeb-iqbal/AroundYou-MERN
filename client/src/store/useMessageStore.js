@@ -38,31 +38,29 @@ export const useMessageStore = create((set, get) => ({
 
             const { openConversationId } = get();
 
-            // Update messages if conversation is open
             if (openConversationId === msg.conversationId) {
-
                 set((state) => ({
-
                     messages: [...state.messages, msg].filter(
-                        (v, i, a) => a.findIndex(m => m._id === v._id) === i
-                    )
-
+                        (v, i, a) => a.findIndex((m) => m._id === v._id) === i
+                    ),
                 }));
-
             }
 
-            // Update users list with last message & unread count
             set((state) => ({
-
                 users: state.users.map((u) =>
-                    
-                u.conversationId === msg.conversationId
-                    ? { ...u, lastMessage: msg }
-                    : u
+                    u.conversationId === msg.conversationId
+                        ? {
+                            ...u,
+                            lastMessage: msg,
+
+                            unreadCount:
+                                openConversationId === msg.conversationId
+                                    ? u.unreadCount
+                                    : (u.unreadCount || 0) + 1,
+                        }
+                        : u
                 ),
-
             }));
-
         };
 
         const handleMessagesRead = (conversationId) => {

@@ -32,9 +32,10 @@ const MessagesPopup = ({ onClose }) => {
     // Initialize socket when user is available
     const { authUser } = useAuthStore();
     useEffect(() => {
-
-        if (authUser?._id) initializeSocket(authUser._id);
-
+        if (authUser?._id) {
+            const cleanup = initializeSocket(authUser._id);
+            return cleanup;
+        }
     }, [authUser]);
 
     // Set logged in user
