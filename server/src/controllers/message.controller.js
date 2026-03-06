@@ -134,6 +134,18 @@ export const sendMessages = async (req, res) => {
         const senderId = req.user._id;
         const io = getIO();
 
+        const friendship = await Friend.findOne({
+            $or: [
+                { requester: senderId, recipient: receiverId },
+                { requester: receiverId, recipient: senderId },
+            ],
+            status: "accepted",
+        });
+
+        if (!friendship) {
+            return res.status(403).json({ error: "You can only message friends." });
+        }
+
         let imageUrl;
 
         if (image) {
