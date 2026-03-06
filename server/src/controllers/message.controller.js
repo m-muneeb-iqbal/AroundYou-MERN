@@ -1,6 +1,7 @@
 import { getIO, onlineUsers } from "../socket.js";
 
 import User from "../models/user.model.js";
+import Friend from "../models/friend.model.js";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 
@@ -23,8 +24,20 @@ export const getUsersForSidebar = async (req, res) => {
 
         const userId = req.user._id;
 
+        // Only fetch accepted friends
+        const friendships = await Friend.find({
+            $or: [{ requester: userId }, { recipient: userId }],
+            status: "accepted",
+        });
+
+        const friendIds = friendships.map((f) =>
+            f.requester.toString() === userId.toString() ? f.recipient : f.requester
+        );
+
+        if (friendIds.length === 0) return res.status(200).json([]);
+
         const [users, conversations] = await Promise.all([
-            User.find({ _id: { $ne: userId } }).select("-password"),
+            User.find({ _id: { $in: friendIds } }).select("-password"),
             Conversation.find({ participants: userId }).populate("lastMessage"),
         ]);
 

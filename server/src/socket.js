@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import { saveMessage } from "./services/message.service.js";
+
+import Friend from "./models/friend.model.js";
 import Conversation from "./models/conversation.model.js";
 import Message from "./models/message.model.js";
 
@@ -82,6 +84,26 @@ export const initSocket = (server) => {
             const { senderId, receiverId, text, image, tempId } = data;
 
             try {
+
+                const friendship = await Friend.findOne({
+
+                    $or: [
+                        { requester: senderId, recipient: receiverId },
+                        { requester: receiverId, recipient: senderId },
+                    ],
+
+                    status: "accepted",
+                });
+
+                if (!friendship) {
+
+                    socket.emit("messagingError", {
+                        message: "You can only message friends.",
+                    });
+
+                    return;
+
+                }
 
                 const newMessage = await saveMessage({ senderId, receiverId, text, image });
 
