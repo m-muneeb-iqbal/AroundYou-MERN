@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 
-import { Row, Col, Dropdown } from "react-bootstrap";
-import { Users, BriefcaseBusiness, Bell, MessageCircleMore, UserRound, LogOut } from "lucide-react";
+import { Row, Col, Dropdown, Form, InputGroup } from "react-bootstrap";
+import { Users, BriefcaseBusiness, Bell, MessageCircleMore, UserRound, LogOut, Search } from "lucide-react";
 
 import MessagesPopup from "../messages/MessagesPopup";
 
@@ -10,11 +10,17 @@ import { useAuthStore } from "../../store/useAuthStore";
 
 import styles from "../../styles/UI/DropDownItems.module.css";
 
-const Header = ({ showMessages = false }) => {
+const Header = ({ showMessages = false, showSearch = false, onSearch }) => {
 
     const { authUser, logout } = useAuthStore();
     const navigate = useNavigate();
     const [showMessagesPopup, setShowMessagesPopup] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+        onSearch?.(e.target.value);
+    };
 
     if (!authUser) return <Navigate to="/" />;
 
@@ -33,6 +39,33 @@ const Header = ({ showMessages = false }) => {
                         style={{ cursor: "pointer", height: "40px" }}
                         alt="aroundyou"
                     />
+
+                    {showSearch && (
+                        <InputGroup size="sm" style={{ width: "180px" }}>
+                            <InputGroup.Text
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    border: "1px solid #e0e0e0",
+                                    borderRight: "none",
+                                }}
+                            >
+                                <Search size={14} color="#898C8F" />
+                            </InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    border: "1px solid #e0e0e0",
+                                    borderLeft: "none",
+                                    fontSize: "0.82rem",
+                                    boxShadow: "none",
+                                }}
+                            />
+                        </InputGroup>
+                    )}
 
                 </div>
 

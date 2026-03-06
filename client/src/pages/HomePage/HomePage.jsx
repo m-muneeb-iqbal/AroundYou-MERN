@@ -14,6 +14,8 @@ const HomePage = () => {
 
             <ThreeColumnLayout
                 showMessages
+                showSearch
+                onSearch={(query) => console.log(query)}
                 left={<LeftPanel />}
                 middle={<Middle />}
                 right={<RightPanel />}
