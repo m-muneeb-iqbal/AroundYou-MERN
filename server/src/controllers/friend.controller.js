@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import Friend from "../models/friend.model.js";
+import { getIO, onlineUsers } from "../socket.js";
 
 export const sendFriendRequest = async (req, res) => {
 
@@ -23,18 +24,25 @@ export const sendFriendRequest = async (req, res) => {
             return res.status(400).json({ message: "Request already sent." });
         }
 
-        const friendRequest = await Friend.create({
-            requester,
-            recipient: recipientId,
-        });
+        const friendRequest = await Friend.create({ requester, recipient: recipientId });
 
-        res.status(201).json(friendRequest);
+        // Populate requester so recipient gets full user details in the event
+        const populated = await friendRequest.populate("requester", "-password");
+
+        // Notify recipient live if online
+        const io = getIO();
+        const recipientSocketId = onlineUsers.get(recipientId.toString());
+        if (recipientSocketId) {
+            io.to(recipientSocketId).emit("friendRequestReceived", populated);
+        }
+
+        res.status(201).json(populated);
 
     } catch (error) {
         console.error("Error sending friend request:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-    
+
 };
 
 export const acceptFriendRequest = async (req, res) => {
@@ -42,7 +50,6 @@ export const acceptFriendRequest = async (req, res) => {
     try {
 
         const { requestId } = req.params;
-
         const request = await Friend.findById(requestId);
 
         if (!request) return res.status(404).json({ message: "Request not found" });
@@ -50,9 +57,33 @@ export const acceptFriendRequest = async (req, res) => {
         if (request.recipient.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: "Not authorized" });
         }
-        
+
         request.status = "accepted";
         await request.save();
+
+        // Fetch both users to send full details to each side
+        const [requester, recipient] = await Promise.all([
+            User.findById(request.requester).select("-password"),
+            User.findById(request.recipient).select("-password"),
+        ]);
+
+        const io = getIO();
+
+        // Notify requester — they can now chat with recipient
+        const requesterSocketId = onlineUsers.get(request.requester.toString());
+        if (requesterSocketId) {
+            io.to(requesterSocketId).emit("friendRequestAccepted", {
+                friend: recipient, // send recipient's details to requester
+            });
+        }
+
+        // Notify recipient — refresh their chat sidebar
+        const recipientSocketId = onlineUsers.get(request.recipient.toString());
+        if (recipientSocketId) {
+            io.to(recipientSocketId).emit("friendRequestAccepted", {
+                friend: requester, // send requester's details to recipient
+            });
+        }
 
         res.status(200).json(request);
 
@@ -60,7 +91,6 @@ export const acceptFriendRequest = async (req, res) => {
         console.error("Error accepting friend request:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-    
 };
 
 export const rejectFriendRequest = async (req, res) => {
@@ -86,7 +116,6 @@ export const rejectFriendRequest = async (req, res) => {
 
 };
 
-// Returns all accepted friends with their user details
 export const getFriends = async (req, res) => {
 
     try {
@@ -111,10 +140,8 @@ export const getFriends = async (req, res) => {
         console.error("Error fetching friends:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-
 };
 
-// Returns pending requests sent TO the current user
 export const getPendingRequests = async (req, res) => {
 
     try {
@@ -135,7 +162,6 @@ export const getPendingRequests = async (req, res) => {
 
 };
 
-// Returns all non-friends for "people you may know"
 export const getNonFriends = async (req, res) => {
 
     try {
@@ -146,16 +172,25 @@ export const getNonFriends = async (req, res) => {
             $or: [{ requester: userId }, { recipient: userId }],
         });
 
-        // Exclude self, existing friends, and pending requests in either direction
         const excludedIds = new Set([userId.toString()]);
         friendships.forEach((f) => {
             excludedIds.add(f.requester.toString());
             excludedIds.add(f.recipient.toString());
         });
 
-        const nonFriends = await User.find({
+        // Get a larger pool then shuffle and slice
+        const pool = await User.find({
             _id: { $nin: Array.from(excludedIds) },
-        }).select("-password").limit(4);
+        })
+        .select("-password")
+        .limit(20);
+
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+
+        const nonFriends = pool.slice(0, 4);
 
         res.status(200).json(nonFriends);
 
@@ -163,5 +198,4 @@ export const getNonFriends = async (req, res) => {
         console.error("Error fetching non-friends:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-
 };
