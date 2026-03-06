@@ -2,13 +2,13 @@ import { Col, Form, Row, Button } from 'react-bootstrap';
 import { X } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../../../store/useAuthStore";
-import { useProfileStore } from "../../../../store/useProfileStore";
+import { useAuthStore } from "../../../store/useAuthStore";
+import { useProfileStore } from "../../../store/useProfileStore";
 
 import { useState, useEffect } from 'react';
-import { useToast } from "../../../../context/ToastContext";
+import { useToast } from "../../../context/ToastContext";
 
-import styles from "../../../../styles/UI/Buttons.module.css";
+import styles from "../../../styles/UI/Buttons.module.css";
 
 const skillOptions = [
 

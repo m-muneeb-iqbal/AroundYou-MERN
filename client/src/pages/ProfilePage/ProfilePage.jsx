@@ -2,8 +2,8 @@ import { Container } from "react-bootstrap";
 
 import TwoRowsLayout from "../../components/layout/TwoRowsLayout"
 
-import Top from "./Main/Top/Top";
-import Bottom from "./Main/Bottom/Bottom";
+import Top from "./Top/Top";
+import Bottom from "./Bottom/Bottom";
 
 import { useAuthStore} from "../../store/useAuthStore";
 

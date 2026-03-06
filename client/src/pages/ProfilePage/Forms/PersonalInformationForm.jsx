@@ -2,14 +2,14 @@
 import { Col, Row, Form, Button } from 'react-bootstrap';
 
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../../../store/useAuthStore";
-import { useProfileStore } from "../../../../store/useProfileStore";
+import { useAuthStore } from "../../../store/useAuthStore";
+import { useProfileStore } from "../../../store/useProfileStore";
 
 import { useEffect, useState } from "react";
-import { useToast } from "../../../../context/ToastContext";
-import { useFormDirty } from "../../../../hooks/useFormDirty"
+import { useToast } from "../../../context/ToastContext";
+import { useFormDirty } from "../../../hooks/useFormDirty"
 
-import styles from "../../../../styles/UI/Buttons.module.css";
+import styles from "../../../styles/UI/Buttons.module.css";
 
 const toDateInputValue = (date) => {
     if (!date) return "";
