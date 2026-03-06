@@ -31,11 +31,17 @@ export const useFriendStore = create((set) => ({
 
     },
 
+    cancelFriendRequest: async (requestId) => {
+        await axiosInstance.delete(`/friend/cancel/${requestId}`, { withCredentials: true });
+    },
+
     acceptFriendRequest: async (requestId, onAccepted) => {
+
         await axiosInstance.put(`/friend/accept/${requestId}`, {}, { withCredentials: true });
         set((state) => ({
             pendingRequests: state.pendingRequests.filter((r) => r._id !== requestId),
         }));
+
         // Callback so caller can refresh message users
         onAccepted?.();
     },
@@ -46,6 +52,15 @@ export const useFriendStore = create((set) => ({
 
         set((state) => ({
             pendingRequests: state.pendingRequests.filter((r) => r._id !== requestId),
+        }));
+
+    },
+
+    unfriend: async (friendId) => {
+        
+        await axiosInstance.delete(`/friend/unfriend/${friendId}`, { withCredentials: true });
+        set((state) => ({
+            friends: state.friends.filter((f) => f._id.toString() !== friendId.toString()),
         }));
 
     },

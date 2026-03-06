@@ -8,7 +8,7 @@ const FriendRequestItem = ({ request, onAccept, onReject }) => (
 
     <ListGroup.Item className="d-flex align-items-center gap-2 px-0 py-2" style={{ borderColor: "#f0f0f0" }} >
 
-        <InitialsAvatar name={request.requester.fullName} />
+        <InitialsAvatar name={request.requester.fullName} profilePic={request.requester.profilePic}/>
 
         <div className="flex-grow-1 overflow-hidden">
 

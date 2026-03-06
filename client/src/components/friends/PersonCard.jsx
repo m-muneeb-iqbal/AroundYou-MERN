@@ -8,7 +8,7 @@ const PersonCard = ({ user, onAdd }) => (
 
     <ListGroup.Item className="d-flex align-items-center gap-2 px-0 py-2" style={{ borderColor: "#F0F0F0" }} >
 
-        <InitialsAvatar name={user.fullName} />
+        <InitialsAvatar name={user.fullName} profilePic={user.profilePic}/>
 
         <div className="flex-grow-1 overflow-hidden">
 
