@@ -34,7 +34,6 @@ const conversationSchema = new mongoose.Schema(
 
 );
 
-conversationSchema.index({ participants: 1 });
 conversationSchema.index({ participants: 1 }, { unique: true, sparse: true });
 
 conversationSchema.pre("deleteOne", { document: true, query: false }, async function () {

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Card, Form, Button, ListGroup } from "react-bootstrap";
-import { SendHorizonal, X } from "lucide-react";
+import { SendHorizonal, X, ArrowLeft } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
@@ -54,14 +54,29 @@ const MessagesPopup = ({ onClose }) => {
         setMessage("");
     };
 
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (selectedUser) {
+            inputRef.current?.focus();
+        }
+    }, [selectedUser]);
+
     return (
 
         <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "320px", height: "450px", zIndex: 1000 }}>
 
-            <Card.Header className="d-flex justify-content-between align-items-center fw-bold">
+            <Card.Header className="position-relative d-flex align-items-center fw-bold">
 
-                <span>{selectedUser ? selectedUser.fullName : "AroundYou"}</span>
-                <X role="button" onClick={() => { handleCloseConversation(); onClose?.(); }} />
+                {selectedUser && (
+                    <ArrowLeft role="button" size={20} color="#04263D" onClick={() => handleCloseConversation()} />
+                )}
+
+                <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
+                    {selectedUser ? selectedUser.fullName : "AroundYou"}
+                </span>
+
+                <X role="button" className="ms-auto" onClick={() => { handleCloseConversation(); onClose?.(); }} />
 
             </Card.Header>
 
@@ -99,7 +114,7 @@ const MessagesPopup = ({ onClose }) => {
 
                         <Form onSubmit={handleSend} className="d-flex gap-2">
 
-                            <Form.Control type="text" placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} />
+                            <Form.Control ref={inputRef} type="text" placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} />
 
                             <Button type="submit" style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}>
                                 <SendHorizonal color="#04263D" size={30} />
