@@ -99,7 +99,7 @@ const Header = () => {
         try {
 
             await login (formData);
-            console.log("Signup successful");
+            console.log("Login successful");
 
             form.classList.remove("was-validated");
 

@@ -11,18 +11,8 @@ const RoleBasedProfile = () => {
 
     const renderProfile = () => {
 
-        switch (authUser.role) {
-
-            case "Admin":
-                return <AdminProfile />;
-
-            case "User":
-                return <UserProfile />;
-            
-            default:
-                return <p>No Profile available for this role.</p>
-
-        }
+        if (authUser.isAdmin) return <AdminProfile />;
+        return <UserProfile />;
 
     };
 

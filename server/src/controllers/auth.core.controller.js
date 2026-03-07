@@ -2,9 +2,18 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 
+export const getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("-password -role -username -__v");
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export const checkAuth = (req, res) => {
     try {
-        res.status(200).json(req.user);
+        res.status(200).json(req.user.toSafeObject());
         
     } catch (error) {
         console.log("Error in checkAuth controller: ", error.message);
@@ -41,14 +50,7 @@ export const signup = async (req, res) => {
         if (newUser) {
             await newUser.save();
 
-            res.status(201).json({
-                _id: newUser._id,
-                fullName: newUser.fullName,
-                username: newUser.username,
-                email: newUser.email,
-                role: newUser.role,
-                profilePic: newUser.profilePic,
-            });
+            res.status(201).json({ message: "Account created successfully" });
 
         } else {
             res.status(400).json({ message: "Invalid user data" });
@@ -82,17 +84,7 @@ export const login = async (req, res) => {
 
         generateToken(user._id, res);
 
-        res.status(200).json({
-            message: "login successul",
-            user: {
-                _id: user._id,
-                fullName: user.fullName,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                profilePic: user.profilePic,
-            },
-        });
+        res.status(201).json({ message: "Logged in successfully" });
 
     } catch (error) {
         console.log("Error in login controller: ", error.message);

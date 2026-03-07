@@ -20,9 +20,22 @@ const toDateInputValue = (date) => {
 const ExperienceForm = () => {
 
     const { authUser } = useAuthStore();
+    
+    if(!authUser) return <navigate to = "/" />;
+
+    const { profileData, fetchProfile,updateExperience, deleteExperience } = useProfileStore();
+
     const navigate = useNavigate();
 
-    if(!authUser) return <navigate to = "/" />;
+    useEffect(() => {
+        
+        if (!authUser) {
+            navigate("/");
+            return;
+
+        }
+        fetchProfile();
+    }, [authUser, navigate]);
 
     const [formData, setFormData] = useState({
         company: "",
@@ -37,17 +50,15 @@ const ExperienceForm = () => {
 
     // Redirect + prefill form
     useEffect(() => {
-        if (!authUser) {
-            navigate("/");
-            return;
-        }
+
+        if (!profileData) return;
     
         const formattedData = {
-            company: authUser.company || "",
-            jobTitle: authUser.jobTitle || "",
-            joiningDate: toDateInputValue(authUser.joiningDate),
-            resignationDate: toDateInputValue(authUser.resignationDate),
-            currentlyWorking: authUser.currentlyWorking ?? false, // important
+            company: profileData.company || "",
+            jobTitle: profileData.jobTitle || "",
+            joiningDate: toDateInputValue(profileData.joiningDate),
+            resignationDate: toDateInputValue(profileData.resignationDate),
+            currentlyWorking: profileData.currentlyWorking ?? false, // important
         };
 
         setFormData(formattedData);
@@ -77,9 +88,6 @@ const ExperienceForm = () => {
             ...(name === "currentlyWorking" && checked ? { resignationDate: "" } : {})
         }));
     };
-
-    const { updateExperience } = useProfileStore();
-    const { deleteExperience } = useProfileStore();
 
     const handleUpdateExperience = async (e) => {
 

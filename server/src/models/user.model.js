@@ -4,6 +4,15 @@ const userSchema = new mongoose.Schema (
 
     {
         //Personal Info
+        profilePic: {
+            type: String,
+            default: ""
+        },
+        description: {
+            type: String,
+            default: "",
+            maxlength: 300,
+        },
         fullName: {
             type: String,
             required: true,
@@ -134,19 +143,31 @@ const userSchema = new mongoose.Schema (
             required: true,
             minlength: 8
         },
-        profilePic: {
-            type: String,
-            default: ""
-        },
-        description: {
-            type: String,
-            default: "",
-            maxlength: 300,
-        },
     },
-    {timestamps: true}
+
+    {timestamps: true},
 
 );
+
+userSchema.methods.toSafeObject = function () {
+    return {
+        _id: this._id,
+        profilePic: this.profilePic,
+        description: this.description,
+        fullName: this.fullName,
+        company: this.company,
+        jobTitle: this.jobTitle,
+        isAdmin: this.role === "Admin"
+    };
+}
+
+userSchema.methods.toPublicObject = function () {
+    return {
+        _id: this._id,
+        fullName: this.fullName,
+        profilePic: this.profilePic,
+    };
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;

@@ -72,9 +72,22 @@ const EducationForm = () => {
     }; 
 
     const { authUser } = useAuthStore();
-    const navigate = useNavigate();
 
     if(!authUser) return <navigate to = "/" />;
+
+    const { profileData, fetchProfile, updateEducation, deleteEducation, deleteCertification} = useProfileStore();
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        
+        if (!authUser) {
+            navigate("/");
+            return;
+
+        }
+        fetchProfile();
+    }, [authUser, navigate]);
 
     const [formData, setFormData] = useState({
         education: "",
@@ -89,21 +102,19 @@ const EducationForm = () => {
     const [originalData, setOriginalData] = useState(null);
     const isFormChanged = useFormDirty(originalData, formData);
 
-    // Redirect + prefill form
+    // Prefill from profileData
     useEffect(() => {
-        if (!authUser) {
-            navigate("/");
-            return;
-        }
+
+        if (!profileData) return;
     
         const formattedData = {
-            education: authUser.education || "",
-            field: authUser.field || "",
-            passingYear: authUser.passingYear != null ? String(authUser.passingYear) : "",
-            cgpa: authUser.cgpa != null ? String(authUser.cgpa) : "",
-            institute: authUser.institute || "",
-            certificate: authUser.certificate || "",
-            provider: authUser.provider || "",
+            education: profileData.education || "",
+            field: profileData.field || "",
+            passingYear: profileData.passingYear != null ? String(profileData.passingYear) : "",
+            cgpa: profileData.cgpa != null ? String(profileData.cgpa) : "",
+            institute: profileData.institute || "",
+            certificate: profileData.certificate || "",
+            provider: profileData.provider || "",
         };
 
         setFormData(formattedData);
@@ -127,10 +138,6 @@ const EducationForm = () => {
         }));
     }
     };
-
-    const { updateEducation } = useProfileStore();
-    const { deleteEducation } = useProfileStore();
-    const { deleteCertification } = useProfileStore();
 
     const { showToast } = useToast(); 
 

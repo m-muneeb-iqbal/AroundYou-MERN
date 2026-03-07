@@ -6,19 +6,25 @@ export const useProfileStore = create ((set) => ({
 
     isUpdating: false,
     isDeleting: false,
+    profileData: null,
 
-    updatePersonalInformation: async (data) => {
+    fetchProfile: async () => {
+        const res = await axiosInstance.get("/auth/profile", { withCredentials: true });
+        set({ profileData: res.data });
+    },
+
+    updatePersonalInformation: async (formData) => {
         set({ isUpdating: true });
 
         try {
 
-            const res = await axiosInstance.put("/auth/update-personal-info", data,
+            const res = await axiosInstance.put("/auth/update-personal-info", formData,
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data);
-
-            return res.data;
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().checkAuth(); 
+            set({ profileData: res.data })
 
         } catch (error) {
             
@@ -38,7 +44,8 @@ export const useProfileStore = create ((set) => ({
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data);
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().setAuthUser(res.data);
 
             return res.data;
 
@@ -58,7 +65,8 @@ export const useProfileStore = create ((set) => ({
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data.user);
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().setAuthUser(res.data.user);
 
             return res.data;
 
@@ -79,7 +87,8 @@ export const useProfileStore = create ((set) => ({
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data.user);
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().setAuthUser(res.data.user);
 
             return res.data;
 
@@ -100,7 +109,8 @@ export const useProfileStore = create ((set) => ({
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data);
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().setAuthUser(res.data);
 
             return res.data;
 
@@ -120,7 +130,8 @@ export const useProfileStore = create ((set) => ({
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data.user);
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().setAuthUser(res.data.user);
 
             return res.data;
 
@@ -141,7 +152,8 @@ export const useProfileStore = create ((set) => ({
                 { withCredentials: true }
             );
 
-            useAuthStore.getState().setAuthUser(res.data);
+            await useProfileStore.getState().fetchProfile();
+            await useAuthStore.getState().setAuthUser(res.data);
 
             return res.data;
 

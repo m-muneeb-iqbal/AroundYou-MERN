@@ -24,7 +24,7 @@ const skillOptions = [
 const SkillsForm = () => {
 
     const { authUser } = useAuthStore();
-    const [skills, setSkills] = useState([]);
+    const { profileData, fetchProfile, updateSkills } = useProfileStore();
     const navigate = useNavigate();
    
     useEffect(() => {
@@ -32,15 +32,22 @@ const SkillsForm = () => {
             navigate("/");
             return;
         }
-        if (authUser?.skills) {
-            setSkills(authUser.skills);
-        }
+        fetchProfile();
     }, [authUser, navigate]);
 
+    const [skills, setSkills] = useState([]);
+    const { showToast } = useToast();
+
+    // Prefill from profileData
+    useEffect(() => {
+        if (!profileData) return;
+        if (profileData.skills) {
+            setSkills(profileData.skills);
+        }
+    }, [profileData]);
+        
     const [selectedSkill, setSelectedSkill] = useState("");
     const [addActive, setAddActive] = useState(false);
-    const { showToast } = useToast();  
-    
     const handleAddSkill = (e) => {
 
         if (!selectedSkill) {
@@ -69,7 +76,6 @@ const SkillsForm = () => {
         setSkills(prev => prev.filter(skill => skill !== skillToRemove));
     };
 
-    const { updateSkills } = useProfileStore();
     const handleUpdateSkill = async (e) => {
         e.preventDefault();
 

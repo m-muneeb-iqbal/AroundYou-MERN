@@ -19,10 +19,24 @@ const toDateInputValue = (date) => {
 const PersonalInformationForm = () => {
 
     const { authUser } = useAuthStore();
+    
+    if(!authUser) return <navigate to = "/" />;
+
+    const { profileData, fetchProfile, updatePersonalInformation } = useProfileStore();
+    
+    // Fetch full profile on mount
     const navigate = useNavigate();
 
-    if(!authUser) return <navigate to = "/" />;
-    
+    useEffect(() => {
+
+        if (!authUser) {
+            navigate("/");
+            return;
+        }
+
+        fetchProfile();
+    }, [authUser, navigate]);
+
     const [formData, setFormData] = useState({
         description: "",
         fullName: "",
@@ -36,28 +50,25 @@ const PersonalInformationForm = () => {
 
     const [originalData, setOriginalData] = useState(null);
 
-    // Redirect + prefill formx
+    // Prefill from profileData
     useEffect(() => {
-        if (!authUser) {
-            navigate("/");
-            return;
-        }
-    
+        if (!profileData) return;
+
         const formattedData = {
-            description: authUser.description || "",
-            fullName: authUser.fullName || "",
-            email: authUser.email || "",
-            dob: toDateInputValue(authUser.dob),
-            phoneNumber: authUser.phoneNumber || "",
-            age: authUser.age != null ? String(authUser.age) : "",
-            location: authUser.location || "",
-            website: authUser.website || "",
+            description: profileData.description || "",
+            fullName: profileData.fullName || "",
+            email: profileData.email || "",
+            dob: toDateInputValue(profileData.dob),
+            phoneNumber: profileData.phoneNumber || "",
+            age: profileData.age != null ? String(profileData.age) : "",
+            location: profileData.location || "",
+            website: profileData.website || "",
         };
 
         setFormData(formattedData);
         setOriginalData(formattedData);
 
-    }, [authUser, navigate]);
+    }, [profileData]);
 
     const isFormChanged = useFormDirty(originalData, formData);
 
@@ -69,7 +80,6 @@ const PersonalInformationForm = () => {
         }));
     };
 
-    const { updatePersonalInformation } = useProfileStore();
     const { showToast } = useToast();
 
     const handleUpdatePersonalInformation = async (e) => {

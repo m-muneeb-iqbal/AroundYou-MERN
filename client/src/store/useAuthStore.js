@@ -19,7 +19,7 @@ export const useAuthStore = create((set) => ({
                 withCredentials: true,
             });
 
-            console.log("CheckAuth response:", res.data);
+            console.log("response:", res.data);
             set({ authUser: res.data });
 
             socket.connect();
