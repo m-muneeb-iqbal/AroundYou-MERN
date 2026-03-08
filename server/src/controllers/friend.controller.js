@@ -46,7 +46,9 @@ export const sendFriendRequest = async (req, res) => {
 };
 
 export const cancelFriendRequest = async (req, res) => {
+
     try {
+
         const { requestId } = req.params;
         const request = await Friend.findById(requestId);
 
@@ -58,7 +60,6 @@ export const cancelFriendRequest = async (req, res) => {
 
         await Friend.findByIdAndDelete(requestId);
 
-        // ✅ No socket emission needed — requester initiated this themselves
         res.status(200).json({ message: "Request cancelled" });
 
     } catch (error) {
@@ -68,7 +69,9 @@ export const cancelFriendRequest = async (req, res) => {
 };
 
 export const acceptFriendRequest = async (req, res) => {
+
     try {
+
         const { requestId } = req.params;
         const request = await Friend.findById(requestId);
 
@@ -88,7 +91,7 @@ export const acceptFriendRequest = async (req, res) => {
 
         const io = getIO();
 
-        // ✅ Only notify requester — recipient (User B) already knows, they clicked Accept
+        // Only notify requester
         const requesterSocketId = onlineUsers.get(request.requester.toString());
         if (requesterSocketId) {
             io.to(requesterSocketId).emit("friendRequestAccepted", {
@@ -105,7 +108,9 @@ export const acceptFriendRequest = async (req, res) => {
 };
 
 export const rejectFriendRequest = async (req, res) => {
+
     try {
+
         const { requestId } = req.params;
         const request = await Friend.findById(requestId);
 
@@ -117,7 +122,6 @@ export const rejectFriendRequest = async (req, res) => {
 
         await Friend.findByIdAndDelete(requestId);
 
-        // ✅ No notification to requester — silent reject
         res.status(200).json({ message: "Request rejected" });
 
     } catch (error) {
