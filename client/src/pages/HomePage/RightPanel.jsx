@@ -1,24 +1,17 @@
 import { socket } from "../../lib/socket";
-
-import { useEffect, useCallback } from "react";
-import { Card, ListGroup, Badge } from "react-bootstrap";
+import { useEffect } from "react";
+import { Card, ListGroup } from "react-bootstrap";
 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
-
-import FriendRequestItem from "../../components/friends/FriendRequestItem";
 import PersonCard from "../../components/friends/PersonCard";
 
 const RightPanel = () => {
 
     const {
         nonFriends,
-        pendingRequests,
         fetchNonFriends,
-        fetchPendingRequests,
         sendFriendRequest,
-        acceptFriendRequest,
-        rejectFriendRequest,
         initializeFriendSocket,
     } = useFriendStore();
 
@@ -26,10 +19,10 @@ const RightPanel = () => {
 
     useEffect(() => {
         fetchNonFriends();
-        fetchPendingRequests();
     }, []);
 
     useEffect(() => {
+
         const { handleFriendRequestReceived, handleFriendRequestAccepted } = initializeFriendSocket();
         const onAccepted = (data) => handleFriendRequestAccepted(data, fetchUsers);
 
@@ -40,90 +33,45 @@ const RightPanel = () => {
             socket.off("friendRequestReceived", handleFriendRequestReceived);
             socket.off("friendRequestAccepted", onAccepted);
         };
-    }, []);
 
-    const handleAccept = useCallback((requestId) => {
-        acceptFriendRequest(requestId, fetchUsers);
-    }, [acceptFriendRequest, fetchUsers]);
+    }, []);
 
     return (
 
-        <div className="d-flex flex-column gap-3">
+        <Card className="border-0 shadow-sm">
 
-            {pendingRequests.length > 0 && (
+            <Card.Body className="p-3">
 
-                <Card className="border-0 shadow-sm">
+                <Card.Title className="mb-3" style={{ fontSize: "0.95rem", color: "#04263D" }}>
+                    People you may know
+                </Card.Title>
 
-                    <Card.Body className="p-3">
+                <ListGroup variant="flush">
 
-                        <div className="d-flex align-items-center gap-2 mb-3">
+                    {nonFriends.length === 0 ? (
 
-                            <Card.Title className="mb-0" style={{ fontSize: "0.95rem", color: "#04263D" }}>
-                                Friend Requests
-                            </Card.Title>
+                        <p className="text-muted mb-0" style={{ fontSize: "0.82rem" }}>
+                            No suggestions available.
+                        </p>
 
-                            <Badge pill style={{ backgroundColor: "#dc3545", fontSize: "0.65rem" }}>
-                                {pendingRequests.length}
-                            </Badge>
+                    ) : (
 
-                        </div>
+                        nonFriends.map((user) => (
+                            <PersonCard
+                                key={user._id}
+                                user={user}
+                                onAdd={() => sendFriendRequest(user._id)}
+                            />
+                        ))
+                        
+                    )}
 
-                        <ListGroup variant="flush">
+                </ListGroup>
 
-                            {pendingRequests.map((req) => (
+            </Card.Body>
 
-                                <FriendRequestItem
-                                    key={req._id}
-                                    request={req}
-                                    onAccept={() => handleAccept(req._id)}
-                                    onReject={() => rejectFriendRequest(req._id)}
-                                />
-                            ))}
+        </Card>
 
-                        </ListGroup>
-
-                    </Card.Body>
-
-                </Card>
-            )}
-
-            <Card className="border-0 shadow-sm">
-
-                <Card.Body className="p-3">
-
-                    <Card.Title className="mb-3" style={{ fontSize: "0.95rem", color: "#04263D" }}>
-                        People you may know
-                    </Card.Title>
-
-                    <ListGroup variant="flush">
-
-                        {nonFriends.length === 0 ? (
-
-                            <p className="text-muted mb-0" style={{ fontSize: "0.82rem" }}>
-                                No suggestions available.
-                            </p>
-
-                        ) : (
-
-                            nonFriends.map((user) => (
-
-                                <PersonCard
-                                    key={user._id}
-                                    user={user}
-                                    onAdd={() => sendFriendRequest(user._id)}
-                                />
-
-                            ))
-
-                        )}
-
-                    </ListGroup>
-
-                </Card.Body>
-
-            </Card>
-
-        </div>
     );
 };
 

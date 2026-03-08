@@ -4,7 +4,7 @@ import { UserRoundPlus, UserRoundMinus, MessageCircleMore, Check, X, Ban } from 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
 
-import InitialsAvatar from "../common/InitialAvatar";
+import InitialsAvatar from "../common/InitialsAvatar";
 
 const UserProfileModal = ({ user, onClose, onActionDone }) => {
 

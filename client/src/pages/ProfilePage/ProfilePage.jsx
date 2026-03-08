@@ -13,7 +13,7 @@ const ProfilePage = () => {
 
     return(
 
-        <Container fluid="md">
+        <Container>
 
             <TwoRowsLayout
                 top={<Top authUser={authUser}/>}

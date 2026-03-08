@@ -17,11 +17,11 @@ const RoleBasedProfile = () => {
     };
 
     return (
-        <div className="p-4">
+        <>
 
             {renderProfile()}
 
-        </div>
+        </>
     );
 
 };

@@ -1,7 +1,7 @@
 import { ListGroup } from "react-bootstrap";
 import { UserRoundPlus, } from "lucide-react";
 
-import InitialsAvatar from "../common/InitialAvatar";
+import InitialsAvatar from "../common/InitialsAvatar";
 import ActionButton from "../common/ActionButton";
 
 const PersonCard = ({ user, onAdd }) => (

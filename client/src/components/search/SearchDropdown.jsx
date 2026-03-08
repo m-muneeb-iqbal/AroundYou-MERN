@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 
 import { axiosInstance } from "../../lib/axios";
 
-import InitialsAvatar from "../common/InitialAvatar";
+import InitialsAvatar from "../common/InitialsAvatar";
 import UserProfileModal from "./UserProfileModal";
 
 const relationshipLabel = {
@@ -14,7 +14,7 @@ const relationshipLabel = {
     friends: { text: "Friends ✓", color: "#198754" }
 };
 
-const SearchDropdown = () => {
+const SearchDropdown = ({ fullWidth = false }) => {
 
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
@@ -26,6 +26,7 @@ const SearchDropdown = () => {
 
     // Debounce search — wait 300ms after user stops typing
     useEffect(() => {
+
         if (!query.trim()) {
             setResults([]);
             setShowDropdown(false);
@@ -34,6 +35,7 @@ const SearchDropdown = () => {
 
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(async () => {
+
             try {
 
                 setLoading(true);
@@ -57,6 +59,7 @@ const SearchDropdown = () => {
 
     // Close dropdown when clicking outside
     useEffect(() => {
+
         const handleClickOutside = (e) => {
             if (containerRef.current && !containerRef.current.contains(e.target)) {
                 setShowDropdown(false);
@@ -65,6 +68,7 @@ const SearchDropdown = () => {
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
+
     }, []);
 
     const handleSelect = (user) => {
@@ -75,22 +79,23 @@ const SearchDropdown = () => {
 
     // Update result in dropdown after action taken in modal
     const handleActionDone = (updatedUser) => {
+
         setResults((prev) =>
             prev.map((u) => (u._id === updatedUser._id ? updatedUser : u))
         );
         setSelectedUser(null);
+
     };
 
     return (
 
         <>
 
-            <div ref={containerRef} className="position-relative" style={{ width: "200px" }}>
+            <div ref={containerRef} className="position-relative" style={{ width: fullWidth ? "100%" : "200px" }}>
 
                 <InputGroup size="sm">
 
-                    <InputGroup.Text
-                        style={{ backgroundColor: "#f5f5f5", border: "1px solid #E0E0E0", borderRight: "none", }} >
+                    <InputGroup.Text style={{ backgroundColor: "#f5f5f5", border: "1px solid #E0E0E0", borderRight: "none", }} >
 
                         {loading
                             ? <Spinner animation="border" size="sm" style={{ width: 12, height: 12 }} />
@@ -117,6 +122,7 @@ const SearchDropdown = () => {
 
                 {/* Dropdown results */}
                 {showDropdown && (
+
                     <div
                         className="position-absolute bg-white shadow-sm rounded"
                         style={{
@@ -130,10 +136,8 @@ const SearchDropdown = () => {
                         }}
                     >
                         {results.length === 0 ? (
-                            <div
-                                className="text-muted text-center py-3"
-                                style={{ fontSize: "0.82rem" }}
-                            >
+
+                            <div className="text-muted text-center py-3" style={{ fontSize: "0.82rem" }} >
                                 No users found
                             </div>
 
