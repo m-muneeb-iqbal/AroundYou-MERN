@@ -46,33 +46,29 @@ export const sendFriendRequest = async (req, res) => {
 };
 
 export const cancelFriendRequest = async (req, res) => {
-
     try {
-
         const { requestId } = req.params;
         const request = await Friend.findById(requestId);
 
         if (!request) return res.status(404).json({ message: "Request not found" });
 
-        // Only requester can cancel
         if (request.requester.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: "Not authorized" });
         }
 
         await Friend.findByIdAndDelete(requestId);
+
+        // ✅ No socket emission needed — requester initiated this themselves
         res.status(200).json({ message: "Request cancelled" });
 
     } catch (error) {
         console.error("Error cancelling friend request:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-    
 };
 
 export const acceptFriendRequest = async (req, res) => {
-
     try {
-
         const { requestId } = req.params;
         const request = await Friend.findById(requestId);
 
@@ -85,7 +81,6 @@ export const acceptFriendRequest = async (req, res) => {
         request.status = "accepted";
         await request.save();
 
-        // Fetch both users to send full details to each side
         const [requester, recipient] = await Promise.all([
             User.findById(request.requester).select("-password"),
             User.findById(request.recipient).select("-password"),
@@ -93,19 +88,11 @@ export const acceptFriendRequest = async (req, res) => {
 
         const io = getIO();
 
-        // Notify requester — they can now chat with recipient
+        // ✅ Only notify requester — recipient (User B) already knows, they clicked Accept
         const requesterSocketId = onlineUsers.get(request.requester.toString());
         if (requesterSocketId) {
             io.to(requesterSocketId).emit("friendRequestAccepted", {
-                friend: recipient, // send recipient's details to requester
-            });
-        }
-
-        // Notify recipient — refresh their chat sidebar
-        const recipientSocketId = onlineUsers.get(request.recipient.toString());
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit("friendRequestAccepted", {
-                friend: requester, // send requester's details to recipient
+                friend: recipient,
             });
         }
 
@@ -118,9 +105,7 @@ export const acceptFriendRequest = async (req, res) => {
 };
 
 export const rejectFriendRequest = async (req, res) => {
-
     try {
-
         const { requestId } = req.params;
         const request = await Friend.findById(requestId);
 
@@ -131,13 +116,14 @@ export const rejectFriendRequest = async (req, res) => {
         }
 
         await Friend.findByIdAndDelete(requestId);
+
+        // ✅ No notification to requester — silent reject
         res.status(200).json({ message: "Request rejected" });
 
     } catch (error) {
         console.error("Error rejecting friend request:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-
 };
 
 export const unfriend = async (req, res) => {

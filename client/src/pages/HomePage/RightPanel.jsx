@@ -1,39 +1,14 @@
-import { socket } from "../../lib/socket";
 import { useEffect } from "react";
 import { Card, ListGroup } from "react-bootstrap";
-
 import { useFriendStore } from "../../store/useFriendStore";
-import { useMessageStore } from "../../store/useMessageStore";
 import PersonCard from "../../components/friends/PersonCard";
 
 const RightPanel = () => {
 
-    const {
-        nonFriends,
-        fetchNonFriends,
-        sendFriendRequest,
-        initializeFriendSocket,
-    } = useFriendStore();
-
-    const { fetchUsers } = useMessageStore();
+    const { nonFriends, fetchNonFriends, sendFriendRequest } = useFriendStore();
 
     useEffect(() => {
         fetchNonFriends();
-    }, []);
-
-    useEffect(() => {
-
-        const { handleFriendRequestReceived, handleFriendRequestAccepted } = initializeFriendSocket();
-        const onAccepted = (data) => handleFriendRequestAccepted(data, fetchUsers);
-
-        socket.on("friendRequestReceived", handleFriendRequestReceived);
-        socket.on("friendRequestAccepted", onAccepted);
-
-        return () => {
-            socket.off("friendRequestReceived", handleFriendRequestReceived);
-            socket.off("friendRequestAccepted", onAccepted);
-        };
-
     }, []);
 
     return (
@@ -57,13 +32,10 @@ const RightPanel = () => {
                     ) : (
 
                         nonFriends.map((user) => (
-                            <PersonCard
-                                key={user._id}
-                                user={user}
-                                onAdd={() => sendFriendRequest(user._id)}
-                            />
+
+                            <PersonCard key={user._id} user={user} onAdd={() => sendFriendRequest(user._id)} />
                         ))
-                        
+
                     )}
 
                 </ListGroup>
@@ -73,6 +45,7 @@ const RightPanel = () => {
         </Card>
 
     );
+    
 };
 
 export default RightPanel;
