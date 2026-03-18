@@ -171,7 +171,7 @@ const AdminPage = () => {
                                     <thead style={{ backgroundColor: "#f8f9fa" }}>
                                         <tr>
                                             <th>User</th>
-                                            <th>Job Title</th>
+                                            <th>Designation</th>
                                             <th>Location</th>
                                             <th>Role</th>
                                             <th>Joined</th>
@@ -205,7 +205,7 @@ const AdminPage = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="text-muted">{user.jobTitle || "—"}</td>
+                                                    <td className="text-muted">{user.designation || "—"}</td>
                                                     <td className="text-muted">{user.location || "—"}</td>
                                                     <td>
                                                         <Badge
