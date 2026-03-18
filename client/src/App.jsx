@@ -3,7 +3,8 @@ import { useAuthStore } from "./store/useAuthStore.js";
 import { useEffect } from "react";
 
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
-import RoleBasedProfile from "./layouts/RoleBasedProfile.jsx"
+import AdminRoute from "./components/admin/AdminRoute";
+import AdminPage from "./pages/AdminPage/AdminPage";
 import HomePage from "./pages/HomePage/HomePage.jsx";
 import SettingsPage from "./pages/SettingsPage/SettingsPage.jsx";
 
@@ -35,7 +36,7 @@ export const App = () => {
                 <Route path="/signup" element={<LandingPage />} />
                 <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
                 <Route path="/home" element={authUser ? <HomePage /> : <Navigate to="/" />} />
-                <Route path="/profile" element={authUser ? <RoleBasedProfile /> : <Navigate to="/" />} />
+                <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
                 <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
             </Routes>
             

@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import authRoutes from "./routes/auth.route.js";
+import adminRoutes from "./routes/admin.route.js";
 import messageRoutes from "./routes/message.route.js";
 import friendRoutes from "./routes/friend.route.js";
 import userRoutes from "./routes/user.routes.js";
@@ -29,6 +30,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/friend", friendRoutes);
 app.use("/api/user", userRoutes);

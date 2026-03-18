@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { Row, Col, Dropdown } from "react-bootstrap";
 import { Users, BriefcaseBusiness, MessageCircleMore, UserRound, LogOut, Search, X } from "lucide-react";
 
@@ -40,7 +40,12 @@ const Header = ({ showMessages = false, showSearch = false }) => {
                     ) : (
 
                         <>
-                            <img src="/Images/aroundyou.png" onClick={() => navigate("/home")} style={{ cursor: "pointer", height: "34px", flexShrink: 0 }} alt="aroundyou" />
+                            
+                            <Link to="/home">
+
+                                <img src="/Images/aroundyou.png" style={{ height: "34px", flexShrink: 0 }} alt="aroundyou" />
+
+                            </Link>
 
                             {/* Search bar — desktop (lg+) only, inline next to logo */}
                             {showSearch && (
@@ -100,6 +105,12 @@ const Header = ({ showMessages = false, showSearch = false }) => {
                                 <Dropdown.Item className={styles.dropDownItem} onClick={() => navigate("/settings")}>
                                     Settings
                                 </Dropdown.Item>
+
+                                {authUser?.isAdmin && (
+                                    <Dropdown.Item className={styles.dropDownItem} onClick={() => navigate("/admin")}>
+                                        Admin Dashboard
+                                    </Dropdown.Item>
+                                )}
 
                                 <Dropdown.Divider />
 
