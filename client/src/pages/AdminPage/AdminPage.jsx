@@ -211,8 +211,8 @@ const AdminPage = () => {
                                                         <Badge
                                                             pill
                                                             style={{
-                                                                backgroundColor: user.role === "Admin" ? "#04263D" : "#e0e0e0",
-                                                                color: user.role === "Admin" ? "white" : "#555",
+                                                                backgroundColor: "#04263D",
+                                                                color: "#FFFFFF",
                                                                 fontSize: "0.65rem",
                                                             }}
                                                         >

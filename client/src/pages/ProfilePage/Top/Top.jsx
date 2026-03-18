@@ -28,7 +28,7 @@ const Top = ({ authUser }) => {
         <ProfileCard
             profilePic={authUser?.profilePic}
             fullName={authUser?.fullName}
-            jobTitle={authUser?.jobTitle}
+            designation={authUser?.designation}
             location={authUser?.location}
             onAvatarClick={handleAvatarChange}
             loading={loading}

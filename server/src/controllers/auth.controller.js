@@ -158,6 +158,7 @@ export const updatePersonalInformation = async (req, res) => {
             "phoneNumber",
             "age",
             "location",
+            "designation",
             "website",
         ];
         const updates = {};

@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import authRoutes from "./routes/auth.route.js";
-import adminRoutes from "./routes/admin.route.js";
-import messageRoutes from "./routes/message.route.js";
-import friendRoutes from "./routes/friend.route.js";
+import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import messageRoutes from "./routes/message.routes.js";
+import friendRoutes from "./routes/friend.routes.js";
 import userRoutes from "./routes/user.routes.js";
 
 import { initSocket } from "./socket.js";

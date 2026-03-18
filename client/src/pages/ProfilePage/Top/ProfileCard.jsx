@@ -1,6 +1,6 @@
 import { Card } from "react-bootstrap";
 
-const ProfileCard = ({ profilePic, fullName, jobTitle, location, onAvatarClick, loading }) => (
+const ProfileCard = ({ profilePic, fullName, designation, location, onAvatarClick, loading }) => (
 
     <Card border="light" style={{ width: "17.98rem", height: "18.71rem" }} className="mb-4 text-center shadow">
 
@@ -29,7 +29,7 @@ const ProfileCard = ({ profilePic, fullName, jobTitle, location, onAvatarClick, 
             </div>
             
             <Card.Title>{fullName}</Card.Title>
-            <Card.Subtitle className="text-muted">{jobTitle}</Card.Subtitle>
+            <Card.Subtitle className="text-muted">{designation}</Card.Subtitle>
 
             <p style={{ fontSize: "0.9em" }}>{location}</p>
 

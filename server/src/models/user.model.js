@@ -92,7 +92,7 @@ const userSchema = new mongoose.Schema (
             type: String,
             default: "",
         },
-        jobTitle: {
+        designation: {
             type: String,
             default: "",
         },
@@ -156,7 +156,7 @@ userSchema.methods.toSafeObject = function () {
         description: this.description,
         fullName: this.fullName,
         company: this.company,
-        jobTitle: this.jobTitle,
+        designation: this.designation,
         isAdmin: this.role === "Admin"
     };
 }

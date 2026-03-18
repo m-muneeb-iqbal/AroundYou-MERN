@@ -45,6 +45,7 @@ const PersonalInformationForm = () => {
         phoneNumber: "",
         age: "",
         location: "",
+        designation: "",
         website: "",
     });
 
@@ -62,6 +63,7 @@ const PersonalInformationForm = () => {
             phoneNumber: profileData.phoneNumber || "",
             age: profileData.age != null ? String(profileData.age) : "",
             location: profileData.location || "",
+            designation: profileData.designation || "",
             website: profileData.website || "",
         };
 
@@ -161,7 +163,12 @@ const PersonalInformationForm = () => {
 
                 <Row className="mb-2">
 
-                    <Form.Group as={Col} xs={12} controlId="formGridWebsite">
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridDesignation">
+                        <Form.Label>Designation</Form.Label>
+                        <Form.Control value={formData.designation} onChange={ handleChange } name="designation" type="text" placeholder="Software Engineer" />
+                    </Form.Group>
+
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridWebsite">
                         <Form.Label>Portfolio/Website</Form.Label>
                         <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" />
                     </Form.Group>
