@@ -1,6 +1,7 @@
-import { checkAuth, signup, login, logout, getProfile } from "../controllers/auth.core.controller.js";
-import { updateProfilePicture, updatePersonalInformation, updateEducation, updateExperience, updateSkills } from "../controllers/auth.update.controller.js";
-import { deleteEducation, deleteCertification, deleteExperience } from "../controllers/auth.delete.controller.js";
+import { 
+    checkAuth, signup, login, logout, getProfile, updateProfilePicture, updatePersonalInformation, 
+    updateEducation, updateExperience, updateSkills, deleteEducation, deleteCertification, deleteExperience
+} from "../controllers/auth.controller.js";
 
 import { protectRoute } from "../middleware/auth.middleware.js";
 import express from "express";
