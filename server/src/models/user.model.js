@@ -157,6 +157,7 @@ userSchema.methods.toSafeObject = function () {
         fullName: this.fullName,
         company: this.company,
         designation: this.designation,
+        location: this.location,
         isAdmin: this.role === "Admin"
     };
 }
