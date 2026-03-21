@@ -8,6 +8,7 @@ export const useAdminStore = create((set) => ({
     totalUsers: 0,
     totalPages: 0,
     currentPage: 1,
+    currentLimit: 10,
     friendRequests: [],
     loading: false,
     selectedUser: null,
@@ -17,27 +18,37 @@ export const useAdminStore = create((set) => ({
         set({ stats: res.data });
     },
 
-    fetchUsers: async ({ q = "", role = "", page = 1 } = {}) => {
+    fetchUsers: async ({
+
+        q = "", role = "", location = "",
+        sortBy = "createdAt", sortOrder = "desc",
+        page = 1, limit = 10,
+
+    } = {}) => {
 
         set({ loading: true });
         try {
 
-            const params = new URLSearchParams({ page, limit: 10 });
-            if (q) params.append("q", q);
-            if (role) params.append("role", role);
-            const res = await axiosInstance.get(`/admin/users?${params}`, { withCredentials: true });
+            const params = new URLSearchParams({ page, limit, sortBy, sortOrder });
+            if (q)              params.append("q", q);
+            if (role)           params.append("role", role);
+            if (location)       params.append("location", location);
 
+            const res = await axiosInstance.get(`/admin/users?${params}`, { withCredentials: true });
             set({
                 users: res.data.users,
                 totalUsers: res.data.total,
                 totalPages: res.data.pages,
                 currentPage: res.data.page,
+                currentLimit: res.data.limit,
             });
 
+        } catch (error) {
+            console.error("Error fetching users:", error);
         } finally {
             set({ loading: false });
         }
-
+        
     },
 
     // Load full user details into drawer

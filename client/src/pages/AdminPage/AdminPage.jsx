@@ -17,26 +17,48 @@ const AdminPage = () => {
     const { authUser } = useAuthStore();
     const isSuperAdmin = authUser?.isSuperAdmin;
 
-    const [search, setSearch] = useState("");
-    const [roleFilter, setRoleFilter] = useState("");
-    const [activeTab, setActiveTab] = useState("users");
-    const [confirmDelete, setConfirmDelete] = useState(null);
-    const debounceRef = useRef(null);
+    const {
+        stats, users, totalUsers, totalPages, currentPage, currentLimit,
+        friendRequests, loading,
+        fetchStats, fetchUsers, deleteUser, fetchFriendRequests,
+        deleteFriendRequest, fetchUserById, clearSelectedUser, selectedUser,
+    } = useAdminStore();
 
-    const { stats, users, totalUsers, totalPages, currentPage, friendRequests, loading, fetchStats, fetchUsers, deleteUser, fetchFriendRequests, deleteFriendRequest, fetchUserById, clearSelectedUser, selectedUser } = useAdminStore();
+    // ── Filter/sort state
+    const [search, setSearch]               = useState("");
+    const [roleFilter, setRoleFilter]       = useState("");
+    const [location, setLocation]           = useState("");
+    const [sortBy, setSortBy]               = useState("createdAt");
+    const [sortOrder, setSortOrder]         = useState("desc");
+    const [limit, setLimit]                 = useState(10);
+
+    const [activeTab, setActiveTab]         = useState("users");
+    const [confirmDelete, setConfirmDelete] = useState(null);
+    const debounceRef                       = useRef(null);
 
     useEffect(() => { fetchStats(); fetchUsers(); fetchFriendRequests(); }, []);
 
+    // ── Debounce all filter/sort changes together
     useEffect(() => {
         clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => fetchUsers({ q: search, role: roleFilter, page: 1 }), 300);
+        debounceRef.current = setTimeout(() => {
+            fetchUsers({ q: search, role: roleFilter, location, sortBy, sortOrder, page: 1, limit });
+        }, 300);
         return () => clearTimeout(debounceRef.current);
-    }, [search, roleFilter]);
+    }, [search, roleFilter, location, sortBy, sortOrder, limit]);
+
+    const handleSortChange = (field, order) => {
+        setSortBy(field);
+        setSortOrder(order);
+    };
+
+    const handlePageChange = (page) => {
+        fetchUsers({ q: search, role: roleFilter, location, sortBy, sortOrder, page, limit });
+    };
 
     return (
 
         <>
-
             <Container>
 
                 <Header />
@@ -48,30 +70,50 @@ const AdminPage = () => {
                     <Col xs={6} lg={3}><StatCard icon={TrendingUp} label="New This Month" value={stats?.newUsersThisMonth} sub={`${stats?.newUsersThisWeek ?? 0} this week`} color="#f0ad4e" /></Col>
                 </Row>
 
-                <div className="d-flex gap-2 mb-3">
-
-                    {["users", "requests"].map((tab) => (
-
-                        <Button key={tab} size="sm" style={{ backgroundColor: activeTab === tab ? "#04263D" : "transparent", border: "1px solid #04263D", color: activeTab === tab ? "white" : "#04263D" }} onClick={() => setActiveTab(tab)}>
-                            {tab === "users" ? "Users" : (<>Friend Requests {friendRequests.length > 0 && <Badge pill bg="danger" className="ms-2" style={{ fontSize: "0.6rem" }}>{friendRequests.length}</Badge>}</>)}
-                        </Button>
-
-                    ))}
-
-                </div>
-
                 <Card className="border-0 shadow-sm">
+
+                    <Card.Header className="bg-white border-bottom d-flex gap-2 px-3 py-2">
+
+                        {["users", "requests"].map((tab) => (
+
+                            <Button key={tab} size="sm" style={{ backgroundColor: activeTab === tab ? "#04263D" : "transparent", border: "1px solid #04263D", color: activeTab === tab ? "white" : "#04263D", }} onClick={() => setActiveTab(tab)} >
+
+                                {tab === "users" ? "Users" : (
+                                    <>
+                                        Friend Requests
+                                        {friendRequests.length > 0 && (
+                                            <Badge pill bg="danger" className="ms-2" style={{ fontSize: "0.6rem" }}>
+                                                {friendRequests.length}
+                                            </Badge>
+                                        )}
+                                    </>
+                                )}
+                                
+                            </Button>
+
+                        ))}
+
+                    </Card.Header>
 
                     <Card.Body className="p-3">
 
                         {activeTab === "users" && (
 
                             <UsersTable
-                                users={users} totalUsers={totalUsers} totalPages={totalPages} currentPage={currentPage}
-                                search={search} roleFilter={roleFilter} loading={loading}
-                                confirmDelete={confirmDelete} isSuperAdmin={isSuperAdmin}
-                                onSearchChange={setSearch} onRoleFilterChange={setRoleFilter}
-                                onPageChange={(page) => fetchUsers({ q: search, role: roleFilter, page })}
+                                users={users} totalUsers={totalUsers}
+                                totalPages={totalPages} currentPage={currentPage}
+                                currentLimit={currentLimit || limit}
+                                search={search} roleFilter={roleFilter}
+                                location={location}
+                                sortBy={sortBy} sortOrder={sortOrder}
+                                loading={loading} confirmDelete={confirmDelete}
+                                isSuperAdmin={isSuperAdmin}
+                                onSearchChange={setSearch}
+                                onRoleFilterChange={setRoleFilter}
+                                onLocationChange={setLocation}
+                                onSortChange={handleSortChange}
+                                onLimitChange={setLimit}
+                                onPageChange={handlePageChange}
                                 onRowClick={fetchUserById}
                                 onDeleteClick={setConfirmDelete}
                                 onDeleteConfirm={async (userId) => { await deleteUser(userId); setConfirmDelete(null); }}
@@ -79,7 +121,6 @@ const AdminPage = () => {
                             />
 
                         )}
-                        
                         {activeTab === "requests" && (
                             <FriendRequestsTable friendRequests={friendRequests} onDelete={deleteFriendRequest} />
                         )}

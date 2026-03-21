@@ -46,47 +46,89 @@ export const getStats = async (req, res) => {
 export const getAllUsers = async (req, res) => {
 
     try {
+        
+        const {
+            q, role, location,
+            sortBy = "createdAt", sortOrder = "desc",
+            page = 1, limit = 10,
+        } = req.query;
 
-        const { q, role, page = 1, limit = 10 } = req.query;
         const isSuperAdmin = req.user.role === "SuperAdmin";
 
-        const filter = {};
-        if (q) filter.fullName = { $regex: q.trim(), $options: "i" };
-        if (role) filter.role = role;
+        // ── Match stage
+        const match = {};
+        if (!isSuperAdmin) match.role = { $in: ["User", "Admin"] };
+        if (role) match.role = role === "SuperAdmin" && !isSuperAdmin ? { $in: ["User", "Admin"] } : role;
+        if (q) match.$or = [
+            { fullName: { $regex: q.trim(), $options: "i" } },
+            { email:    { $regex: q.trim(), $options: "i" } },
+        ];
+        if (location) match.location = { $regex: location.trim(), $options: "i" };
 
-        // Admin cannot see SuperAdmin in the list
-        if (!isSuperAdmin) {
-            filter.role = filter.role
-                ? filter.role === "SuperAdmin" ? "User" : filter.role
-                : { $in: ["User", "Admin"] };
-        }
+        // ── Sort stage
+        const validSortFields = { fullName: 1, createdAt: 1, role: 1, friendCount: 1 };
+        const sortField = validSortFields[sortBy] !== undefined ? sortBy : "createdAt";
+        const sortDir   = sortOrder === "asc" ? 1 : -1;
 
-        const total = await User.countDocuments(filter);
-        const users = await User.find(filter)
-            .select("fullName email location role createdAt profilePic")
-            .sort({ createdAt: -1 })
-            .skip((page - 1) * limit)
-            .limit(Number(limit));
+        const pipeline = [
+            { $match: match },
+            { $project: { password: 0 } },
 
-        const usersWithFriendCount = await Promise.all(
+            // ── Join Friend collection to compute friendCount
+            {
+                $lookup: {
+                    from: "friends",
+                    let: { userId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$status", "accepted"] },
+                                        {
+                                            $or: [
+                                                { $eq: ["$requester", "$$userId"] },
+                                                { $eq: ["$recipient", "$$userId"] },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        { $count: "count" },
+                    ],
+                    as: "friendData",
+                },
+            },
+            {
+                $addFields: {
+                    friendCount: { $ifNull: [{ $arrayElemAt: ["$friendData.count", 0] }, 0] },
+                },
+            },
+            { $project: { friendData: 0 } },
 
-            users.map(async (user) => {
+            // ── Count total before pagination
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }],
+                    data: [
+                        { $sort: { [sortField]: sortDir } },
+                        { $skip: (Number(page) - 1) * Number(limit) },
+                        { $limit: Number(limit) },
+                    ],
+                },
+            },
+        ];
 
-                const friendCount = await Friend.countDocuments({
-                    $or: [{ requester: user._id }, { recipient: user._id }],
-                    status: "accepted",
-                });
-
-                return { ...user.toObject(), friendCount };
-            })
-
-        );
+        const [result] = await User.aggregate(pipeline);
+        const total = result.metadata[0]?.total || 0;
 
         res.status(200).json({
-            users: usersWithFriendCount,
+            users: result.data,
             total,
             page: Number(page),
-            pages: Math.ceil(total / limit),
+            pages: Math.ceil(total / Number(limit)),
+            limit: Number(limit),
         });
 
     } catch (error) {
