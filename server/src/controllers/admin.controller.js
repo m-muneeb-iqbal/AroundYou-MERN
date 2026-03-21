@@ -20,11 +20,11 @@ export const getStats = async (req, res) => {
             newUsersThisWeek,
             newUsersThisMonth,
         ] = await Promise.all([
-            User.countDocuments({ role: "User" }),
+            User.countDocuments({ role: { $in: ["User", "Admin"] } }),
             Friend.countDocuments({ status: "accepted" }),
             Conversation.countDocuments(),
-            User.countDocuments({ role: "User", createdAt: { $gte: startOfWeek } }),
-            User.countDocuments({ role: "User", createdAt: { $gte: startOfMonth } }),
+            User.countDocuments({ role: { $in: ["User", "Admin"] }, createdAt: { $gte: startOfWeek } }),
+            User.countDocuments({ role: { $in: ["User", "Admin"] }, createdAt: { $gte: startOfMonth } }),
         ]);
 
         res.status(200).json({

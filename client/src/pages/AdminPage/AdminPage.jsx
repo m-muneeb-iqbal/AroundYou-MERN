@@ -19,21 +19,20 @@ const AdminPage = () => {
 
     const {
         stats, users, totalUsers, totalPages, currentPage, currentLimit,
-        friendRequests, loading,
-        fetchStats, fetchUsers, deleteUser, fetchFriendRequests,
+        friendRequests,
+        fetchStats, fetchUsers, fetchFriendRequests,
         deleteFriendRequest, fetchUserById, clearSelectedUser, selectedUser,
     } = useAdminStore();
 
     // ── Filter/sort state
-    const [search, setSearch]               = useState("");
-    const [roleFilter, setRoleFilter]       = useState("");
-    const [location, setLocation]           = useState("");
-    const [sortBy, setSortBy]               = useState("createdAt");
-    const [sortOrder, setSortOrder]         = useState("desc");
-    const [limit, setLimit]                 = useState(10);
+    const [search, setSearch] = useState("");
+    const [roleFilter, setRoleFilter] = useState("");
+    const [location, setLocation] = useState("");
+    const [sortBy, setSortBy] = useState("createdAt");
+    const [sortOrder, setSortOrder] = useState("desc");
+    const [limit, setLimit] = useState(10);
 
     const [activeTab, setActiveTab]         = useState("users");
-    const [confirmDelete, setConfirmDelete] = useState(null);
     const debounceRef                       = useRef(null);
 
     useEffect(() => { fetchStats(); fetchUsers(); fetchFriendRequests(); }, []);
@@ -106,7 +105,6 @@ const AdminPage = () => {
                                 search={search} roleFilter={roleFilter}
                                 location={location}
                                 sortBy={sortBy} sortOrder={sortOrder}
-                                loading={loading} confirmDelete={confirmDelete}
                                 isSuperAdmin={isSuperAdmin}
                                 onSearchChange={setSearch}
                                 onRoleFilterChange={setRoleFilter}
@@ -115,9 +113,6 @@ const AdminPage = () => {
                                 onLimitChange={setLimit}
                                 onPageChange={handlePageChange}
                                 onRowClick={fetchUserById}
-                                onDeleteClick={setConfirmDelete}
-                                onDeleteConfirm={async (userId) => { await deleteUser(userId); setConfirmDelete(null); }}
-                                onDeleteCancel={() => setConfirmDelete(null)}
                             />
 
                         )}

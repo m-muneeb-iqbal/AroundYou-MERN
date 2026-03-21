@@ -61,10 +61,10 @@ const FilterPill = ({ label, onRemove }) => (
 const UsersTable = ({
     users, totalUsers, totalPages, currentPage, currentLimit,
     search, roleFilter, location,
-    sortBy, sortOrder, loading, confirmDelete, isSuperAdmin,
+    sortBy, sortOrder, loading, isSuperAdmin,
     onSearchChange, onRoleFilterChange, onLocationChange,
     onSortChange, onLimitChange, onPageChange,
-    onRowClick, onDeleteClick, onDeleteConfirm, onDeleteCancel,
+    onRowClick,
 }) => {
 
     // Active filters for pill display
@@ -181,7 +181,6 @@ const UsersTable = ({
                             <SortHeader label="Friends" field="friendCount" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
                             <SortHeader label="Role" field="role" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
                             <SortHeader label="Joined" field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
-                            {isSuperAdmin && <th></th>}
                         </tr>
 
                     </thead>
@@ -233,24 +232,6 @@ const UsersTable = ({
                                     <td className="text-muted align-middle">
                                         {new Date(user.createdAt).toLocaleDateString()}
                                     </td>
-
-                                    {isSuperAdmin && (
-
-                                        <td className="align-middle" onClick={(e) => e.stopPropagation()}>
-
-                                            {confirmDelete === user._id ? (
-
-                                                <div className="d-flex gap-1">
-                                                    <button className="btn btn-danger btn-sm" style={{ fontSize: "0.72rem", padding: "2px 8px" }} onClick={(e) => { e.stopPropagation(); onDeleteConfirm(user._id); }}>Confirm</button>
-                                                    <button className="btn btn-outline-secondary btn-sm" style={{ fontSize: "0.72rem", padding: "2px 8px" }} onClick={(e) => { e.stopPropagation(); onDeleteCancel(); }}>Cancel</button>
-                                                </div>
-
-                                            ) : (
-                                                <Trash2 size={16} color="#dc3545" role="button" onClick={(e) => { e.stopPropagation(); onDeleteClick(user._id); }} />
-                                            )}
-
-                                        </td>
-                                    )}
 
                                 </tr>
 
