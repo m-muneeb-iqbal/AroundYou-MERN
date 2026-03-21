@@ -16,10 +16,10 @@ const PersonCard = ({ user, onAdd }) => (
                 {user.fullName}
             </div>
 
-            {user.jobTitle && (
+            {user.designation && (
 
                 <div className="text-muted text-truncate" style={{ fontSize: "0.72rem" }}>
-                    {user.jobTitle}
+                    {user.designation}
                 </div>
 
             )}

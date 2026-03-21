@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Card, Table, Form, InputGroup, Button, Badge, Pagination, Spinner } from "react-bootstrap";
-import { Search, Trash2, Users, MessageCircleMore, UserRoundPlus, Activity } from "lucide-react";
+import { Search, Trash2, Users, UserRoundPlus, MessageCircleMore, TrendingUp } from "lucide-react";
 import { useAdminStore } from "../../store/useAdminStore";
+import { useAuthStore } from "../../store/useAuthStore";
 import InitialsAvatar from "../../components/common/InitialsAvatar";
 import Header from "../../components/layout/Header";
+import UserDrawer from "../../components/admin/UserDrawer";
 
-const StatCard = ({ icon: Icon, label, value, color }) => (
+const StatCard = ({ icon: Icon, label, value, sub, color }) => (
     <Card className="border-0 shadow-sm h-100">
         <Card.Body className="d-flex align-items-center gap-3 p-3">
             <div
@@ -16,13 +18,27 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
             </div>
             <div>
                 <div className="text-muted" style={{ fontSize: "0.78rem" }}>{label}</div>
-                <div className="fw-bold" style={{ fontSize: "1.3rem", color: "#04263D" }}>{value ?? "—"}</div>
+                <div className="fw-bold" style={{ fontSize: "1.3rem", color: "#04263D" }}>
+                    {value ?? "—"}
+                </div>
+                {sub && (
+                    <div style={{ fontSize: "0.7rem", color: "#898C8F" }}>{sub}</div>
+                )}
             </div>
         </Card.Body>
     </Card>
 );
 
+const roleBadgeStyle = (role) => {
+    if (role === "SuperAdmin") return { backgroundColor: "#6f42c1", color: "white" };
+    if (role === "Admin") return { backgroundColor: "#04263D", color: "white" };
+    return { backgroundColor: "#e0e0e0", color: "#555" };
+};
+
 const AdminPage = () => {
+
+    const { authUser } = useAuthStore();
+    const isSuperAdmin = authUser?.isSuperAdmin;
 
     const {
         stats,
@@ -37,13 +53,19 @@ const AdminPage = () => {
         deleteUser,
         fetchFriendRequests,
         deleteFriendRequest,
+        fetchUserById, 
+        clearSelectedUser, 
+        selectedUser
     } = useAdminStore();
 
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("");
-    const [activeTab, setActiveTab] = useState("users"); // "users" | "requests"
+    const [activeTab, setActiveTab] = useState("users");
     const [confirmDelete, setConfirmDelete] = useState(null);
     const debounceRef = useRef(null);
+    const handleRowClick = async (userId) => {
+        await fetchUserById(userId);
+    };
 
     useEffect(() => {
         fetchStats();
@@ -51,7 +73,6 @@ const AdminPage = () => {
         fetchFriendRequests();
     }, []);
 
-    // Debounced search
     useEffect(() => {
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
@@ -74,51 +95,69 @@ const AdminPage = () => {
             <Header />
             <Container className="py-4">
 
-                {/* Stats row */}
+                {/* Stats */}
                 <Row className="g-3 mb-4">
                     <Col xs={6} lg={3}>
-                        <StatCard icon={Users} label="Total Users" value={stats?.totalUsers} color="#04263D" />
+                        <StatCard
+                            icon={Users}
+                            label="Total Users"
+                            value={stats?.totalUsers}
+                            color="#04263D"
+                        />
                     </Col>
                     <Col xs={6} lg={3}>
-                        <StatCard icon={UserRoundPlus} label="Friendships" value={stats?.totalFriendships} color="#198754" />
+                        <StatCard
+                            icon={UserRoundPlus}
+                            label="Friendships"
+                            value={stats?.totalFriendships}
+                            color="#198754"
+                        />
                     </Col>
                     <Col xs={6} lg={3}>
-                        <StatCard icon={MessageCircleMore} label="Messages" value={stats?.totalMessages} color="#5BC8F5" />
+                        <StatCard
+                            icon={MessageCircleMore}
+                            label="Conversations"
+                            value={stats?.totalConversations}
+                            color="#5BC8F5"
+                        />
                     </Col>
                     <Col xs={6} lg={3}>
-                        <StatCard icon={Activity} label="Pending Requests" value={stats?.totalPendingRequests} color="#f0ad4e" />
+                        <StatCard
+                            icon={TrendingUp}
+                            label="New This Month"
+                            value={stats?.newUsersThisMonth}
+                            sub={`${stats?.newUsersThisWeek ?? 0} this week`}
+                            color="#f0ad4e"
+                        />
                     </Col>
                 </Row>
 
                 {/* Tabs */}
-                <div className="d-flex gap-3 mb-3">
-                    <Button
-                        size="sm"
-                        style={{
-                            backgroundColor: activeTab === "users" ? "#04263D" : "transparent",
-                            border: "1px solid #04263D",
-                            color: activeTab === "users" ? "white" : "#04263D",
-                        }}
-                        onClick={() => setActiveTab("users")}
-                    >
-                        Users
-                    </Button>
-                    <Button
-                        size="sm"
-                        style={{
-                            backgroundColor: activeTab === "requests" ? "#04263D" : "transparent",
-                            border: "1px solid #04263D",
-                            color: activeTab === "requests" ? "white" : "#04263D",
-                        }}
-                        onClick={() => setActiveTab("requests")}
-                    >
-                        Friend Requests
-                        {friendRequests.length > 0 && (
-                            <Badge pill bg="danger" className="ms-2" style={{ fontSize: "0.6rem" }}>
-                                {friendRequests.length}
-                            </Badge>
-                        )}
-                    </Button>
+                <div className="d-flex gap-2 mb-3">
+                    {["users", "requests"].map((tab) => (
+                        <Button
+                            key={tab}
+                            size="sm"
+                            style={{
+                                backgroundColor: activeTab === tab ? "#04263D" : "transparent",
+                                border: "1px solid #04263D",
+                                color: activeTab === tab ? "white" : "#04263D",
+                                textTransform: "capitalize",
+                            }}
+                            onClick={() => setActiveTab(tab)}
+                        >
+                            {tab === "users" ? "Users" : (
+                                <>
+                                    Friend Requests
+                                    {friendRequests.length > 0 && (
+                                        <Badge pill bg="danger" className="ms-2" style={{ fontSize: "0.6rem" }}>
+                                            {friendRequests.length}
+                                        </Badge>
+                                    )}
+                                </>
+                            )}
+                        </Button>
+                    ))}
                 </div>
 
                 {/* Users tab */}
@@ -127,7 +166,7 @@ const AdminPage = () => {
                         <Card.Body className="p-3">
 
                             {/* Filters */}
-                            <Row className="g-2 mb-3">
+                            <Row className="g-2 mb-3 align-items-center">
                                 <Col xs={12} md={7}>
                                     <InputGroup size="sm">
                                         <InputGroup.Text style={{ backgroundColor: "#f5f5f5", border: "1px solid #e0e0e0", borderRight: "none" }}>
@@ -142,22 +181,16 @@ const AdminPage = () => {
                                         />
                                     </InputGroup>
                                 </Col>
-                                <Col xs={12} md={3}>
-                                    <Form.Select
-                                        size="sm"
-                                        value={roleFilter}
-                                        onChange={(e) => setRoleFilter(e.target.value)}
-                                        style={{ fontSize: "0.82rem", border: "1px solid #e0e0e0" }}
-                                    >
+                                <Col xs={8} md={3}>
+                                    <Form.Select size="sm" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={{ fontSize: "0.82rem", border: "1px solid #e0e0e0" }}>
                                         <option value="">All roles</option>
                                         <option value="User">Users</option>
                                         <option value="Admin">Admins</option>
+                                        {isSuperAdmin && <option value="SuperAdmin">Super Admins</option>}
                                     </Form.Select>
                                 </Col>
-                                <Col xs={12} md={2} className="d-flex align-items-center">
-                                    <span className="text-muted" style={{ fontSize: "0.78rem" }}>
-                                        {totalUsers} total
-                                    </span>
+                                <Col xs={4} md={2} className="text-muted" style={{ fontSize: "0.78rem" }}>
+                                    {totalUsers} total
                                 </Col>
                             </Row>
 
@@ -171,30 +204,29 @@ const AdminPage = () => {
                                     <thead style={{ backgroundColor: "#f8f9fa" }}>
                                         <tr>
                                             <th>User</th>
-                                            <th>Designation</th>
                                             <th>Location</th>
+                                            <th>Friends</th>
                                             <th>Role</th>
-                                            <th>Joined</th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {users.length === 0 ? (
                                             <tr>
-                                                <td colSpan={6} className="text-center text-muted py-4">
+                                                <td colSpan={5} className="text-center text-muted py-4">
                                                     No users found
                                                 </td>
                                             </tr>
                                         ) : (
                                             users.map((user) => (
-                                                <tr key={user._id}>
+                                                <tr
+                                                    key={user._id}
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() => handleRowClick(user._id)}
+                                                >
                                                     <td>
                                                         <div className="d-flex align-items-center gap-2">
-                                                            <InitialsAvatar
-                                                                name={user.fullName}
-                                                                profilePic={user.profilePic}
-                                                                size={32}
-                                                            />
+                                                            <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
                                                             <div>
                                                                 <div className="fw-bold" style={{ color: "#04263D" }}>
                                                                     {user.fullName}
@@ -205,51 +237,27 @@ const AdminPage = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="text-muted">{user.designation || "—"}</td>
-                                                    <td className="text-muted">{user.location || "—"}</td>
-                                                    <td>
-                                                        <Badge
-                                                            pill
-                                                            style={{
-                                                                backgroundColor: "#04263D",
-                                                                color: "#FFFFFF",
-                                                                fontSize: "0.65rem",
-                                                            }}
-                                                        >
+                                                    <td className="text-muted align-middle">
+                                                        {user.location || "—"}
+                                                    </td>
+                                                    <td className="align-middle">
+                                                        {user.friendCount ?? 0}
+                                                    </td>
+                                                    <td className="align-middle">
+                                                        <Badge pill bg="none" style={{ ...roleBadgeStyle(user.role), fontSize: "0.65rem" }}>
                                                             {user.role}
                                                         </Badge>
                                                     </td>
-                                                    <td className="text-muted">
-                                                        {new Date(user.createdAt).toLocaleDateString()}
-                                                    </td>
-                                                    <td>
-                                                        {confirmDelete === user._id ? (
-                                                            <div className="d-flex gap-1">
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="danger"
-                                                                    style={{ fontSize: "0.72rem", padding: "2px 8px" }}
-                                                                    onClick={() => handleDelete(user._id)}
-                                                                >
-                                                                    Confirm
-                                                                </Button>
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="outline-secondary"
-                                                                    style={{ fontSize: "0.72rem", padding: "2px 8px" }}
-                                                                    onClick={() => setConfirmDelete(null)}
-                                                                >
-                                                                    Cancel
-                                                                </Button>
-                                                            </div>
-                                                        ) : (
-                                                            <Trash2
-                                                                size={16}
-                                                                color="#dc3545"
-                                                                role="button"
-                                                                title="Delete user"
-                                                                onClick={() => setConfirmDelete(user._id)}
-                                                            />
+                                                    <td className="align-middle" onClick={(e) => e.stopPropagation()}>
+                                                        {isSuperAdmin && (
+                                                            confirmDelete === user._id ? (
+                                                                <div className="d-flex gap-1">
+                                                                    <Button size="sm" variant="danger" style={{ fontSize: "0.72rem", padding: "2px 8px" }} onClick={(e) => { e.stopPropagation(); handleDelete(user._id); }}>Confirm</Button>
+                                                                    <Button size="sm" variant="outline-secondary" style={{ fontSize: "0.72rem", padding: "2px 8px" }} onClick={(e) => { e.stopPropagation(); setConfirmDelete(null); }}>Cancel</Button>
+                                                                </div>
+                                                            ) : (
+                                                                <Trash2 size={16} color="#dc3545" role="button" title="Delete user" onClick={(e) => { e.stopPropagation(); setConfirmDelete(user._id); }} />
+                                                            )
                                                         )}
                                                     </td>
                                                 </tr>
@@ -268,7 +276,6 @@ const AdminPage = () => {
                                                 key={page}
                                                 active={page === currentPage}
                                                 onClick={() => handlePageChange(page)}
-                                                style={{ fontSize: "0.82rem" }}
                                             >
                                                 {page}
                                             </Pagination.Item>
@@ -316,10 +323,10 @@ const AdminPage = () => {
                                                         <span>{req.recipient.fullName}</span>
                                                     </div>
                                                 </td>
-                                                <td className="text-muted">
+                                                <td className="text-muted align-middle">
                                                     {new Date(req.createdAt).toLocaleDateString()}
                                                 </td>
-                                                <td>
+                                                <td className="align-middle">
                                                     <Trash2
                                                         size={16}
                                                         color="#dc3545"
@@ -338,6 +345,9 @@ const AdminPage = () => {
                 )}
 
             </Container>
+            {selectedUser && (
+                <UserDrawer onClose={clearSelectedUser} />
+            )}
         </>
     );
 };

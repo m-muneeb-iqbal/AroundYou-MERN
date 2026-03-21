@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema (
             type: String,
             default: "",
         },
+        designation: {
+            type: String,
+            default: "",
+        },
         website: {
             type: String,
             default: "",
@@ -92,7 +96,7 @@ const userSchema = new mongoose.Schema (
             type: String,
             default: "",
         },
-        designation: {
+        jobTitle: {
             type: String,
             default: "",
         },
@@ -135,7 +139,7 @@ const userSchema = new mongoose.Schema (
         },
         role: {
             type: String,
-            enum: ["Admin", "User"],
+            enum: ["SuperAdmin", "Admin", "User"],
             default: "User"
         },
         password: {
@@ -158,7 +162,9 @@ userSchema.methods.toSafeObject = function () {
         company: this.company,
         designation: this.designation,
         location: this.location,
-        isAdmin: this.role === "Admin"
+        jobTitle: this.jobTitle,
+        isAdmin: this.role === "Admin" || this.role === "SuperAdmin",
+        isSuperAdmin: this.role === "SuperAdmin",
     };
 }
 

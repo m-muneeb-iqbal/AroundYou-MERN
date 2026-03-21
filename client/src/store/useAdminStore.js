@@ -10,6 +10,7 @@ export const useAdminStore = create((set) => ({
     currentPage: 1,
     friendRequests: [],
     loading: false,
+    selectedUser: null, // ✅ user loaded in drawer
 
     fetchStats: async () => {
         const res = await axiosInstance.get("/admin/stats", { withCredentials: true });
@@ -22,7 +23,6 @@ export const useAdminStore = create((set) => ({
             const params = new URLSearchParams({ page, limit: 10 });
             if (q) params.append("q", q);
             if (role) params.append("role", role);
-
             const res = await axiosInstance.get(`/admin/users?${params}`, { withCredentials: true });
             set({
                 users: res.data.users,
@@ -35,11 +35,63 @@ export const useAdminStore = create((set) => ({
         }
     },
 
+    // ✅ Load full user details into drawer
+    fetchUserById: async (userId) => {
+        const res = await axiosInstance.get(`/admin/users/${userId}`, { withCredentials: true });
+        set({ selectedUser: res.data });
+    },
+
+    clearSelectedUser: () => set({ selectedUser: null }),
+
+    // ✅ Update user fields — refreshes both drawer and table row
+    updateUser: async (userId, updates) => {
+        const res = await axiosInstance.patch(`/admin/users/${userId}`, updates, { withCredentials: true });
+        set((state) => ({
+            selectedUser: res.data,
+            users: state.users.map((u) =>
+                u._id === userId
+                    ? { ...u, ...res.data }
+                    : u
+            ),
+        }));
+    },
+
     deleteUser: async (userId) => {
         await axiosInstance.delete(`/admin/users/${userId}`, { withCredentials: true });
         set((state) => ({
             users: state.users.filter((u) => u._id !== userId),
             totalUsers: state.totalUsers - 1,
+            selectedUser: null,
+        }));
+    },
+
+    removeProfilePic: async (userId) => {
+        const res = await axiosInstance.delete(`/admin/users/${userId}/profile-pic`, { withCredentials: true });
+        set((state) => ({
+            selectedUser: res.data,
+            users: state.users.map((u) => u._id === userId ? { ...u, profilePic: "" } : u),
+        }));
+    },
+
+    clearEducation: async (userId) => {
+        const res = await axiosInstance.delete(`/admin/users/${userId}/education`, { withCredentials: true });
+        set({ selectedUser: res.data });
+    },
+
+    clearExperience: async (userId) => {
+        const res = await axiosInstance.delete(`/admin/users/${userId}/experience`, { withCredentials: true });
+        set({ selectedUser: res.data });
+    },
+
+    clearSkills: async (userId) => {
+        const res = await axiosInstance.delete(`/admin/users/${userId}/skills`, { withCredentials: true });
+        set({ selectedUser: res.data });
+    },
+
+    clearFriends: async (userId) => {
+        await axiosInstance.delete(`/admin/users/${userId}/friends`, { withCredentials: true });
+        set((state) => ({
+            users: state.users.map((u) => u._id === userId ? { ...u, friendCount: 0 } : u),
         }));
     },
 
