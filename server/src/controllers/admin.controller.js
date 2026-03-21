@@ -168,7 +168,7 @@ export const updateUser = async (req, res) => {
             { new: true, runValidators: true }
         ).select("-password");
 
-        res.status(200).json(updatedUser);
+        res.status(201).json({ message: "User info updated successfully" });
 
     } catch (error) {
         console.error("Error updating user:", error);
@@ -202,7 +202,7 @@ export const deleteUser = async (req, res) => {
             User.findByIdAndDelete(userId),
         ]);
 
-        res.status(200).json({ message: "User deleted successfully" });
+        res.status(201).json({ message: "User deleted successfully" });
 
     } catch (error) {
         console.error("Error deleting user:", error);
@@ -229,7 +229,7 @@ export const removeProfilePic = async (req, res) => {
             { new: true }
         ).select("-password");
 
-        res.status(200).json(user);
+        res.status(201).json({ message: "Profile picture removed successfully" });
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -254,7 +254,7 @@ export const clearEducation = async (req, res) => {
             { new: true }
         ).select("-password");
 
-        res.status(200).json(user);
+        res.status(201).json({ message: "Education cleared successfully" });
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -280,7 +280,7 @@ export const clearExperience = async (req, res) => {
             { new: true }
         ).select("-password");
 
-        res.status(200).json(user);
+        res.status(201).json({ message: "Experience cleared successfully" });
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -306,7 +306,7 @@ export const clearSkills = async (req, res) => {
             { new: true }
         ).select("-password");
 
-        res.status(200).json(user);
+        res.status(201).json({ message: "Skills cleared successfully" });
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -323,7 +323,7 @@ export const clearFriends = async (req, res) => {
             $or: [{ requester: req.params.userId }, { recipient: req.params.userId }],
         });
 
-        res.status(200).json({ message: "All friendships removed" });
+        res.status(201).json({ message: "All friendships removed" });
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -356,7 +356,7 @@ export const deleteFriendRequest = async (req, res) => {
 
         const request = await Friend.findByIdAndDelete(req.params.requestId);
         if (!request) return res.status(404).json({ message: "Request not found" });
-        res.status(200).json({ message: "Friend request removed" });
+        res.status(201).json({ message: "Friend request removed" });
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });

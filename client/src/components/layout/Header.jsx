@@ -108,7 +108,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                                 {authUser?.isAdmin && (
                                     <Dropdown.Item className={styles.dropDownItem} onClick={() => navigate("/admin")}>
-                                        Admin Dashboard
+                                        Dashboard
                                     </Dropdown.Item>
                                 )}
 
