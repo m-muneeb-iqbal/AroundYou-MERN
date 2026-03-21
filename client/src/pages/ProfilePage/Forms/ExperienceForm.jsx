@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState } from "react";
 
-import { Col, Row, Form, Button } from 'react-bootstrap';
+import { Col, Row, Form, Button, Spinner } from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ const ExperienceForm = () => {
     
     if(!authUser) return <navigate to = "/" />;
 
-    const { profileData, fetchProfile,updateExperience, deleteExperience } = useProfileStore();
+    const { profileData, fetchProfile,updateExperience, deleteExperience, isUpdating } = useProfileStore();
 
     const navigate = useNavigate();
 
@@ -184,7 +184,7 @@ const ExperienceForm = () => {
 
                 <Row className='d-flex justify-content-end'>
                     <Col xs={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
-                        Save & Next
+                        {isUpdating ? <Spinner animation="border" size="sm" /> : "Save & Next"}
                     </Col>
                 </Row>
 

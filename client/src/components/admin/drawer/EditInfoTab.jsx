@@ -5,7 +5,9 @@ import EducationFields from "./fields/EducationFields";
 import ExperienceFields from "./fields/ExperienceFields";
 import SkillsField from "./fields/SkillsField";
 
-const EditInfoTab = ({ form, edu, exp, skillsInput, isSuperAdmin, saving, onFormChange, onEduChange, onExpChange, onSkillsChange, onSave }) => (
+import styles from "../../../styles/UI/Buttons.module.css";
+
+const EditInfoTab = ({ form, edu, exp, skillsInput, isSuperAdmin, saving, isChanged, onFormChange, onEduChange, onExpChange, onSkillsChange, onSave }) => (
 
     <div className="p-3 d-flex flex-column gap-3">
 
@@ -13,8 +15,8 @@ const EditInfoTab = ({ form, edu, exp, skillsInput, isSuperAdmin, saving, onForm
         <EducationFields edu={edu} onChange={onEduChange} />
         <ExperienceFields exp={exp} onChange={onExpChange} />
         <SkillsField value={skillsInput} onChange={onSkillsChange} />
-        
-        <Button onClick={onSave} disabled={saving} style={{ backgroundColor: "#04263D", border: "none", fontSize: "0.85rem" }} >
+
+        <Button variant="outline-primary" onClick={onSave} disabled={saving || !isChanged} className={styles.submitButton} type="submit" >
             {saving ? <Spinner animation="border" size="sm" /> : "Save Changes"}
         </Button>
 

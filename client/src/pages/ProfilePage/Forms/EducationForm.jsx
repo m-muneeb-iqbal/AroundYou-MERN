@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Col, Row, Form, Button } from 'react-bootstrap';
+import { Col, Row, Form, Button, Spinner } from 'react-bootstrap';
 import { SquarePlus, Trash } from 'lucide-react';
 
 import { useNavigate } from "react-router-dom";
@@ -75,7 +75,7 @@ const EducationForm = () => {
 
     if(!authUser) return <navigate to = "/" />;
 
-    const { profileData, fetchProfile, updateEducation, deleteEducation, deleteCertification} = useProfileStore();
+    const { profileData, fetchProfile, updateEducation, deleteEducation, deleteCertification, isUpdating } = useProfileStore();
 
     const navigate = useNavigate();
 
@@ -332,7 +332,7 @@ const EducationForm = () => {
 
                 <Row className='d-flex justify-content-end'>
                     <Col xs={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
-                        Save & Next
+                        {isUpdating ? <Spinner animation="border" size="sm" /> : "Save & Next"}
                     </Col>
                 </Row>
 

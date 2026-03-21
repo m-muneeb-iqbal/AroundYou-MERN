@@ -1,4 +1,3 @@
-import { X } from "lucide-react";
 import { Badge } from "react-bootstrap";
 
 import InitialsAvatar from "../../common/InitialsAvatar";
@@ -7,16 +6,15 @@ export const roleBadgeStyle = (role) => {
 
     if (role === "SuperAdmin") return { backgroundColor: "#6F42C1", color: "#FFFFFF" };
     if (role === "Admin") return { backgroundColor: "#04263D", color: "#FFFFFF" };
-    return { backgroundColor: "#e0e0e0", color: "#555555" };
+    return { backgroundColor: "#E0E0E0", color: "#555555" };
 
 };
 
-const DrawerHeader = ({ user, onClose }) => (
+const DrawerHeader = ({ user }) => (
 
-    <div className="d-flex align-items-center gap-3 p-3" style={{ borderBottom: "1px solid #F0F0F0", flexShrink: 0 }} >
+    <div className="d-flex align-items-center gap-3 w-100">
 
         <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={42} />
-
         <div className="flex-grow-1 overflow-hidden">
 
             <div className="fw-bold text-truncate" style={{ color: "#04263D" }}>
@@ -29,13 +27,12 @@ const DrawerHeader = ({ user, onClose }) => (
 
         </div>
 
-        <Badge pill bg="none" style={{ ...roleBadgeStyle(user.role), fontSize: "0.65rem", flexShrink: 0 }} >
+        <Badge pill bg="none" style={{ ...roleBadgeStyle(user.role), fontSize: "0.65rem", flexShrink: 0 }}>
             {user.role}
         </Badge>
 
-        <X role="button" size={20} color="#898C8F" onClick={onClose} />
-
     </div>
+
 );
 
 export default DrawerHeader;

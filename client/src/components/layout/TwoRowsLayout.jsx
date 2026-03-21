@@ -10,11 +10,11 @@ const TwoRowsLayout = ({ top, bottom }) => {
         
             <Header/>
             
-            <Row className="pt-5">
+            <Row className="mt-1">
                 {top && <Col xs={12} className="d-flex justify-content-center">{top}</Col>}
             </Row>
 
-            <Row className="pt-0">
+            <Row>
                 {bottom && <Col xs={12}>{bottom}</Col>}
             </Row>
         

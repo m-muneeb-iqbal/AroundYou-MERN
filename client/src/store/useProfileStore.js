@@ -18,9 +18,10 @@ export const useProfileStore = create ((set) => ({
 
         try {
 
-            const res = await axiosInstance.put("/auth/update-personal-info", formData,
-                { withCredentials: true }
-            );
+            const [res] = await Promise.all([
+                axiosInstance.put("/auth/update-personal-info", formData, { withCredentials: true }),
+                new Promise((resolve) => setTimeout(resolve, 800)),
+            ]);
 
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().checkAuth(); 
@@ -40,10 +41,11 @@ export const useProfileStore = create ((set) => ({
         set({ isUpdating: true });
 
         try {
-            const res = await axiosInstance.put("/auth/update-education", data,
-                { withCredentials: true }
-            );
 
+            const [res] = await Promise.all([
+                axiosInstance.put("/auth/update-education", data, { withCredentials: true }),
+                new Promise((resolve) => setTimeout(resolve, 800)),
+            ]);
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().setAuthUser(res.data);
 
@@ -105,9 +107,11 @@ export const useProfileStore = create ((set) => ({
         set({ isUpdating: true });
 
         try {
-            const res = await axiosInstance.put("/auth/update-experience", data,
-                { withCredentials: true }
-            );
+
+            const [res] = await Promise.all([
+                axiosInstance.put("/auth/update-experience", data, { withCredentials: true }),
+                new Promise((resolve) => setTimeout(resolve, 800)),
+            ]);
 
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().setAuthUser(res.data);
@@ -148,9 +152,10 @@ export const useProfileStore = create ((set) => ({
         set({ isUpdating: true });
 
         try {
-            const res = await axiosInstance.put("/auth/update-skills", data,
-                { withCredentials: true }
-            );
+            const [res] = await Promise.all([
+                axiosInstance.put("/auth/update-skills", data, { withCredentials: true }),
+                new Promise((resolve) => setTimeout(resolve, 800)),
+            ]);
 
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().setAuthUser(res.data);

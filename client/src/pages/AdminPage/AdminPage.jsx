@@ -37,8 +37,9 @@ const AdminPage = () => {
 
         <>
 
-            <Header />
-            <Container className="py-4">
+            <Container>
+
+                <Header />
 
                 <Row className="g-3 mb-4">
                     <Col xs={6} lg={3}><StatCard icon={Users} label="Total Users" value={stats?.totalUsers} color="#04263D" /></Col>
