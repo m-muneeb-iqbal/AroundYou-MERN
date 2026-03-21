@@ -5,7 +5,9 @@ import Conversation from "../models/conversation.model.js";
 
 // ── GET /admin/stats
 export const getStats = async (req, res) => {
+
     try {
+
         const now = new Date();
         const startOfWeek = new Date(now);
         startOfWeek.setDate(now.getDate() - 7);
@@ -37,11 +39,14 @@ export const getStats = async (req, res) => {
         console.error("Error fetching stats:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── GET /admin/users
 export const getAllUsers = async (req, res) => {
+
     try {
+
         const { q, role, page = 1, limit = 10 } = req.query;
         const isSuperAdmin = req.user.role === "SuperAdmin";
 
@@ -49,7 +54,7 @@ export const getAllUsers = async (req, res) => {
         if (q) filter.fullName = { $regex: q.trim(), $options: "i" };
         if (role) filter.role = role;
 
-        // ✅ Admin cannot see SuperAdmin in the list
+        // Admin cannot see SuperAdmin in the list
         if (!isSuperAdmin) {
             filter.role = filter.role
                 ? filter.role === "SuperAdmin" ? "User" : filter.role
@@ -64,13 +69,17 @@ export const getAllUsers = async (req, res) => {
             .limit(Number(limit));
 
         const usersWithFriendCount = await Promise.all(
+
             users.map(async (user) => {
+
                 const friendCount = await Friend.countDocuments({
                     $or: [{ requester: user._id }, { recipient: user._id }],
                     status: "accepted",
                 });
+
                 return { ...user.toObject(), friendCount };
             })
+
         );
 
         res.status(200).json({
@@ -84,17 +93,20 @@ export const getAllUsers = async (req, res) => {
         console.error("Error fetching users:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── GET /admin/users/:userId
 export const getUserById = async (req, res) => {
+
     try {
+
         const isSuperAdmin = req.user.role === "SuperAdmin";
         const user = await User.findById(req.params.userId).select("-password");
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // ✅ Admin cannot view SuperAdmin profile
+        // Admin cannot view SuperAdmin profile
         if (!isSuperAdmin && user.role === "SuperAdmin") {
             return res.status(403).json({ message: "Access denied." });
         }
@@ -105,23 +117,26 @@ export const getUserById = async (req, res) => {
         console.error("Error fetching user:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── PATCH /admin/users/:userId
 export const updateUser = async (req, res) => {
+
     try {
+
         const { userId } = req.params;
         const isSuperAdmin = req.user.role === "SuperAdmin";
 
         const targetUser = await User.findById(userId);
         if (!targetUser) return res.status(404).json({ message: "User not found" });
 
-        // ✅ Admin cannot edit SuperAdmin or other Admins
+        // Admin cannot edit SuperAdmin or other Admins
         if (!isSuperAdmin && targetUser.role !== "User") {
             return res.status(403).json({ message: "You can only edit regular users." });
         }
 
-        // ✅ Fields available to both Admin and SuperAdmin
+        // Fields available to both Admin and SuperAdmin
         const sharedFields = [
             "fullName", "email", "location", "designation", "description",
             "education", "field", "passingYear", "cgpa", "institute",
@@ -129,12 +144,12 @@ export const updateUser = async (req, res) => {
             "resignationDate", "currentlyWorking", "skills",
         ];
 
-        // ✅ Role change — SuperAdmin only
+        // Role change — SuperAdmin only
         const allowedFields = isSuperAdmin
             ? [...sharedFields, "role"]
             : sharedFields;
 
-        // ✅ Prevent SuperAdmin role from being assigned by anyone
+        // Prevent SuperAdmin role from being assigned by anyone
         if (req.body.role === "SuperAdmin") {
             return res.status(403).json({ message: "SuperAdmin role cannot be assigned." });
         }
@@ -159,11 +174,14 @@ export const updateUser = async (req, res) => {
         console.error("Error updating user:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── DELETE /admin/users/:userId — SuperAdmin only
 export const deleteUser = async (req, res) => {
+
     try {
+
         const { userId } = req.params;
 
         if (userId === req.user._id.toString())
@@ -172,7 +190,7 @@ export const deleteUser = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        // ✅ Cannot delete SuperAdmin
+        // Cannot delete SuperAdmin
         if (user.role === "SuperAdmin") {
             return res.status(403).json({ message: "SuperAdmin cannot be deleted." });
         }
@@ -190,11 +208,14 @@ export const deleteUser = async (req, res) => {
         console.error("Error deleting user:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── DELETE /admin/users/:userId/profile-pic — both Admin and SuperAdmin
 export const removeProfilePic = async (req, res) => {
+
     try {
+
         const isSuperAdmin = req.user.role === "SuperAdmin";
         const target = await User.findById(req.params.userId);
 
@@ -217,7 +238,9 @@ export const removeProfilePic = async (req, res) => {
 
 // ── DELETE /admin/users/:userId/education
 export const clearEducation = async (req, res) => {
+
     try {
+
         const isSuperAdmin = req.user.role === "SuperAdmin";
         const target = await User.findById(req.params.userId);
 
@@ -236,11 +259,14 @@ export const clearEducation = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── DELETE /admin/users/:userId/experience
 export const clearExperience = async (req, res) => {
+
     try {
+
         const isSuperAdmin = req.user.role === "SuperAdmin";
         const target = await User.findById(req.params.userId);
 
@@ -259,11 +285,14 @@ export const clearExperience = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── DELETE /admin/users/:userId/skills
 export const clearSkills = async (req, res) => {
+
     try {
+
         const isSuperAdmin = req.user.role === "SuperAdmin";
         const target = await User.findById(req.params.userId);
 
@@ -282,40 +311,55 @@ export const clearSkills = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── DELETE /admin/users/:userId/friends — SuperAdmin only
 export const clearFriends = async (req, res) => {
+
     try {
+
         await Friend.deleteMany({
             $or: [{ requester: req.params.userId }, { recipient: req.params.userId }],
         });
+
         res.status(200).json({ message: "All friendships removed" });
+
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
+
 };
 
 // ── GET /admin/friend-requests
 export const getAllFriendRequests = async (req, res) => {
+
     try {
+
         const requests = await Friend.find({ status: "pending" })
             .populate("requester", "fullName profilePic")
             .populate("recipient", "fullName profilePic")
             .sort({ createdAt: -1 });
         res.status(200).json(requests);
+
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
+
     }
+
 };
 
 // ── DELETE /admin/friend-requests/:requestId
 export const deleteFriendRequest = async (req, res) => {
+
     try {
+
         const request = await Friend.findByIdAndDelete(req.params.requestId);
         if (!request) return res.status(404).json({ message: "Request not found" });
         res.status(200).json({ message: "Friend request removed" });
+
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
+    
 };

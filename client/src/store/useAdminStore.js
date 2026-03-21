@@ -10,7 +10,7 @@ export const useAdminStore = create((set) => ({
     currentPage: 1,
     friendRequests: [],
     loading: false,
-    selectedUser: null, // ✅ user loaded in drawer
+    selectedUser: null,
 
     fetchStats: async () => {
         const res = await axiosInstance.get("/admin/stats", { withCredentials: true });
@@ -18,24 +18,29 @@ export const useAdminStore = create((set) => ({
     },
 
     fetchUsers: async ({ q = "", role = "", page = 1 } = {}) => {
+
         set({ loading: true });
         try {
+
             const params = new URLSearchParams({ page, limit: 10 });
             if (q) params.append("q", q);
             if (role) params.append("role", role);
             const res = await axiosInstance.get(`/admin/users?${params}`, { withCredentials: true });
+
             set({
                 users: res.data.users,
                 totalUsers: res.data.total,
                 totalPages: res.data.pages,
                 currentPage: res.data.page,
             });
+
         } finally {
             set({ loading: false });
         }
+
     },
 
-    // ✅ Load full user details into drawer
+    // Load full user details into drawer
     fetchUserById: async (userId) => {
         const res = await axiosInstance.get(`/admin/users/${userId}`, { withCredentials: true });
         set({ selectedUser: res.data });
@@ -43,16 +48,18 @@ export const useAdminStore = create((set) => ({
 
     clearSelectedUser: () => set({ selectedUser: null }),
 
-    // ✅ Update user fields — refreshes both drawer and table row
+    // Update user fields — refreshes both drawer and table row
     updateUser: async (userId, updates) => {
         const res = await axiosInstance.patch(`/admin/users/${userId}`, updates, { withCredentials: true });
         set((state) => ({
+
             selectedUser: res.data,
             users: state.users.map((u) =>
                 u._id === userId
                     ? { ...u, ...res.data }
                     : u
             ),
+            
         }));
     },
 

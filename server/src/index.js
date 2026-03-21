@@ -32,8 +32,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/friend", friendRoutes);
-const server = createServer (app);
 
+const server = createServer (app);
 initSocket (server);
 
 server.listen (PORT, () => {
