@@ -5,6 +5,7 @@ import { useAdminStore } from "../../store/useAdminStore";
 import { useAuthStore } from "../../store/useAuthStore";
 
 import { useFormDirty } from "../../hooks/useFormDirty";
+import { useToast } from "../../context/ToastContext";
 
 import DrawerHeader from "./drawer/DrawerHeader";
 import DrawerTabs from "./drawer/DrawerTabs";
@@ -13,6 +14,7 @@ import DangerZoneTab from "./drawer/DangerZoneTab";
 
 const UserDrawer = ({ onClose }) => {
 
+    const { showToast } = useToast();
     const { authUser } = useAuthStore();
     const isSuperAdmin = authUser?.isSuperAdmin;
 
@@ -90,24 +92,103 @@ const UserDrawer = ({ onClose }) => {
     if (!selectedUser) return null;
 
     const handleSave = async () => {
-
         setSaving(true);
         try {
-
             const skills = skillsInput.split(",").map((s) => s.trim()).filter(Boolean);
             await updateUser(selectedUser._id, { ...form, ...edu, ...exp, skills });
             setOriginalData(currentData);
+            showToast("User updated successfully", "success");
+
+        } catch (err) {
+            
+            const status = err.response?.status;
+            const message = err.response?.data?.message;
+
+            if (status === 403 && message?.includes("SuperAdmin")) {
+                showToast("SuperAdmin details cannot be edited.", "danger");
+            } else if (status === 403 && message?.includes("regular users")) {
+                showToast("You can only edit regular users.", "danger");
+            } else if (status === 403) {
+                showToast(message || "You don't have permission to edit this user.", "danger");
+            } else if (status === 404) {
+                showToast("User not found.", "danger");
+            } else if (status === 400) {
+                showToast(message || "Invalid data provided.", "danger");
+            } else {
+                showToast("Update failed. Please try again.", "danger");
+            }
 
         } finally {
             setSaving(false);
         }
-
     };
 
     const handleAction = async (action) => {
-        const actions = { profilePic: removeProfilePic, education: clearEducation, experience: clearExperience, skills: clearSkills, friends: clearFriends };
-        if (action === "deleteUser") { await deleteUser(selectedUser._id); onClose(); return; }
-        await actions[action]?.(selectedUser._id);
+
+        const actions = { 
+            profilePic: removeProfilePic, 
+            education: clearEducation, 
+            experience: clearExperience, 
+            skills: clearSkills, 
+            friends: clearFriends 
+        };
+
+        const actionLabels = {
+            profilePic: "Profile picture removed",
+            education:  "Education cleared",
+            experience: "Experience cleared",
+            skills:     "Skills cleared",
+            friends:    "All friendships removed",
+        };
+
+        if (action === "deleteUser") {
+
+            try {
+
+                await deleteUser(selectedUser._id);
+                showToast("User deleted successfully", "success");
+                onClose();
+
+            } catch (err) {
+
+                const status = err.response?.status;
+                const message = err.response?.data?.message;
+
+                if (status === 403 && message?.includes("SuperAdmin")) {
+                    showToast("SuperAdmin account cannot be deleted.", "danger");
+                } else if (status === 400 && message?.includes("own")) {
+                    showToast("You cannot delete your own account.", "danger");
+                } else if (status === 404) {
+                    showToast("User not found.", "danger");
+                } else {
+                    showToast("Failed to delete user. Please try again.", "danger");
+                }
+            }
+
+            setConfirm(null);
+            return;
+
+        }
+
+        try {
+
+            await actions[action]?.(selectedUser._id);
+            showToast(actionLabels[action] || "Done", "success");
+
+        } catch (err) {
+
+            const status = err.response?.status;
+            const message = err.response?.data?.message;
+
+            if (status === 403) {
+                showToast(message || "You don't have permission to do this.", "danger");
+            } else if (status === 404) {
+                showToast("User not found.", "danger");
+            } else {
+                showToast(`Failed to ${action}. Please try again.`, "danger");
+            }
+
+        }
         setConfirm(null);
     };
 

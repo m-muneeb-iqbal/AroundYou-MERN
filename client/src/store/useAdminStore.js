@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 
@@ -77,42 +78,66 @@ export const useAdminStore = create((set) => ({
     },
 
     deleteUser: async (userId) => {
-        await axiosInstance.delete(`/admin/users/${userId}`, { withCredentials: true });
-        set((state) => ({
-            users: state.users.filter((u) => u._id !== userId),
-            totalUsers: state.totalUsers - 1,
-            selectedUser: null,
-        }));
+        try {
+            await axiosInstance.delete(`/admin/users/${userId}`, { withCredentials: true });
+            set((state) => ({
+                users: state.users.filter((u) => u._id !== userId),
+                totalUsers: state.totalUsers - 1,
+                selectedUser: null,
+            }));
+        } catch (err) {
+            throw err;
+        }
     },
 
     removeProfilePic: async (userId) => {
-        const res = await axiosInstance.delete(`/admin/users/${userId}/profile-pic`, { withCredentials: true });
-        set((state) => ({
-            selectedUser: res.data,
-            users: state.users.map((u) => u._id === userId ? { ...u, profilePic: "" } : u),
-        }));
+        try {
+            const res = await axiosInstance.delete(`/admin/users/${userId}/profile-pic`, { withCredentials: true });
+            set((state) => ({
+                selectedUser: res.data,
+                users: state.users.map((u) => u._id === userId ? { ...u, profilePic: "" } : u),
+            }));
+        } catch (err) {
+            throw err;
+        }
     },
 
     clearEducation: async (userId) => {
-        const res = await axiosInstance.delete(`/admin/users/${userId}/education`, { withCredentials: true });
-        set({ selectedUser: res.data });
+        try {
+            const res = await axiosInstance.delete(`/admin/users/${userId}/education`, { withCredentials: true });
+            set({ selectedUser: res.data });
+        } catch (err) {
+            throw err;
+        }
     },
 
     clearExperience: async (userId) => {
-        const res = await axiosInstance.delete(`/admin/users/${userId}/experience`, { withCredentials: true });
-        set({ selectedUser: res.data });
+        try {
+            const res = await axiosInstance.delete(`/admin/users/${userId}/experience`, { withCredentials: true });
+            set({ selectedUser: res.data });
+        } catch (err) {
+            throw err;
+        }
     },
 
     clearSkills: async (userId) => {
-        const res = await axiosInstance.delete(`/admin/users/${userId}/skills`, { withCredentials: true });
-        set({ selectedUser: res.data });
+        try {
+            const res = await axiosInstance.delete(`/admin/users/${userId}/skills`, { withCredentials: true });
+            set({ selectedUser: res.data });
+        } catch (err) {
+            throw err;
+        }
     },
 
     clearFriends: async (userId) => {
-        await axiosInstance.delete(`/admin/users/${userId}/friends`, { withCredentials: true });
-        set((state) => ({
-            users: state.users.map((u) => u._id === userId ? { ...u, friendCount: 0 } : u),
-        }));
+        try {
+            await axiosInstance.delete(`/admin/users/${userId}/friends`, { withCredentials: true });
+            set((state) => ({
+                users: state.users.map((u) => u._id === userId ? { ...u, friendCount: 0 } : u),
+            }));
+        } catch (err) {
+            throw err;
+        }
     },
 
     fetchFriendRequests: async () => {

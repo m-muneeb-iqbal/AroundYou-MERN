@@ -107,7 +107,7 @@ const Header = () => {
 
             setTimeout(async () => {
                 await checkAuth();
-            }, 3000);
+            }, 3300);
             
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
