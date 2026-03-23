@@ -10,7 +10,7 @@ import { useToast } from "../../../context/ToastContext";
 import styles from "../../../styles/LandingPage/Header/Header.module.css";
 
 function VerticallyCenteredModal({
-    show, onHide, formData, handleChange, handleLogin, isLoggingIn
+    show, onHide, formData, handleChange, handleLogin, isLoggingIn, isNavigating
 }) {
 
     return (
@@ -43,8 +43,8 @@ function VerticallyCenteredModal({
                         
                     </Form.Group>
 
-                    <Button variant="success" className="w-100" type="submit" disabled={isLoggingIn}>
-                        {isLoggingIn ? "Signing In..." : "Sign In"}
+                    <Button variant="success" className="w-100" type="submit" disabled={isLoggingIn || isNavigating}>
+                        {isLoggingIn ? "Signing In..." : isNavigating ? "Redirecting..." : "Sign In"}
                     </Button>
 
                 </Form>
@@ -84,6 +84,7 @@ const Header = () => {
     const { login, isLoggingIn, checkAuth } = useAuthStore();
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const [isNavigating, setIsNavigating] = useState(false);
 
     const handleLogin = async (e) => {
 
@@ -104,15 +105,29 @@ const Header = () => {
             form.classList.remove("was-validated");
 
             showToast("Logged in successfully!", "success");
+            setIsNavigating(true);
 
             setTimeout(async () => {
                 await checkAuth();
+                navigate("/home");
+                setIsNavigating(false);
             }, 3300);
             
         } catch (err) {
-            console.error("Login failed:", err.response?.data || err.message);
-            showToast("Login failed", "danger");
 
+            setIsNavigating(false);
+            const status = err.response?.status;
+            const message = err.response?.data?.message;
+
+            if (status === 400 && message?.includes("credentials")) {
+                showToast("Incorrect email or password.", "danger");
+            } else if (status === 500) {
+                showToast("Server error. Please try again later.", "danger");
+            } else if (!navigator.onLine) {
+                showToast("No internet connection.", "danger");
+            } else {
+                showToast(message || "Login failed. Please try again.", "danger");
+            }
         }
     }
 
@@ -165,7 +180,8 @@ const Header = () => {
                             formData={formData} 
                             handleChange={handleChange} 
                             handleLogin={handleLogin} 
-                            isLoggingIn={isLoggingIn} 
+                            isLoggingIn={isLoggingIn}
+                            isNavigating={isNavigating}
                         />
 
                     </Row>

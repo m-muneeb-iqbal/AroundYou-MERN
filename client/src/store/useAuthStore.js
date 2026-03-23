@@ -57,23 +57,20 @@ export const useAuthStore = create((set) => ({
     },
 
     login: async (data) => {
-
         set({ isLoggingIn: true });
-
         try {
             const res = await axiosInstance.post("/auth/login", data, {
                 withCredentials: true,
             });
-            console.log("Login response:", res.data);
-
             return res.data;
 
         } catch (error) {
             console.error("Error in login:", error.response?.data || error.message);
             throw error;
 
+        } finally {
+            set({ isLoggingIn: false });
         }
-
     },
 
     logout: async () => {
