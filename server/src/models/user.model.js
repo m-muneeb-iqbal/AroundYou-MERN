@@ -3,6 +3,29 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema (
 
     {
+
+        googleId: { 
+            type: String, 
+            default: null 
+        },
+        isVerified: { 
+            type: Boolean, 
+            default: false 
+        },
+        authProvider: { 
+            type: String, 
+            enum: ["local", "google"], 
+            default: "local" 
+        },
+        verificationToken: { 
+            type: String, 
+            default: null 
+        },
+        verificationTokenExpiry: { 
+            type: Date, 
+            default: null 
+        },
+
         //Personal Info
         profilePic: {
             type: String,
@@ -144,8 +167,10 @@ const userSchema = new mongoose.Schema (
         },
         password: {
             type: String,
-            required: true,
-            minlength: 8
+            minlength: 8,
+            required: function() { 
+                return this.authProvider === "local"; 
+            }
         },
     },
 

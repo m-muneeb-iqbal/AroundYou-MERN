@@ -1,6 +1,7 @@
 import { 
-    checkAuth, signup, login, logout, getProfile, updateProfilePicture, updatePersonalInformation, 
-    updateEducation, updateExperience, updateSkills, deleteEducation, deleteCertification, deleteExperience
+    checkAuth, signup, verifyEmail, resendVerification, login, logout, 
+    getProfile, updateProfilePicture, updatePersonalInformation, updateEducation, 
+    updateExperience, updateSkills, deleteEducation, deleteCertification, deleteExperience
 } from "../controllers/auth.controller.js";
 
 import { protectRoute } from "../middleware/auth.middleware.js";
@@ -11,6 +12,8 @@ const router = express.Router();
 const  upload = multer ({ storage: multer.memoryStorage() });
 
 router.post("/signup",                                                  signup);
+router.get("/verify-email",                                             verifyEmail);
+router.post("/resend-verification",                                     resendVerification);
 router.post("/login",                                                   login);
 router.post("/logout",                                                  logout);
 router.get("/check",                                                    protectRoute, checkAuth);

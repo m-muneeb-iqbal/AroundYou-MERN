@@ -118,8 +118,12 @@ const Header = () => {
             setIsNavigating(false);
             const status = err.response?.status;
             const message = err.response?.data?.message;
+            const isUnverified = err.response?.data?.unverified;
 
-            if (status === 400 && message?.includes("credentials")) {
+            if (isUnverified) {
+                showToast("Please verify your email before logging in. Check your inbox.", "danger");
+            }
+            else if (status === 400 && message?.includes("credentials")) {
                 showToast("Incorrect email or password.", "danger");
             } else if (status === 500) {
                 showToast("Server error. Please try again later.", "danger");

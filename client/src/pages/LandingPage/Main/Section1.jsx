@@ -11,7 +11,7 @@ import { useToast } from "../../../context/ToastContext";
 import styles from "../../../styles/LandingPage/Main/Section1.module.css";
 
 function VerticallyCenteredModal({
-    show, onHide, formData, handleChange, handleSubmit, isSigningUp
+    show, onHide, formData, handleChange, handleSignup, isSigningUp, signupDone
 }) {
 
     return (
@@ -27,46 +27,71 @@ function VerticallyCenteredModal({
 
             <Modal.Body className="p-5">
 
-                <p className={`fw-bolder text-start ${styles.waitingList}`}> Join the Waiting List and Secure Your Spot!</p>
-                <p className="text-start"> Exciting things are coming, and you don't want to miss out!</p>
+                {signupDone ? (
 
-                <Form onSubmit={handleSubmit} className="needs-validation" noValidate>
+                    <div className="text-center">
 
-                    <Form.Group as={Col} xs={12} controlId="formGridFullName">
+                        <div style={{ fontSize: "3rem" }}>📧</div>
+                        <h5 className="fw-bold mt-3" style={{ color: "#04263D" }}>
+                            Check your email
+                        </h5>
 
-                        <Form.Control value={formData.fullName}  onChange={ handleChange } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
+                        <p className="text-muted mt-2" style={{ fontSize: "0.9rem" }}>
+                            We sent a verification link to your email address.
+                            Click the link to activate your account.
+                        </p>
 
-                    </Form.Group>
+                        <p className="text-muted" style={{ fontSize: "0.78rem" }}>
+                            The link expires in <strong>15 minutes</strong>.
+                            Check your spam folder if you don't see it.
+                        </p>
 
-                    <Form.Group as={Col} xs={12} controlId="formGridEmail">
+                    </div>
 
-                        <Form.Control value={formData.email}  onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
+                ) : (
+                    <>
+                        <p className={`fw-bolder text-start ${styles.waitingList}`}> Join the Waiting List and Secure Your Spot!</p>
+                        <p className="text-start"> Exciting things are coming, and you don't want to miss out!</p>
 
-                    </Form.Group>
+                        <Form onSubmit={handleSignup} className="needs-validation" noValidate>
 
-                    <Form.Group as={Col} xs={12} controlId="formGridUsername">
+                            <Form.Group as={Col} xs={12} controlId="formGridFullName">
 
-                        <Form.Control value={formData.username}  onChange={ handleChange } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
+                                <Form.Control value={formData.fullName}  onChange={ handleChange } className="mb-3" name="fullName" type="text" placeholder="Enter your full name" required/>
 
-                    </Form.Group>
+                            </Form.Group>
 
-                    <Form.Group as={Col} xs={12} controlId="formGridPassword">
+                            <Form.Group as={Col} xs={12} controlId="formGridEmail">
 
-                        <Form.Control value={formData.password}  onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
+                                <Form.Control value={formData.email}  onChange={ handleChange } className="mb-3" name="email" type="email" placeholder="Enter your email" required/>
 
-                    </Form.Group>
+                            </Form.Group>
 
-                    <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
+                            <Form.Group as={Col} xs={12} controlId="formGridUsername">
 
-                        <Form.Control value={formData.confirmPassword}  onChange={ handleChange } className="mb-3" name="confirmPassword" type="password" placeholder="Confirm password" required minLength={8}/>
+                                <Form.Control value={formData.username}  onChange={ handleChange } className="mb-3" name="username" type="text" placeholder="Enter your username" required/>
 
-                    </Form.Group>
+                            </Form.Group>
 
-                    <Button variant="success" className="w-100 main-submit" type="submit" disabled={isSigningUp}>
-                        {isSigningUp ? "Joining..." : "Join"}
-                    </Button>
+                            <Form.Group as={Col} xs={12} controlId="formGridPassword">
 
-                </Form>
+                                <Form.Control value={formData.password}  onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter password" required minLength={8} />
+
+                            </Form.Group>
+
+                            <Form.Group as={Col} xs={12} controlId="formGridConfirmPassword">
+
+                                <Form.Control value={formData.confirmPassword}  onChange={ handleChange } className="mb-3" name="confirmPassword" type="password" placeholder="Confirm password" required minLength={8}/>
+
+                            </Form.Group>
+
+                            <Button variant="success" className="w-100 main-submit" type="submit" disabled={isSigningUp}>
+                                {isSigningUp ? "Joining..." : "Join"}
+                            </Button>
+
+                        </Form>
+                    </>
+                )}
 
             </Modal.Body>
 
@@ -106,8 +131,9 @@ const Section1 = () => {
     const { signup, isSigningUp } = useAuthStore();
     const { showToast } = useToast();
     const navigate = useNavigate();
+    const [signupDone, setSignupDone] = useState(false);
     
-    const handleSubmit = async (e) => {
+    const handleSignup = async (e) => {
 
         e.preventDefault();
         const form = e.target;
@@ -133,17 +159,22 @@ const Section1 = () => {
             });
 
             form.classList.remove("was-validated");
-            showToast("Registered successfully!", "success");
-            
-            // close modal
-            setModalShow(false);
-
-            // navigate to login
-            navigate("/login");
+            setSignupDone(true);
 
         } catch (err) {
-            console.error("Signup failed ❌", err);
-            showToast("Registration failed", "danger");
+            console.error("Signup failed", err);
+            const message = err.response?.data?.message;
+            const isUnverified = err.response?.data?.unverified;
+
+            if (isUnverified) {
+                setSignupDone(true); // ✅ treat as success, new email was sent
+            } else if (message?.includes("Email already exists")) {
+                showToast("An account with this email already exists.", "danger");
+            } else if (message?.includes("Username already taken")) {
+                showToast("This username is already taken.", "danger");
+            } else {
+                showToast(message || "Registration failed. Please try again.", "danger");
+            }
         }
 
     };
@@ -189,13 +220,15 @@ const Section1 = () => {
                                 show={modalShow} 
                                 onHide={() => {
                                     setModalShow(false);
+                                    setSignupDone(false);
                                     if (location.pathname === "/signup") 
                                         navigate("/");  
                                 }} 
                                 formData={formData} 
                                 handleChange={handleChange} 
-                                handleSubmit={handleSubmit} 
+                                handleSignup={handleSignup} 
                                 isSigningUp={isSigningUp} 
+                                signupDone={signupDone}
                             />
 
                         </div>
