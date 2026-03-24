@@ -47,6 +47,21 @@ function VerticallyCenteredModal({
                         {isLoggingIn ? "Signing In..." : isNavigating ? "Redirecting..." : "Sign In"}
                     </Button>
 
+                    <div className="mt-2 mb-1 d-flex align-items-center">
+                        <div style={{ flex: 1, height: "1px", backgroundColor: "#ccc" }}></div>
+                        <span style={{ margin: "0 10px", color: "#999", fontSize: "0.85rem", fontWeight: "500" }}>OR</span>
+                        <div style={{ flex: 1, height: "1px", backgroundColor: "#ccc" }}></div>
+                    </div>
+
+                    <Button 
+                        variant="outline-secondary" 
+                        className="w-100" 
+                        onClick={() => window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/auth/google`}
+                    >
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ height: "20px", marginRight: "8px" }} />
+                        Sign In with Google
+                    </Button>
+                    
                 </Form>
 
             </Modal.Body>

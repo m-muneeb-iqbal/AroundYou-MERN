@@ -2,6 +2,8 @@ import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import { ArrowLeftCircle} from "lucide-react";
 
 import { useLocation, useNavigate } from "react-router-dom";
+import { useGoogleLogin } from '@react-oauth/google';
+
 import { useAuthStore } from "../../../store/useAuthStore";
 
 import { useState, useEffect } from "react";
@@ -87,6 +89,21 @@ function VerticallyCenteredModal({
 
                             <Button variant="success" className="w-100 main-submit" type="submit" disabled={isSigningUp}>
                                 {isSigningUp ? "Joining..." : "Join"}
+                            </Button>
+
+                            <div className="mt-2 mb-1 d-flex align-items-center">
+                                <div style={{ flex: 1, height: "1px", backgroundColor: "#ccc" }}></div>
+                                <span style={{ margin: "0 10px", color: "#999", fontSize: "0.85rem", fontWeight: "500" }}>OR</span>
+                                <div style={{ flex: 1, height: "1px", backgroundColor: "#ccc" }}></div>
+                            </div>
+
+                            <Button 
+                                variant="outline-secondary" 
+                                className="w-100" 
+                                onClick={() => window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/auth/google`}
+                            >
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ height: "20px", marginRight: "8px" }} />
+                                Sign Up with Google
                             </Button>
 
                         </Form>

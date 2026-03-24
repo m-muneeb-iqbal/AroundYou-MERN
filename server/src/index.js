@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import passport from "passport";
 
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
@@ -13,6 +14,7 @@ import { initSocket } from "./socket.js";
 
 import { createServer } from "http";
 import { connectDB } from "./lib/db.js";
+import "./lib/passport.js";
 
 dotenv.config();
 const app = express();
@@ -29,6 +31,8 @@ app.use(
     })
 );
 
+
+app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/message", messageRoutes);

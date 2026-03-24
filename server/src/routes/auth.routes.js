@@ -5,12 +5,27 @@ import {
 } from "../controllers/auth.controller.js";
 
 import { protectRoute } from "../middleware/auth.middleware.js";
+import passport from "passport";
 import express from "express";
 import multer from "multer";
+
+import { generateToken } from "../lib/utils.js";
 
 const router = express.Router();
 const  upload = multer ({ storage: multer.memoryStorage() });
 
+router.get("/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"]
+    })
+);
+router.get("/google/callback",
+    passport.authenticate("google", { session: false }),
+    (req, res) => {
+        generateToken(req.user._id, res);
+        res.redirect(`${process.env.CLIENT_URL}/home`);
+    }
+);
 router.post("/signup",                                                  signup);
 router.get("/verify-email",                                             verifyEmail);
 router.post("/resend-verification",                                     resendVerification);
