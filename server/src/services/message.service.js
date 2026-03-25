@@ -3,19 +3,16 @@ import Conversation from "../models/conversation.model.js";
 
 export const saveMessage = async ({ senderId, receiverId, text, image }) => {
 
-    // Sort participants to ensure consistent ordering
-    const sortedParticipants = [senderId, receiverId].sort((a, b) => a.toString().localeCompare(b.toString()));
-
-    // Try to find existing conversation
+    // Query for existing conversation - $all matches regardless of order
     let conversation = await Conversation.findOne({
-        participants: { $all: sortedParticipants },
+        participants: { $all: [senderId, receiverId] },
     });
 
     if (!conversation) {
         try {
-            // Initialize unreadCounts subdocument for both participants
+            // Create with unsorted participants - order doesn't matter for $all queries
             conversation = await Conversation.create({
-                participants: sortedParticipants,
+                participants: [senderId, receiverId],
                 unreadCounts: [
                     { userId: senderId, count: 0 },
                     { userId: receiverId, count: 0 },
@@ -25,12 +22,19 @@ export const saveMessage = async ({ senderId, receiverId, text, image }) => {
             // Handle race condition: another request may have created it
             if (err.code === 11000 || err.message.includes('duplicate')) {
                 conversation = await Conversation.findOne({
-                    participants: { $all: sortedParticipants },
+                    participants: { $all: [senderId, receiverId] },
                 });
+                if (!conversation) {
+                    throw new Error("Conversation not found after creation attempt");
+                }
             } else {
                 throw err;
             }
         }
+    }
+
+    if (!conversation) {
+        throw new Error("Failed to create or find conversation");
     }
 
     const newMessage = await Message.create({
