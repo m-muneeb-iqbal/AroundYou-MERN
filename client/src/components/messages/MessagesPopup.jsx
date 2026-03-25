@@ -10,7 +10,7 @@ import { normalizeSenderId } from "../../lib/utils";
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
 
-const MessagesPopup = () => {
+const MessagesPopup = ({ onClose }) => {
 
     const { startCall } = useCallStore();
 
@@ -67,27 +67,69 @@ const MessagesPopup = () => {
 
     return (
 
-        <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "320px", height: "450px", zIndex: 1000 }}>
+        <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "410px", height: "460px", zIndex: 1000 }}>
 
             <Card.Header className="position-relative d-flex align-items-center fw-bold">
 
-                {selectedUser && (
-                    <ArrowLeft role="button" size={20} color="#04263D" onClick={() => handleCloseConversation()} />
-                )}
+                {selectedUser ? (
+                    <>
+                        {/* Back button (left) */}
+                        <ArrowLeft
+                            role="button"
+                            size={20}
+                            color="#04263D"
+                            onClick={() => {
+                                handleCloseConversation();
+                                onClose?.();
+                            }}
+                        />
 
-                <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
-                    {selectedUser ? selectedUser.fullName : "AroundYou"}
-                </span>
+                        {/* Title (center) */}
+                        <span
+                            className="position-absolute start-50 translate-middle-x"
+                            style={{ pointerEvents: "none" }}
+                        >
 
-                {selectedUser && (
-                    <Phone
-                        role="button"
-                        size={18}
-                        color="#04263D"
-                        title="Audio call"
-                        onClick={() => startCall(selectedUser, authUser)}
-                        style={{ marginRight: "8px" }}
-                    />
+                            {selectedUser.fullName}
+
+                        </span>
+
+                        {/* Phone (right) */}
+                        <Phone
+                            role="button"
+                            size={18}
+                            color="#04263D"
+                            title="Audio call"
+                            onClick={() => startCall(selectedUser, authUser)}
+                            className="ms-auto"
+                        />
+
+                    </>
+
+                ) : (
+
+                    <>
+                        {/* Title (center) */}
+                        <span
+                            className="position-absolute start-50 translate-middle-x"
+                            style={{ pointerEvents: "none" }}
+                        >
+                            AroundYou
+
+                        </span>
+
+                        {/* Close button (right) */}
+                        <X
+                            role="button"
+                            className="ms-auto"
+                            onClick={() => {
+                                handleCloseConversation();
+                                onClose?.();
+                            }}
+                        />
+
+                    </>
+
                 )}
 
             </Card.Header>
