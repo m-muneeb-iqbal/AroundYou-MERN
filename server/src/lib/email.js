@@ -2,6 +2,24 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
 
+const EMAIL_TIMEOUT_MS = Number(process.env.EMAIL_TIMEOUT_MS || 10000);
+
+const withTimeout = (promise, timeoutMs, operation) => new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+        reject(new Error(`${operation} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    promise
+        .then((value) => {
+            clearTimeout(timer);
+            resolve(value);
+        })
+        .catch((error) => {
+            clearTimeout(timer);
+            reject(error);
+        });
+});
+
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -14,7 +32,7 @@ export const sendVerificationEmail = async ({ to, fullName, token }) => {
 
     const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 
-    await transporter.sendMail({
+    await withTimeout(transporter.sendMail({
         
         from: `"AroundYou" <${process.env.EMAIL_USER}>`,
         to,
@@ -44,6 +62,6 @@ export const sendVerificationEmail = async ({ to, fullName, token }) => {
             </div>
         `,
 
-    });
+    }), EMAIL_TIMEOUT_MS, "Verification email send");
 
 };

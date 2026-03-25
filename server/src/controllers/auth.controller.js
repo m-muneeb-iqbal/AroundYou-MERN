@@ -8,6 +8,12 @@ import { generateToken } from "../lib/utils.js";
 import { sendVerificationEmail } from "../lib/email.js";
 import cloudinary from "../lib/cloudinary.js";
 
+const sendVerificationEmailInBackground = ({ to, fullName, token }, errorPrefix) => {
+    sendVerificationEmail({ to, fullName, token }).catch((emailErr) => {
+        console.error(`${errorPrefix}:`, emailErr.message);
+    });
+};
+
 export const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -54,11 +60,10 @@ export const signup = async (req, res) => {
                 existingUser.verificationTokenExpiry = expiry;
                 await existingUser.save();
 
-                try {
-                    await sendVerificationEmail({ to: email, fullName: existingUser.fullName, token });
-                } catch (emailErr) {
-                    console.error("Failed to resend verification email:", emailErr.message);
-                }
+                sendVerificationEmailInBackground(
+                    { to: email, fullName: existingUser.fullName, token },
+                    "Failed to resend verification email"
+                );
 
                 return res.status(200).json({
                     message: "Account exists but is unverified. A new verification email has been sent.",
@@ -93,11 +98,10 @@ export const signup = async (req, res) => {
 
         await newUser.save();
 
-        try {
-            await sendVerificationEmail({ to: email, fullName, token });
-        } catch (emailErr) {
-            console.error("Failed to send verification email:", emailErr.message);
-        }
+        sendVerificationEmailInBackground(
+            { to: email, fullName, token },
+            "Failed to send verification email"
+        );
 
         res.status(201).json({
             message: "Account created. Please check your email to verify your account.",
