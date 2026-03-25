@@ -20,8 +20,8 @@ export const initSocket = (server) => {
 
     io.on("connection", (socket) => {
 
-        console.log("🔌 A user connected:", socket.id);
-        console.log("📡 Total online users:", onlineUsers.size);
+        console.log("A user connected:", socket.id);
+        console.log("Total online users:", onlineUsers.size);
 
         socket.on("userOnline", async (userId) => {
             onlineUsers.set(userId, socket.id);

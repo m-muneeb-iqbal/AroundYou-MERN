@@ -283,6 +283,8 @@ export const useMessageStore = create((set, get) => ({
         const tempId = `temp_${Date.now()}`;
 
         console.log("Sending message via socket:", payload);
+        console.log("Socket connected?", socket.connected);
+        console.log("Socket ID:", socket.id);
 
         set((state) => ({
 
@@ -304,6 +306,11 @@ export const useMessageStore = create((set, get) => ({
             ],
             
         }));
+
+        if (!socket.connected) {
+            console.warn("Socket not connected! Attempting to connect...");
+            socket.connect();
+        }
 
         socket.emit("sendMessage", { ...payload, tempId });
     },

@@ -1,7 +1,9 @@
 import { io } from "socket.io-client";
 
-const socketURL = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log("VITE_API_URL from env:", apiUrl);
 
+const socketURL = apiUrl?.replace("/api", "") || "http://localhost:5000";
 console.log("Socket connecting to:", socketURL);
 
 export const socket = io(socketURL, {
@@ -11,7 +13,7 @@ export const socket = io(socketURL, {
 });
 
 socket.on("connect", () => {
-    console.log("🔌 Socket connected:", socket.id);
+    console.log("Socket connected:", socket.id);
 });
 
 socket.on("disconnect", () => {
