@@ -21,6 +21,7 @@ const app = express();
 
 const PORT = process.env.PORT;
 
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true })); 
 app.use(cookieParser());
 app.use(
@@ -29,16 +30,9 @@ app.use(
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
-        optionsSuccessStatus: 200
     })
 );
 
-app.options("*", cors({
-    origin: "https://aroundyou-one.vercel.app",
-    credentials: true
-}));
-
-app.use(express.json({ limit: "10mb" }));
 
 app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
