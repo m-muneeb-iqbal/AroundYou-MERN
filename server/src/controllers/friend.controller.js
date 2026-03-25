@@ -27,7 +27,7 @@ export const sendFriendRequest = async (req, res) => {
         const friendRequest = await Friend.create({ requester, recipient: recipientId });
 
         // Populate requester so recipient gets full user details in the event
-        const populated = await friendRequest.populate("requester", "-password");
+        const populated = await friendRequest.populate("requester", "-password -role -verificationToken -verificationTokenExpiry");
 
         // Notify recipient live if online
         const io = getIO();
@@ -85,8 +85,8 @@ export const acceptFriendRequest = async (req, res) => {
         await request.save();
 
         const [requester, recipient] = await Promise.all([
-            User.findById(request.requester).select("-password"),
-            User.findById(request.recipient).select("-password"),
+            User.findById(request.requester).select("-password -role -verificationToken -verificationTokenExpiry"),
+            User.findById(request.recipient).select("-password -role -verificationToken -verificationTokenExpiry"),
         ]);
 
         const io = getIO();
@@ -173,7 +173,7 @@ export const getFriends = async (req, res) => {
             f.requester.toString() === userId.toString() ? f.recipient : f.requester
         );
 
-        const friends = await User.find({ _id: { $in: friendIds } }).select("-password");
+        const friends = await User.find({ _id: { $in: friendIds } }).select("-password -role -verificationToken -verificationTokenExpiry");
         res.status(200).json(friends);
 
     } catch (error) {
@@ -191,7 +191,7 @@ export const getPendingRequests = async (req, res) => {
         const requests = await Friend.find({
             recipient: userId,
             status: "pending",
-        }).populate("requester", "-password");
+        }).populate("requester", "-password -role -verificationToken -verificationTokenExpiry");
 
         res.status(200).json(requests);
 
@@ -222,7 +222,7 @@ export const getNonFriends = async (req, res) => {
         const pool = await User.find({
             _id: { $nin: Array.from(excludedIds) },
         })
-        .select("-password")
+        .select("-password -role -verificationToken -verificationTokenExpiry")
         .limit(20);
 
         for (let i = pool.length - 1; i > 0; i--) {

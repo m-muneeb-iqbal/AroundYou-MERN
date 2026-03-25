@@ -25,13 +25,10 @@ export const initSocket = (server) => {
 
     io.on("connection", (socket) => {
 
-        console.log("A user connected:", socket.id);
-        console.log("Total online users:", onlineUsers.size);
+        // User connected
 
         socket.on("userOnline", async (userId) => {
-            console.log("User going online:", userId);
             onlineUsers.set(userId, socket.id);
-            console.log("Online users after:", Array.from(onlineUsers.entries()));
 
             try {
 
@@ -89,9 +86,6 @@ export const initSocket = (server) => {
 
         socket.on("sendMessage", async (data) => {
 
-            console.log("sendMessage event received:", data);
-            console.log("Current onlineUsers:", Array.from(onlineUsers.entries()));
-
             const { senderId, receiverId, text, image, tempId } = data;
 
             try {
@@ -106,7 +100,7 @@ export const initSocket = (server) => {
                     status: "accepted",
                 });
 
-                console.log("Friendship found?", !!friendship);
+
 
                 if (!friendship) {
 
@@ -140,7 +134,6 @@ export const initSocket = (server) => {
 
                 // Emit to receiver using their socketId
                 const receiverSocketId = onlineUsers.get(receiverId.toString());
-                console.log("Receiver socket ID:", receiverSocketId, "for user:", receiverId);
 
                 if (receiverSocketId) {
 
@@ -158,8 +151,7 @@ export const initSocket = (server) => {
 
                     });
 
-                } else {
-                    console.log("Receiver not online, message saved for later delivery");
+
                 }
 
             } catch (error) {
@@ -169,8 +161,6 @@ export const initSocket = (server) => {
         });
 
         socket.on("disconnect", () => {
-
-            console.log("User disconnected:", socket.id);
 
             for (const [key, value] of onlineUsers.entries()) {
                 if (value === socket.id) onlineUsers.delete(key);

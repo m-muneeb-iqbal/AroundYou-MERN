@@ -282,10 +282,6 @@ export const useMessageStore = create((set, get) => ({
     sendMessage: (payload) => {
         const tempId = `temp_${Date.now()}`;
 
-        console.log("Sending message via socket:", payload);
-        console.log("Socket connected?", socket.connected);
-        console.log("Socket ID:", socket.id);
-
         set((state) => ({
 
             messages: [
@@ -308,15 +304,10 @@ export const useMessageStore = create((set, get) => ({
         }));
 
         if (!socket.connected) {
-            console.warn("Socket not connected! Attempting to connect...");
             socket.connect();
         }
 
-        const payload_to_send = { ...payload, tempId };
-        console.log("Emitting sendMessage with:", payload_to_send);
-        socket.emit("sendMessage", payload_to_send, (ack) => {
-            console.log("Server acknowledged sendMessage:", ack);
-        });
+        socket.emit("sendMessage", { ...payload, tempId });
     },
     
 }));

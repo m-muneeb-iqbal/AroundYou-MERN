@@ -10,7 +10,7 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select("-password -role -username -__v");
+        const user = await User.findById(req.user._id).select("-password -role -verificationToken -verificationTokenExpiry -__v");
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -297,7 +297,7 @@ export const updatePersonalInformation = async (req, res) => {
                 new: true,          // return updated document
                 runValidators: true // run schema validators
             }
-            ).select("-password");
+            ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found." });
@@ -344,7 +344,7 @@ export const updateEducation = async (req, res) => {
                 new: true,          // return updated document
                 runValidators: true // run schema validators
             }
-            ).select("-password");
+            ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found." });
@@ -370,23 +370,31 @@ export const updateExperience = async (req, res) => {
             "currentlyWorking"
         ];
 
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: "User not found." });
-
-        let hasUpdates = false;
+        const updates = {};
         allowedFields.forEach((field) => {
             if (req.body[field] !== undefined) {
-                user[field] = req.body[field];
-                hasUpdates = true;
+                updates[field] = req.body[field];
             }
         });
 
-        if (!hasUpdates) {
+        if (Object.keys(updates).length === 0) {
             return res.status(400).json({ message: "No valid fields provided to update." });
         }
 
-        await user.save();
-        res.status(200).json(user);
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select("-password -role -verificationToken -verificationTokenExpiry");
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        
+        res.status(200).json(updatedUser);
 
     } catch (error) {
         console.error("Error in updateExperience:", error.message);
@@ -422,7 +430,7 @@ export const updateSkills = async (req, res) => {
                 new: true,          // return updated document
                 runValidators: true // run schema validators
             }
-            ).select("-password");
+            ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found." });

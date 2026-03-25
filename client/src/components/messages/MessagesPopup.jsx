@@ -45,16 +45,7 @@ const MessagesPopup = ({ onClose }) => {
     const [message, setMessage] = useState("");
     const handleSend = (e) => {
         e.preventDefault();
-        if (!message.trim() || !selectedUser) {
-            console.warn("Cannot send: message.trim()=", message.trim(), "selectedUser=", selectedUser);
-            return;
-        }
-        console.log("🔵 handleSend called with:", {
-            senderId: authUser._id,
-            receiverId: selectedUser._id,
-            text: message,
-            selectedUser,
-        });
+        if (!message.trim() || !selectedUser) return;
         sendMessage({
             senderId: authUser._id,
             receiverId: selectedUser._id,

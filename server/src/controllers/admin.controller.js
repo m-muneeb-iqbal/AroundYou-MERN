@@ -144,7 +144,7 @@ export const getUserById = async (req, res) => {
     try {
 
         const isSuperAdmin = req.user.role === "SuperAdmin";
-        const user = await User.findById(req.params.userId).select("-password");
+        const user = await User.findById(req.params.userId).select("-password -role -verificationToken -verificationTokenExpiry");
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -208,7 +208,7 @@ export const updateUser = async (req, res) => {
             userId,
             updates,
             { new: true, runValidators: true }
-        ).select("-password");
+        ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         res.status(201).json({ message: "User info updated successfully" });
 
@@ -269,7 +269,7 @@ export const removeProfilePic = async (req, res) => {
             req.params.userId,
             { profilePic: "" },
             { new: true }
-        ).select("-password");
+        ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         res.status(201).json({ message: "Profile picture removed successfully" });
 
@@ -294,7 +294,7 @@ export const clearEducation = async (req, res) => {
             req.params.userId,
             { $unset: { education: "", field: "", passingYear: "", cgpa: "", institute: "" } },
             { new: true }
-        ).select("-password");
+        ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         res.status(201).json({ message: "Education cleared successfully" });
 
@@ -320,7 +320,7 @@ export const clearExperience = async (req, res) => {
             req.params.userId,
             { $unset: { company: "", jobTitle: "", joiningDate: "", resignationDate: "" }, currentlyWorking: false },
             { new: true }
-        ).select("-password");
+        ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         res.status(201).json({ message: "Experience cleared successfully" });
 
@@ -346,7 +346,7 @@ export const clearSkills = async (req, res) => {
             req.params.userId,
             { skills: [] },
             { new: true }
-        ).select("-password");
+        ).select("-password -role -verificationToken -verificationTokenExpiry");
 
         res.status(201).json({ message: "Skills cleared successfully" });
 

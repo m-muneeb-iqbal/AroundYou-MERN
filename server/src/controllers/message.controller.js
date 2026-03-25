@@ -37,7 +37,7 @@ export const getUsersForSidebar = async (req, res) => {
         if (friendIds.length === 0) return res.status(200).json([]);
 
         const [users, conversations] = await Promise.all([
-            User.find({ _id: { $in: friendIds } }).select("-password"),
+            User.find({ _id: { $in: friendIds } }).select("-password -role -verificationToken -verificationTokenExpiry"),
             Conversation.find({ participants: userId }).populate("lastMessage"),
         ]);
 

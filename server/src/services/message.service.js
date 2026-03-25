@@ -18,9 +18,9 @@ export const saveMessage = async ({ senderId, receiverId, text, image }) => {
                     { userId: receiverId, count: 0 },
                 ],
             });
-            console.log("New conversation created:", conversation._id);
+
         } catch (err) {
-            console.error("Error creating conversation:", err.code, err.message);
+            if (err.code !== 11000) console.error("Error creating conversation:", err.message);
             
             // If duplicate error, retry the find
             if (err.code === 11000) {
