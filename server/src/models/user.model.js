@@ -193,6 +193,37 @@ userSchema.methods.toSafeObject = function () {
     };
 }
 
+userSchema.methods.toProfileData = function () {
+    return {
+        _id: this._id,
+        fullName: this.fullName,
+        email: this.email,
+        profilePic: this.profilePic,
+        description: this.description,
+        location: this.location,
+        designation: this.designation,
+        website: this.website,
+        dob: this.dob,
+        phoneNumber: this.phoneNumber,
+        age: this.age,
+        education: this.education,
+        field: this.field,
+        passingYear: this.passingYear,
+        cgpa: this.cgpa,
+        institute: this.institute,
+        certificate: this.certificate,
+        provider: this.provider,
+        company: this.company,
+        jobTitle: this.jobTitle,
+        joiningDate: this.joiningDate,
+        resignationDate: this.resignationDate,
+        currentlyWorking: this.currentlyWorking,
+        skills: this.skills,
+        isAdmin: this.role === "Admin" || this.role === "SuperAdmin",
+        isSuperAdmin: this.role === "SuperAdmin",
+    };
+}
+
 userSchema.methods.toPublicObject = function () {
     return {
         _id: this._id,

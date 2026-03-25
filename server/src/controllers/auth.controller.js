@@ -343,12 +343,12 @@ export const updateEducation = async (req, res) => {
                 new: true,          // return updated document
                 runValidators: true // run schema validators
             }
-            ).select("-password -role -verificationToken -verificationTokenExpiry");
+        );
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found." });
         }
-        res.status(200).json(updatedUser);
+        res.status(200).json(updatedUser.toProfileData());
     } catch (error) {
         console.error("Error in updateEducation:", error.message);
         res.status(500).json({ message: "Internal Server Error" });
@@ -387,13 +387,13 @@ export const updateExperience = async (req, res) => {
                 new: true,
                 runValidators: true
             }
-        ).select("-password -role -verificationToken -verificationTokenExpiry");
+        );
 
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found." });
         }
         
-        res.status(200).json(updatedUser);
+        res.status(200).json(updatedUser.toProfileData());
 
     } catch (error) {
         console.error("Error in updateExperience:", error.message);
