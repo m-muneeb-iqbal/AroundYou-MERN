@@ -128,7 +128,7 @@ const PersonalInformationForm = () => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridEmail">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
+                        <Form.Control disabled value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
                     </Form.Group>
 
                 </Row>
