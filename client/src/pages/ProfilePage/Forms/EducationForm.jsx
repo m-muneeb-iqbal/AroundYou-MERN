@@ -120,7 +120,7 @@ const EducationForm = () => {
         setFormData(formattedData);
         setOriginalData(formattedData);
 
-    }, [authUser, navigate]);
+    }, [profileData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

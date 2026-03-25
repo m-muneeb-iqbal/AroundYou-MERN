@@ -40,7 +40,6 @@ const PersonalInformationForm = () => {
     const [formData, setFormData] = useState({
         description: "",
         fullName: "",
-        email: "",
         dob: "",
         phoneNumber: "",
         age: "",
@@ -58,7 +57,6 @@ const PersonalInformationForm = () => {
         const formattedData = {
             description: profileData.description || "",
             fullName: profileData.fullName || "",
-            email: profileData.email || "",
             dob: toDateInputValue(profileData.dob),
             phoneNumber: profileData.phoneNumber || "",
             age: profileData.age != null ? String(profileData.age) : "",
@@ -128,7 +126,7 @@ const PersonalInformationForm = () => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridEmail">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control disabled value={formData.email} onChange={ handleChange } name="email" type="email" placeholder="yourname@example.com" />
+                        <Form.Control disabled value={authUser?.email || ""} readOnly name="email" type="email" placeholder="yourname@example.com" />
                     </Form.Group>
 
                 </Row>

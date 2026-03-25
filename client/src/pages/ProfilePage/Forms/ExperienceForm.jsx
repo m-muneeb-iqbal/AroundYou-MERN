@@ -65,7 +65,7 @@ const ExperienceForm = () => {
         setFormData(formattedData);
         setOriginalData(formattedData);
 
-    }, [authUser, navigate]);
+    }, [profileData]);
 
     const { showToast } = useToast();
 
