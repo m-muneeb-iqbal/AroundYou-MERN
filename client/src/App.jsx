@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
 import VerifyEmailPage from "./pages/VerifyEmailPage/VerifyEmailPage.jsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
 import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx";
 import AdminRoute from "./components/admin/AdminRoute";
@@ -48,6 +50,8 @@ export const App = () => {
                 <Route path="/signup" element={<LandingPage />} />
                 <Route path="/verify-email" element={<VerifyEmailPage />} />
                 <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
+                <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/home" />} />
+                <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/home" />} />
                 <Route path="/home" element={authUser ? <HomePage /> : <Navigate to="/" />} />
                 <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/" />} />
                 <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />

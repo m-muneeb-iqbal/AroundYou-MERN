@@ -13,6 +13,8 @@ function VerticallyCenteredModal({
     show, onHide, formData, handleChange, handleLogin, isLoggingIn, isNavigating
 }) {
 
+    const navigate = useNavigate();
+
     return (
 
         <Modal show={show} onHide={onHide} keyboard={false} backdrop="static" size="md" aria-labelledby="contained-modal-title-vcenter" className="fade" centered >
@@ -42,6 +44,14 @@ function VerticallyCenteredModal({
                         <Form.Control value={formData.password} onChange={ handleChange } className="mb-3" name="password" type="password" placeholder="Enter your password" required/>
                         
                     </Form.Group>
+
+                    <div className="text-end mb-3">
+
+                        <Button  variant="link"  className="p-0" onClick={() => { onHide();  navigate('/forgot-password'); }} style={{ color: '#04263D', textDecoration: 'none', fontSize: '0.9rem' }} >
+                            Forgot Password?
+                        </Button>
+                        
+                    </div>
 
                     <Button variant="success" className="w-100" type="submit" disabled={isLoggingIn || isNavigating}>
                         {isLoggingIn ? "Signing In..." : isNavigating ? "Redirecting..." : "Sign In"}
