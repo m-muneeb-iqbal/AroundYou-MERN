@@ -312,7 +312,11 @@ export const useMessageStore = create((set, get) => ({
             socket.connect();
         }
 
-        socket.emit("sendMessage", { ...payload, tempId });
+        const payload_to_send = { ...payload, tempId };
+        console.log("✉️ Emitting sendMessage with:", payload_to_send);
+        socket.emit("sendMessage", payload_to_send, (ack) => {
+            console.log("Server acknowledged sendMessage:", ack);
+        });
     },
     
 }));

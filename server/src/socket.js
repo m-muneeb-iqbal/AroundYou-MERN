@@ -89,7 +89,7 @@ export const initSocket = (server) => {
 
         socket.on("sendMessage", async (data) => {
 
-            console.log("📨 sendMessage event received:", data);
+            console.log("sendMessage event received:", data);
             console.log("Current onlineUsers:", Array.from(onlineUsers.entries()));
 
             const { senderId, receiverId, text, image, tempId } = data;
