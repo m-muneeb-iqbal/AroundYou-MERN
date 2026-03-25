@@ -165,7 +165,6 @@ export const initSocket = (server) => {
             for (const [key, value] of onlineUsers.entries()) {
                 if (value === socket.id) onlineUsers.delete(key);
             }
-            console.log("Online users:", Array.from(onlineUsers.keys()));
 
         });
         

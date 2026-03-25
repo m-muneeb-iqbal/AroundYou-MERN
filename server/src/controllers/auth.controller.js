@@ -10,8 +10,11 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select("-password -role -verificationToken -verificationTokenExpiry -__v");
-        res.status(200).json(user);
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user.toSafeObject());
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
@@ -181,15 +184,12 @@ export const resendVerification = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-
-    console.log("Login route hit");
     const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email });
 
         if (!user) {
-            console.log("User not found");
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
@@ -198,7 +198,6 @@ export const login = async (req, res) => {
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
-            console.log("Password mismatch");
             return res.status(400).json({ message: "Invalid credentials" });
         }
 

@@ -144,7 +144,7 @@ export const getUserById = async (req, res) => {
     try {
 
         const isSuperAdmin = req.user.role === "SuperAdmin";
-        const user = await User.findById(req.params.userId).select("-password -role -verificationToken -verificationTokenExpiry");
+        const user = await User.findById(req.params.userId).select("-password -verificationToken -verificationTokenExpiry");
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
