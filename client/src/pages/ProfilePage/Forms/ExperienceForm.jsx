@@ -18,7 +18,7 @@ const toDateInputValue = (date) => {
     return new Date(date).toISOString().split("T")[0];
 };
     
-const ExperienceForm = () => {
+const ExperienceForm = ({ onDirtyChange }) => {
 
     const { authUser } = useAuthStore();
     
@@ -48,6 +48,9 @@ const ExperienceForm = () => {
 
     const [originalData, setOriginalData] = useState(null);
     const isFormChanged = useFormDirty(originalData, formData);
+
+    // Notify parent when dirty state changes
+    useEffect(() => { onDirtyChange?.(isFormChanged); }, [isFormChanged]);
 
     // Redirect + prefill form
     useEffect(() => {

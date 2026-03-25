@@ -43,7 +43,7 @@ export const App = () => {
 
     return (
 
-        <div>
+        <div className="page-enter">
 
             <Routes>
                 <Route path="/" element={<LandingPage />} />

@@ -7,10 +7,16 @@ export const useFriendStore = create((set, get) => ({
     pendingRequests: [],
     friends: [],
     notifications: [],
+    isLoadingNonFriends: false,
 
     fetchNonFriends: async () => {
-        const res = await axiosInstance.get("/friend/non-friends", { withCredentials: true });
-        set({ nonFriends: res.data });
+        set({ isLoadingNonFriends: true });
+        try {
+            const res = await axiosInstance.get("/friend/non-friends", { withCredentials: true });
+            set({ nonFriends: res.data });
+        } finally {
+            set({ isLoadingNonFriends: false });
+        }
     },
 
     fetchPendingRequests: async () => {

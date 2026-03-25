@@ -12,10 +12,10 @@ const CallNotification = () => {
         <div
             className="position-fixed bg-white shadow-lg rounded d-flex align-items-center gap-3 p-3"
             style={{
-                bottom: "24px",
+                top: "80px",
                 right: "24px",
-                zIndex: 2000,
-                width: "300px",
+                zIndex: "var(--z-call-notify, 1300)",
+                width: "min(300px, calc(100vw - 2rem))",
                 border: "1px solid #E0E0E0",
             }}
         >

@@ -30,6 +30,17 @@ const LeftPanel = () => {
                     <Card.Text className="text-muted">
                        {authUser?.description}
                     </Card.Text>
+
+                    {(!authUser?.description && !authUser?.designation) && (
+                        <div
+                            role="button"
+                            onClick={() => navigate("/profile")}
+                            className="text-center mt-2"
+                            style={{ fontSize: "0.78rem", color: "#04263D", cursor: "pointer", textDecoration: "underline" }}
+                        >
+                            Complete your profile →
+                        </div>
+                    )}
     
                 </Card.Body>
             </Card>
@@ -37,36 +48,32 @@ const LeftPanel = () => {
             <Card style={{ width: '18rem' }} className="d-none d-md-block">
                 <ListGroup variant="flush">
 
-                    <ListGroup.Item className="px-3 text-start">
+                    <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
                         <div className="d-flex align-items-center gap-3">
                             <SquarePlay color = "#797979" size={20}/>
                             <span className="text-muted">Learning</span>
                         </div>
-
                     </ListGroup.Item>
 
-                    <ListGroup.Item className="px-3 text-start">
+                    <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
                         <div className="d-flex align-items-center gap-3">
                             <Bookmark color = "#797979" size={20}/>
                             <span className="text-muted">Bookmark</span>
                         </div>
-
                     </ListGroup.Item>
 
-                    <ListGroup.Item className="px-3 text-start">
+                    <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
                         <div className="d-flex align-items-center gap-3">
                             <UserRoundPlus color = "#797979" size={20}/>
                             <span className="text-muted">Find colleagues</span>
                         </div>
-
                     </ListGroup.Item>
 
-                    <ListGroup.Item className="px-3 text-start">
+                    <ListGroup.Item action className="px-3 text-start" onClick={() => navigate("/settings")} style={{ cursor: "pointer" }}>
                         <div className="d-flex align-items-center gap-3">
                             <Settings color = "#797979" size={20}/>
                             <span className="text-muted">Settings</span>
                         </div>
-
                     </ListGroup.Item>
 
                  </ListGroup>

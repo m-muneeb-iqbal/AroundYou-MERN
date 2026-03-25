@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Container, Spinner } from "react-bootstrap";
+import { Container, Spinner, Button } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 
@@ -12,6 +12,7 @@ const VerifyEmailPage = () => {
 
     const [status, setStatus] = useState("verifying"); // "verifying" | "success" | "expired" | "invalid"
     const [message, setMessage] = useState("");
+    const [countdown, setCountdown] = useState(3);
 
     useEffect(() => {
         const token = searchParams.get("token");
@@ -31,7 +32,17 @@ const VerifyEmailPage = () => {
 
             // Auto login — checkAuth picks up the JWT cookie issued by backend
             await checkAuth();
-            setTimeout(() => navigate("/home"), 2000);
+
+            // Countdown then redirect
+            let count = 3;
+            const interval = setInterval(() => {
+                count -= 1;
+                setCountdown(count);
+                if (count === 0) {
+                    clearInterval(interval);
+                    navigate("/home");
+                }
+            }, 1000);
 
         } catch (err) {
 
@@ -71,8 +82,18 @@ const VerifyEmailPage = () => {
             {status === "success" && (
 
                 <div className="text-center">
+                    <div style={{ fontSize: "3rem" }}>✓</div>
                     <h4 className="fw-bold mt-3" style={{ color: "#04263D" }}>Email Verified!</h4>
-                    <p className="text-muted">Redirecting you to your dashboard...</p>
+                    <p className="text-muted mb-1">Your account is ready.</p>
+                    <p className="text-muted small mb-4">
+                        Redirecting in <strong>{countdown}</strong>s...
+                    </p>
+                    <Button
+                        onClick={() => navigate("/home")}
+                        style={{ backgroundColor: "#04263D", borderColor: "#04263D", minWidth: "180px" }}
+                    >
+                        Continue to Dashboard
+                    </Button>
                 </div>
 
             )}

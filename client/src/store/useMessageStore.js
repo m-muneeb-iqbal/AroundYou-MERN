@@ -11,13 +11,19 @@ export const useMessageStore = create((set, get) => ({
     authUser: null,
     openConversationId: null,
     messageInput: "",
+    isLoadingUsers: false,
 
     setAuthUser: (user) => set({ authUser: user }),
 
     // Fetch users
     fetchUsers: async () => {
-        const res = await axiosInstance.get("/message/users", { withCredentials: true });
-        set({ users: res.data });
+        set({ isLoadingUsers: true });
+        try {
+            const res = await axiosInstance.get("/message/users", { withCredentials: true });
+            set({ users: res.data });
+        } finally {
+            set({ isLoadingUsers: false });
+        }
     },
 
     // Initialize socket

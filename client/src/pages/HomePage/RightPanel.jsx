@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { Card, ListGroup } from "react-bootstrap";
 import { useFriendStore } from "../../store/useFriendStore";
 import PersonCard from "../../components/friends/PersonCard";
+import SkeletonLoader from "../../components/common/SkeletonLoader";
 
 const RightPanel = () => {
 
-    const { nonFriends, fetchNonFriends, sendFriendRequest } = useFriendStore();
+    const { nonFriends, fetchNonFriends, sendFriendRequest, isLoadingNonFriends } = useFriendStore();
 
     useEffect(() => {
         fetchNonFriends();
@@ -23,7 +24,11 @@ const RightPanel = () => {
 
                 <ListGroup variant="flush">
 
-                    {nonFriends.length === 0 ? (
+                    {isLoadingNonFriends ? (
+
+                        <SkeletonLoader rows={3} />
+
+                    ) : nonFriends.length === 0 ? (
 
                         <p className="text-muted mb-0" style={{ fontSize: "0.82rem" }}>
                             No suggestions available.

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Button, Spinner, Alert, Container, Row, Col, InputGroup } from 'react-bootstrap';
 
 import { useAuthStore } from '../../../store/useAuthStore';
@@ -7,7 +7,7 @@ import { useToast } from '../../../context/ToastContext';
 
 import styles from '../../../styles/UI/Buttons.module.css';
 
-const ChangePasswordForm = () => {
+const ChangePasswordForm = ({ onDirtyChange }) => {
 
     const { changePassword, isChangingPassword } = useAuthStore();
     const { showToast } = useToast();
@@ -25,6 +25,10 @@ const ChangePasswordForm = () => {
     });
 
     const [errors, setErrors] = useState({});
+
+    // Notify parent when any password field is filled in
+    const isFormChanged = Object.values(formData).some((v) => v.trim() !== '');
+    useEffect(() => { onDirtyChange?.(isFormChanged); }, [isFormChanged]);
 
     const validateForm = () => {
         const newErrors = {};

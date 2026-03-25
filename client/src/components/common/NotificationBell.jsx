@@ -106,7 +106,7 @@ const NotificationBell = () => {
             <div ref={ref} className="d-inline-flex align-items-center position-relative">
 
                 {/* Bell */}
-                <div role="button" className="d-inline-flex align-items-center position-relative" onClick={handleOpen} >
+                <div role="button" aria-label={`Notifications${badgeCount > 0 ? `, ${badgeCount} unread` : ""}`} className="d-inline-flex align-items-center position-relative" onClick={handleOpen} >
 
                     <Bell color="#04263D" size={24} />
                     {badgeCount > 0 && (

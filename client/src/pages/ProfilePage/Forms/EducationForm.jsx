@@ -12,7 +12,7 @@ import { useFormDirty } from "../../../hooks/useFormDirty"
 
 import styles from "../../../styles/UI/Buttons.module.css";
     
-const EducationForm = () => {
+const EducationForm = ({ onDirtyChange }) => {
 
     const fieldOptions = {
         "Matriculation/O-Level": [
@@ -102,7 +102,8 @@ const EducationForm = () => {
     const [originalData, setOriginalData] = useState(null);
     const isFormChanged = useFormDirty(originalData, formData);
 
-    // Prefill from profileData
+    // Notify parent when dirty state changes
+    useEffect(() => { onDirtyChange?.(isFormChanged); }, [isFormChanged]);
     useEffect(() => {
 
         if (!profileData) return;

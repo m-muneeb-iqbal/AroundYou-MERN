@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useProfileStore } from "../../../store/useProfileStore";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from "../../../context/ToastContext";
 
 import styles from "../../../styles/UI/Buttons.module.css";
@@ -21,7 +21,7 @@ const skillOptions = [
 
 ];
     
-const SkillsForm = () => {
+const SkillsForm = ({ onDirtyChange }) => {
 
     const { authUser } = useAuthStore();
     const { profileData, fetchProfile, updateSkills } = useProfileStore();
@@ -36,6 +36,7 @@ const SkillsForm = () => {
     }, [authUser, navigate]);
 
     const [skills, setSkills] = useState([]);
+    const originalSkillsRef = useRef([]);
     const { showToast } = useToast();
 
     // Prefill from profileData
@@ -43,8 +44,16 @@ const SkillsForm = () => {
         if (!profileData) return;
         if (profileData.skills) {
             setSkills(profileData.skills);
+            originalSkillsRef.current = profileData.skills;
         }
     }, [profileData]);
+
+    // Report dirty state to parent
+    useEffect(() => {
+        const orig = [...originalSkillsRef.current].sort().join(",");
+        const curr = [...skills].sort().join(",");
+        onDirtyChange?.(orig !== curr);
+    }, [skills]);
         
     const [selectedSkill, setSelectedSkill] = useState("");
     const [addActive, setAddActive] = useState(false);
@@ -81,11 +90,10 @@ const SkillsForm = () => {
 
         try {
             await updateSkills({ skills });
-            console.log("Skills updated.");
+            originalSkillsRef.current = skills;
             showToast("Profile updated successfully!", "success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            console.error(err.response?.data || err.message);
         }
     };
 

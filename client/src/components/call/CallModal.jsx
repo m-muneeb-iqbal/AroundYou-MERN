@@ -29,7 +29,7 @@ const CallModal = () => {
                 bottom: "24px",
                 left: "50%",
                 transform: "translateX(-50%)",
-                zIndex: 2000,
+                zIndex: "var(--z-call-modal, 1200)",
                 width: "260px",
                 padding: "24px 16px",
                 border: "1px solid #E0E0E0",

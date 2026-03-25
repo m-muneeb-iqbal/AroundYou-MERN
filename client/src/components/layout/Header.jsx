@@ -74,14 +74,14 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                     <Col xs={7} sm={7} md={8} lg={9} className="d-flex justify-content-end align-items-center gap-3 gap-md-4 pe-3" >
 
-                        <Users color="#04263D" size={24} role="button" />
-                        <BriefcaseBusiness color="#04263D" size={24} role="button" />
+                        <Users color="#04263D" size={24} role="button" aria-label="Friends" title="Friends" />
+                        <BriefcaseBusiness color="#04263D" size={24} role="button" aria-label="Jobs" title="Jobs" />
                         <NotificationBell />
 
                         {showMessages && (
 
                             <>
-                                <MessageCircleMore color="#04263D" size={24} role="button" onClick={() => setShowMessagesPopup((prev) => !prev)} />
+                                <MessageCircleMore color="#04263D" size={24} role="button" aria-label="Messages" title="Messages" onClick={() => setShowMessagesPopup((prev) => !prev)} />
 
                                 {showMessagesPopup && (
                                     <MessagesPopup onClose={() => setShowMessagesPopup(false)} />

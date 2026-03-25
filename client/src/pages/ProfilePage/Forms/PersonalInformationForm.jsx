@@ -16,7 +16,7 @@ const toDateInputValue = (date) => {
     return new Date(date).toISOString().split("T")[0];
 };
     
-const PersonalInformationForm = () => {
+const PersonalInformationForm = ({ onDirtyChange }) => {
 
     const { authUser } = useAuthStore();
     
@@ -71,6 +71,9 @@ const PersonalInformationForm = () => {
     }, [profileData]);
 
     const isFormChanged = useFormDirty(originalData, formData);
+
+    // Notify parent when dirty state changes
+    useEffect(() => { onDirtyChange?.(isFormChanged); }, [isFormChanged]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Card, Form, Button, ListGroup } from "react-bootstrap";
-import { SendHorizonal, X, ArrowLeft, Phone } from "lucide-react";
+import { SendHorizonal, X, ArrowLeft, Phone, MessageSquareDashed } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
@@ -9,6 +9,7 @@ import { normalizeSenderId } from "../../lib/utils";
 
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
+import SkeletonLoader from "../common/SkeletonLoader";
 
 const MessagesPopup = ({ onClose }) => {
 
@@ -23,6 +24,7 @@ const MessagesPopup = ({ onClose }) => {
         sendMessage,
         initializeSocket,
         handleCloseConversation,
+        isLoadingUsers,
     } = useMessageStore();
 
     useEffect(() => { fetchUsers(); }, []);
@@ -67,7 +69,7 @@ const MessagesPopup = ({ onClose }) => {
 
     return (
 
-        <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "410px", height: "460px", zIndex: 1000 }}>
+        <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "min(410px, calc(100vw - 1.5rem))", height: "min(460px, calc(100vh - 6rem))", zIndex: "var(--z-popup, 1100)" }}>
 
             <Card.Header className="position-relative d-flex align-items-center fw-bold">
 
@@ -136,11 +138,20 @@ const MessagesPopup = ({ onClose }) => {
 
             {!selectedUser ? (
 
-                <ListGroup variant="flush" className="overflow-auto flex-grow-1">
+                <ListGroup variant="flush" className="overflow-auto flex-grow-1 px-2">
 
-                    {users.map((user) => (
-                        <UserListItem key={user._id} user={user} onSelect={selectUser} />
-                    ))}
+                    {isLoadingUsers ? (
+                        <SkeletonLoader rows={4} />
+                    ) : users.length === 0 ? (
+                        <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5">
+                            <MessageSquareDashed size={36} color="#C0C0C0" className="mb-2" />
+                            <span style={{ fontSize: "0.82rem" }}>No conversations yet</span>
+                        </div>
+                    ) : (
+                        users.map((user) => (
+                            <UserListItem key={user._id} user={user} onSelect={selectUser} />
+                        ))
+                    )}
 
                 </ListGroup>
 
