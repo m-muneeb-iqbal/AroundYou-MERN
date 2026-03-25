@@ -7,13 +7,28 @@ const createPeerConnection = () => new RTCPeerConnection({
 
 export const useCallStore = create((set, get) => ({
 
-    incomingCall: null,   // { from, offer, callerInfo }
-    activeCall: null,     // { userId, name, profilePic }
+    incomingCall: null,        // { from, offer, callerInfo }
+    activeCall: null,          // { userId, name, profilePic }
     localStream: null,
     remoteStream: null,
     isMuted: false,
-    callStatus: null,     // "calling" | "active" | null
+    callStatus: null,          // "calling" | "active" | null
     peerConnection: null,
+    iceCandidateBuffer: [],    // candidates that arrived before remote description was set
+
+    // Drain buffered ICE candidates once peerConnection + remoteDescription are both ready
+    _flushIceCandidates: async () => {
+        const { peerConnection, iceCandidateBuffer } = get();
+        if (!peerConnection || iceCandidateBuffer.length === 0) return;
+        set({ iceCandidateBuffer: [] });
+        for (const candidate of iceCandidateBuffer) {
+            try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            } catch (e) {
+                console.error("ICE flush error:", e);
+            }
+        }
+    },
 
     // ── Caller: initiate call
     startCall: async (user, authUser) => {
@@ -128,6 +143,9 @@ export const useCallStore = create((set, get) => ({
             },
             callStatus: "active",
         });
+
+        // Flush any caller ICE candidates that arrived before we had a peerConnection
+        await get()._flushIceCandidates();
     },
 
     // ── Callee: reject incoming call
@@ -157,6 +175,7 @@ export const useCallStore = create((set, get) => ({
             incomingCall: null,
             callStatus: null,
             isMuted: false,
+            iceCandidateBuffer: [],
         });
     },
 
@@ -181,6 +200,8 @@ export const useCallStore = create((set, get) => ({
             await peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
             console.log("remote description set, signalingState:", peerConnection?.signalingState);
             set({ callStatus: "active" });
+            // Flush any callee ICE candidates that arrived before the answer was processed
+            await get()._flushIceCandidates();
         };
 
         const handleCallRejected = () => {
@@ -189,12 +210,13 @@ export const useCallStore = create((set, get) => ({
 
         const handleIceCandidate = async ({ candidate }) => {
             const { peerConnection } = get();
-            console.log("ICE candidate received:", candidate);
-            console.log("peerConnection exists:", !!peerConnection);
-            console.log("signalingState:", peerConnection?.signalingState);
+            // Buffer if peerConnection isn't ready or remote description isn't set yet
+            if (!peerConnection || !peerConnection.remoteDescription) {
+                set({ iceCandidateBuffer: [...get().iceCandidateBuffer, candidate] });
+                return;
+            }
             try {
-                await peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
-                console.log("ICE candidate added successfully");
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
             } catch (e) {
                 console.error("ICE candidate error:", e);
             }
