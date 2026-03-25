@@ -34,7 +34,8 @@ const conversationSchema = new mongoose.Schema(
 
 );
 
-conversationSchema.index({ participants: 1 }, { unique: true, sparse: true });
+// Use non-unique index for querying efficiency
+conversationSchema.index({ participants: 1 });
 
 conversationSchema.pre("save", function(next) {
     // Sort participants to ensure consistent ordering

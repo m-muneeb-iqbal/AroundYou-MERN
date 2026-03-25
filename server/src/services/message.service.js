@@ -6,23 +6,30 @@ export const saveMessage = async ({ senderId, receiverId, text, image }) => {
     // Sort participants to ensure consistent ordering
     const sortedParticipants = [senderId, receiverId].sort((a, b) => a.toString().localeCompare(b.toString()));
 
-    let conversation = await Conversation.findOne({
-        participants: { $all: sortedParticipants },
-    });
+    // Use findOneAndUpdate with upsert to safely create or find conversation
+    let conversation = await Conversation.findOneAndUpdate(
+        {
+            participants: { $all: sortedParticipants },
+        },
+        {
+            $setOnInsert: {
+                participants: sortedParticipants,
+                unreadCounts: [
+                    { userId: senderId, count: 0 },
+                    { userId: receiverId, count: 0 },
+                ],
+            }
+        },
+        { upsert: true, new: true }
+    );
 
-    if (!conversation) {
-
-        // Initialize unreadCounts subdocument for both participants
-        conversation = await Conversation.create({
-
-            participants: sortedParticipants,
-            unreadCounts: [
-                { userId: senderId, count: 0 },
-                { userId: receiverId, count: 0 },
-            ],
-
-        });
-
+    if (!conversation.unreadCounts || conversation.unreadCounts.length === 0) {
+        // In case unreadCounts is missing, initialize it
+        conversation.unreadCounts = [
+            { userId: senderId, count: 0 },
+            { userId: receiverId, count: 0 },
+        ];
+        await conversation.save();
     }
 
     const newMessage = await Message.create({
