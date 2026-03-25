@@ -29,8 +29,9 @@ export const initSocket = (server) => {
         console.log("Total online users:", onlineUsers.size);
 
         socket.on("userOnline", async (userId) => {
+            console.log("User going online:", userId);
             onlineUsers.set(userId, socket.id);
-            console.log("Online users:", Array.from(onlineUsers.keys()));
+            console.log("Online users after:", Array.from(onlineUsers.entries()));
 
             try {
 
@@ -89,6 +90,7 @@ export const initSocket = (server) => {
         socket.on("sendMessage", async (data) => {
 
             console.log("📨 sendMessage event received:", data);
+            console.log("Current onlineUsers:", Array.from(onlineUsers.entries()));
 
             const { senderId, receiverId, text, image, tempId } = data;
 
@@ -103,6 +105,8 @@ export const initSocket = (server) => {
 
                     status: "accepted",
                 });
+
+                console.log("Friendship found?", !!friendship);
 
                 if (!friendship) {
 
@@ -136,6 +140,7 @@ export const initSocket = (server) => {
 
                 // Emit to receiver using their socketId
                 const receiverSocketId = onlineUsers.get(receiverId.toString());
+                console.log("Receiver socket ID:", receiverSocketId, "for user:", receiverId);
 
                 if (receiverSocketId) {
 
@@ -153,6 +158,8 @@ export const initSocket = (server) => {
 
                     });
 
+                } else {
+                    console.log("Receiver not online, message saved for later delivery");
                 }
 
             } catch (error) {
