@@ -34,8 +34,8 @@ const conversationSchema = new mongoose.Schema(
 
 );
 
-// Use non-unique index for querying efficiency
-conversationSchema.index({ participants: 1 });
+// No indexes - let MongoDB create them naturally
+
 
 conversationSchema.pre("deleteOne", { document: true, query: false }, async function () {
 
