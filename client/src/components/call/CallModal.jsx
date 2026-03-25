@@ -8,20 +8,21 @@ const CallModal = () => {
     const { activeCall, callStatus, isMuted, remoteStream, endCall, toggleMute } = useCallStore();
     const remoteAudioRef = useRef(null);
 
-    // Attach remote stream to audio element.
-    // Depends on both remoteStream AND activeCall: when the caller accepts,
-    // ontrack can fire before activeCall is set, so <audio> doesn't exist yet.
-    // When activeCall is then set, <audio> mounts and this effect re-runs.
+    // Keep the <audio> element always mounted so the ref is always valid.
+    // This avoids any race condition between ontrack firing and the element mounting.
     useEffect(() => {
         if (remoteAudioRef.current && remoteStream) {
             remoteAudioRef.current.srcObject = remoteStream;
+            remoteAudioRef.current.play().catch(() => {});
         }
-    }, [remoteStream, activeCall]);
-
-    if (!activeCall) return null;
+    }, [remoteStream]);
 
     return (
+        <>
+            {/* Always-mounted hidden audio element — ref must never be null */}
+            <audio ref={remoteAudioRef} autoPlay style={{ display: "none" }} />
 
+            {activeCall && (
         <div
             className="position-fixed d-flex flex-column align-items-center justify-content-center bg-white shadow-lg rounded"
             style={{
@@ -34,8 +35,6 @@ const CallModal = () => {
                 border: "1px solid #E0E0E0",
             }}
         >
-            {/* Hidden audio element for remote stream */}
-            <audio ref={remoteAudioRef} autoPlay />
 
             <InitialsAvatar
                 name={activeCall.name}
@@ -89,7 +88,8 @@ const CallModal = () => {
             </div>
 
         </div>
-
+            )}
+        </>
     );
 
 };
