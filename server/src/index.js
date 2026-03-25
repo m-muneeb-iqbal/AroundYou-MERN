@@ -27,7 +27,10 @@ app.use(cookieParser());
 app.use(
     cors({
         origin: "https://aroundyou-one.vercel.app",
-        credentials: true
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        optionsSuccessStatus: 200
     })
 );
 
