@@ -36,6 +36,14 @@ const conversationSchema = new mongoose.Schema(
 
 conversationSchema.index({ participants: 1 }, { unique: true, sparse: true });
 
+conversationSchema.pre("save", function(next) {
+    // Sort participants to ensure consistent ordering
+    if (this.participants && this.participants.length > 1) {
+        this.participants.sort((a, b) => a.toString().localeCompare(b.toString()));
+    }
+    next();
+});
+
 conversationSchema.pre("deleteOne", { document: true, query: false }, async function () {
 
     await mongoose.model("Message").deleteMany({ conversationId: this._id });

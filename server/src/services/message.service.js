@@ -3,8 +3,11 @@ import Conversation from "../models/conversation.model.js";
 
 export const saveMessage = async ({ senderId, receiverId, text, image }) => {
 
+    // Sort participants to ensure consistent ordering
+    const sortedParticipants = [senderId, receiverId].sort((a, b) => a.toString().localeCompare(b.toString()));
+
     let conversation = await Conversation.findOne({
-        participants: { $all: [senderId, receiverId] },
+        participants: { $all: sortedParticipants },
     });
 
     if (!conversation) {
@@ -12,7 +15,7 @@ export const saveMessage = async ({ senderId, receiverId, text, image }) => {
         // Initialize unreadCounts subdocument for both participants
         conversation = await Conversation.create({
 
-            participants: [senderId, receiverId],
+            participants: sortedParticipants,
             unreadCounts: [
                 { userId: senderId, count: 0 },
                 { userId: receiverId, count: 0 },
