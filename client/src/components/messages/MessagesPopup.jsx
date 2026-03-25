@@ -10,7 +10,7 @@ import { normalizeSenderId } from "../../lib/utils";
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
 
-const MessagesPopup = ({ onClose }) => {
+const MessagesPopup = () => {
 
     const { startCall } = useCallStore();
 
@@ -75,6 +75,10 @@ const MessagesPopup = ({ onClose }) => {
                     <ArrowLeft role="button" size={20} color="#04263D" onClick={() => handleCloseConversation()} />
                 )}
 
+                <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
+                    {selectedUser ? selectedUser.fullName : "AroundYou"}
+                </span>
+
                 {selectedUser && (
                     <Phone
                         role="button"
@@ -85,12 +89,6 @@ const MessagesPopup = ({ onClose }) => {
                         style={{ marginRight: "8px" }}
                     />
                 )}
-
-                <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
-                    {selectedUser ? selectedUser.fullName : "AroundYou"}
-                </span>
-
-                <X role="button" className="ms-auto" onClick={() => { handleCloseConversation(); onClose?.(); }} />
 
             </Card.Header>
 

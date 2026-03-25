@@ -11,14 +11,24 @@ import AdminPage from "./pages/AdminPage/AdminPage";
 import SettingsPage from "./pages/SettingsPage/SettingsPage.jsx";
 
 import { Loader } from "lucide-react";
+import { useCallStore } from "./store/useCallStore.js";
+import CallNotification from "./components/call/CallNotification.jsx";
+import CallModal from "./components/call/CallModal.jsx";
 
 export const App = () => {
 
     const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+    const { initializeCallSocket } = useCallStore();
 
     useEffect (() => {
         checkAuth()
     }, [checkAuth]);
+
+    useEffect(() => {
+        if (!authUser) return;
+        const cleanup = initializeCallSocket();
+        return cleanup;
+    }, [authUser, initializeCallSocket]);
 
     console.log({ authUser });
 
@@ -43,6 +53,13 @@ export const App = () => {
                 <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
                 <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
             </Routes>
+
+            {authUser && (
+                <>
+                    <CallNotification />
+                    <CallModal />
+                </>
+            )}
             
         </div>
     );
