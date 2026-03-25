@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Card, Form, Button, ListGroup } from "react-bootstrap";
-import { SendHorizonal, X, ArrowLeft } from "lucide-react";
+import { SendHorizonal, X, ArrowLeft, Phone } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
