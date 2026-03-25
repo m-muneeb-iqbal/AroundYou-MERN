@@ -54,7 +54,9 @@ export const useCallStore = create((set, get) => ({
 
         const remoteStream = new MediaStream();
         pc.ontrack = (e) => {
-            e.streams[0].getTracks().forEach((track) => remoteStream.addTrack(track));
+            if (!remoteStream.getTracks().includes(e.track)) {
+                remoteStream.addTrack(e.track);
+            }
             set({ remoteStream });
         };
 
@@ -110,7 +112,9 @@ export const useCallStore = create((set, get) => ({
 
         const remoteStream = new MediaStream();
         pc.ontrack = (e) => {
-            e.streams[0].getTracks().forEach((track) => remoteStream.addTrack(track));
+            if (!remoteStream.getTracks().includes(e.track)) {
+                remoteStream.addTrack(e.track);
+            }
             set({ remoteStream });
         };
 
