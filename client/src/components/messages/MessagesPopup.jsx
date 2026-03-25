@@ -4,12 +4,15 @@ import { SendHorizonal, X, ArrowLeft } from "lucide-react";
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
+import { useCallStore } from "../../store/useCallStore";
 import { normalizeSenderId } from "../../lib/utils";
 
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
 
 const MessagesPopup = ({ onClose }) => {
+
+    const { startCall } = useCallStore();
 
     const {
         users,
@@ -70,6 +73,17 @@ const MessagesPopup = ({ onClose }) => {
 
                 {selectedUser && (
                     <ArrowLeft role="button" size={20} color="#04263D" onClick={() => handleCloseConversation()} />
+                )}
+
+                {selectedUser && (
+                    <Phone
+                        role="button"
+                        size={18}
+                        color="#04263D"
+                        title="Audio call"
+                        onClick={() => startCall(selectedUser, authUser)}
+                        style={{ marginRight: "8px" }}
+                    />
                 )}
 
                 <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >

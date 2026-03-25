@@ -160,6 +160,45 @@ export const initSocket = (server) => {
 
         });
 
+        socket.on("callUser", ({ to, offer, callerInfo }) => {
+            const receiverSocketId = onlineUsers.get(to);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("incomingCall", {
+                    from: callerInfo.userId,
+                    offer,
+                    callerInfo,
+                });
+            }
+        });
+
+        socket.on("answerCall", ({ to, answer }) => {
+            const callerSocketId = onlineUsers.get(to);
+            if (callerSocketId) {
+                io.to(callerSocketId).emit("callAnswered", { answer });
+            }
+        });
+
+        socket.on("rejectCall", ({ to }) => {
+            const callerSocketId = onlineUsers.get(to);
+            if (callerSocketId) {
+                io.to(callerSocketId).emit("callRejected");
+            }
+        });
+
+        socket.on("iceCandidate", ({ to, candidate }) => {
+            const targetSocketId = onlineUsers.get(to);
+            if (targetSocketId) {
+                io.to(targetSocketId).emit("iceCandidate", { candidate });
+            }
+        });
+
+        socket.on("endCall", ({ to }) => {
+            const targetSocketId = onlineUsers.get(to);
+            if (targetSocketId) {
+                io.to(targetSocketId).emit("callEnded");
+            }
+        });
+
         socket.on("disconnect", () => {
 
             for (const [key, value] of onlineUsers.entries()) {
