@@ -14,8 +14,13 @@ export const initSocket = (server) => {
         cors: {
             origin: process.env.CLIENT_URL || "http://localhost:5173",
             credentials: true,
+            methods: ["GET", "POST"],
+            allowedHeaders: ["Content-Type", "Authorization"],
         },
         transports: ["websocket", "polling"],
+        allowEIO3: true,
+        pingInterval: 25000,
+        pingTimeout: 5000,
     });
 
     io.on("connection", (socket) => {
