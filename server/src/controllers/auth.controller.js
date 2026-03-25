@@ -5,7 +5,7 @@ import crypto from "crypto";
 import User from "../models/user.model.js";
 
 import { generateToken } from "../lib/utils.js";
-import { sendVerificationEmail } from "../lib/email.js";
+import { sendVerificationEmail, sendPasswordResetEmail } from "../lib/email.js";
 import cloudinary from "../lib/cloudinary.js";
 
 const sendVerificationEmailInBackground = ({ to, fullName, token }, errorPrefix) => {
@@ -530,5 +530,124 @@ export const deleteExperience = async (req, res) => {
     } catch (error) {
         console.error("Delete experience error:", error);
         res.status(500).json({ message: "Server error" });
+    }
+};
+
+// ── PASSWORD RESET ROUTES
+
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        if (!email)
+            return res.status(400).json({ message: "Email is required." });
+
+        const user = await User.findOne({ email });
+
+        if (!user)
+            return res.status(404).json({ message: "No account found with this email." });
+
+        // Generate reset token and expiry (1 hour)
+        const token = crypto.randomBytes(32).toString("hex");
+        const expiry = new Date(Date.now() + 60 * 60 * 1000);
+
+        user.resetPasswordToken = token;
+        user.resetPasswordTokenExpiry = expiry;
+        await user.save();
+
+        // Send reset email in background
+        sendPasswordResetEmail({ to: email, fullName: user.fullName, token }).catch((emailErr) => {
+            console.error("Failed to send password reset email:", emailErr.message);
+        });
+
+        res.status(200).json({
+            message: "Password reset link has been sent to your email.",
+        });
+
+    } catch (error) {
+        console.error("Error in forgotPassword:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    try {
+        if (!token || !newPassword)
+            return res.status(400).json({ message: "Token and new password are required." });
+
+        if (newPassword.length < 8)
+            return res.status(400).json({ message: "Password must be at least 8 characters." });
+
+        const user = await User.findOne({ resetPasswordToken: token });
+
+        if (!user)
+            return res.status(400).json({ message: "Invalid reset link." });
+
+        if (user.resetPasswordTokenExpiry < new Date())
+            return res.status(400).json({ message: "Reset link has expired. Please request a new one." });
+
+        // Hash and update password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        user.resetPasswordToken = null;
+        user.resetPasswordTokenExpiry = null;
+        await user.save();
+
+        res.status(200).json({
+            message: "Password has been reset successfully. You can now log in with your new password.",
+        });
+
+    } catch (error) {
+        console.error("Error in resetPassword:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const changePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user._id;
+
+    try {
+        if (!currentPassword || !newPassword)
+            return res.status(400).json({ message: "Current and new password are required." });
+
+        if (newPassword.length < 8)
+            return res.status(400).json({ message: "Password must be at least 8 characters." });
+
+        const user = await User.findById(userId);
+
+        if (!user)
+            return res.status(404).json({ message: "User not found." });
+
+        // Verify current password
+        const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+
+        if (!isPasswordCorrect)
+            return res.status(400).json({ message: "Current password is incorrect." });
+
+        // Can't use same password
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+
+        if (isSamePassword)
+            return res.status(400).json({ message: "New password must be different from current password." });
+
+        // Hash and update password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({
+            message: "Password has been changed successfully.",
+        });
+
+    } catch (error) {
+        console.error("Error in changePassword:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };

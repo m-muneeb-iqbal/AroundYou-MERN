@@ -5,6 +5,7 @@ import PersonalInformationForm from "../Forms/PersonalInformationForm";
 import EducationForm from "../Forms/EducationForm";
 import ExperienceForm from "../Forms/ExperienceForm";
 import SkillsForm from "../Forms/SkillsForm";
+import ChangePasswordForm from "../Forms/ChangePasswordForm";
 
 import styles from "../../../styles/UI/ToggleButtons.module.css";
 
@@ -34,6 +35,10 @@ const Bottom = () => {
                     Skills
                 </ToggleButton>
 
+                <ToggleButton className={styles.ToggleButtonForm} variant="outline-primary"id="tbg-radio-5" value={5}>
+                    Security & Password
+                </ToggleButton>
+
             </ToggleButtonGroup>
 
             <div className="mt-4">
@@ -41,6 +46,7 @@ const Bottom = () => {
                 {activeTab === 2 && <EducationForm />}
                 {activeTab === 3 && <ExperienceForm />}
                 {activeTab === 4 && <SkillsForm />}
+                {activeTab === 5 && <ChangePasswordForm />}
             </div>
 
         </>

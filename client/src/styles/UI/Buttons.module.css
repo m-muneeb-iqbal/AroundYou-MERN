@@ -62,3 +62,35 @@
     border: 2px solid #FFFFFF !important;
     font-weight: bold;
 }
+
+:global(.btn-outline-primary).resetButton {
+    background-color: #04263D; 
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+:global(.btn-outline-primary).resetButton:hover {
+    background-color: #04263D; 
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    font-weight: bold;
+}
+
+:global(.btn-outline-primary:focus).resetButton,
+:global(.btn-outline-primary:active).resetButton,
+:global(.btn-outline-primary.active).resetButton,
+:global(.btn-check:checked) + .resetButton {
+    background-color: #04263D !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FFFFFF !important;
+    font-weight: bold;
+}
+
+.resetButtonActive {
+    background-color: #04263D !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FFFFFF !important;
+    font-weight: bold;
+}

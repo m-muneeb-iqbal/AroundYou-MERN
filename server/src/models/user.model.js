@@ -172,6 +172,14 @@ const userSchema = new mongoose.Schema (
                 return this.authProvider === "local"; 
             }
         },
+        resetPasswordToken: { 
+            type: String, 
+            default: null 
+        },
+        resetPasswordTokenExpiry: { 
+            type: Date, 
+            default: null 
+        },
     },
 
     {timestamps: true},

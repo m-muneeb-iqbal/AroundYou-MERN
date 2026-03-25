@@ -3,11 +3,13 @@ import { axiosInstance } from "../lib/axios.js";
 import { socket } from "../lib/socket.js"
 
 export const useAuthStore = create((set) => ({
+
     authUser: null,
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
     isCheckingAuth: true,
+    isCheckingPassword: true,
 
     setAuthUser: (user) => set((state) => ({ ...state, authUser: user })),
 
@@ -83,6 +85,26 @@ export const useAuthStore = create((set) => ({
 
         } catch (error) {
             console.error("Error in logout:", error.response?.data || error.message);
+        }
+    },
+
+    changePassword: async (formData) => {
+
+        set({ isChangingPassword: true });
+
+        try {
+            const [res] = await Promise.all([
+                axiosInstance.put("/auth/change-password", formData, { withCredentials: true }),
+                new Promise((resolve) => setTimeout(resolve, 800)),
+            ]);
+            return res.data;
+
+        } catch (error) {
+            console.error("Error in changePassword:", error.response?.data || error.message);
+            throw error;
+
+        } finally {
+            set({ isChangingPassword: false });
         }
     },
 

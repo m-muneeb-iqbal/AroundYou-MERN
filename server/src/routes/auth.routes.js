@@ -1,7 +1,8 @@
 import { 
     checkAuth, signup, verifyEmail, resendVerification, login, logout, 
     getProfile, updateProfilePicture, updatePersonalInformation, updateEducation, 
-    updateExperience, updateSkills, deleteEducation, deleteCertification, deleteExperience
+    updateExperience, updateSkills, deleteEducation, deleteCertification, deleteExperience,
+    forgotPassword, resetPassword, changePassword
 } from "../controllers/auth.controller.js";
 
 import { protectRoute } from "../middleware/auth.middleware.js";
@@ -42,6 +43,8 @@ router.delete("/delete-certification",                                  protectR
 router.put("/update-experience",                                        protectRoute,  updateExperience);
 router.delete("/delete-experience",                                     protectRoute, deleteExperience);
 router.put("/update-skills",                                            protectRoute,  updateSkills);
-
+router.post("/forgot-password",                                         forgotPassword);
+router.post("/reset-password",                                          resetPassword);
+router.put("/change-password",                                          protectRoute, changePassword);
 
 export default router;

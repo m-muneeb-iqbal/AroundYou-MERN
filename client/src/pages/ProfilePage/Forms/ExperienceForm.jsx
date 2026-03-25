@@ -24,7 +24,7 @@ const ExperienceForm = () => {
     
     if(!authUser) return <navigate to = "/" />;
 
-    const { profileData, fetchProfile,updateExperience, deleteExperience, isUpdating } = useProfileStore();
+    const { profileData, fetchProfile, updateExperience, deleteExperience, isUpdating } = useProfileStore();
 
     const navigate = useNavigate();
 
