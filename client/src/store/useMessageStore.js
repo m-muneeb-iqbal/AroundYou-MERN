@@ -282,6 +282,8 @@ export const useMessageStore = create((set, get) => ({
     sendMessage: (payload) => {
         const tempId = `temp_${Date.now()}`;
 
+        console.log("Sending message via socket:", payload);
+
         set((state) => ({
 
             messages: [
