@@ -8,12 +8,15 @@ const CallModal = () => {
     const { activeCall, callStatus, isMuted, remoteStream, endCall, toggleMute } = useCallStore();
     const remoteAudioRef = useRef(null);
 
-    // Attach remote stream to audio element
+    // Attach remote stream to audio element.
+    // Depends on both remoteStream AND activeCall: when the caller accepts,
+    // ontrack can fire before activeCall is set, so <audio> doesn't exist yet.
+    // When activeCall is then set, <audio> mounts and this effect re-runs.
     useEffect(() => {
         if (remoteAudioRef.current && remoteStream) {
             remoteAudioRef.current.srcObject = remoteStream;
         }
-    }, [remoteStream]);
+    }, [remoteStream, activeCall]);
 
     if (!activeCall) return null;
 

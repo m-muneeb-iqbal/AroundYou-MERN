@@ -52,12 +52,15 @@ export const useCallStore = create((set, get) => ({
 
         localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
 
-        const remoteStream = new MediaStream();
         pc.ontrack = (e) => {
-            if (!remoteStream.getTracks().includes(e.track)) {
-                remoteStream.addTrack(e.track);
+            const stream = e.streams?.[0];
+            if (stream) {
+                set({ remoteStream: stream });
+            } else {
+                const existing = get().remoteStream || new MediaStream();
+                existing.addTrack(e.track);
+                set({ remoteStream: existing });
             }
-            set({ remoteStream });
         };
 
         pc.onicecandidate = (e) => {
@@ -110,12 +113,15 @@ export const useCallStore = create((set, get) => ({
 
         localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
 
-        const remoteStream = new MediaStream();
         pc.ontrack = (e) => {
-            if (!remoteStream.getTracks().includes(e.track)) {
-                remoteStream.addTrack(e.track);
+            const stream = e.streams?.[0];
+            if (stream) {
+                set({ remoteStream: stream });
+            } else {
+                const existing = get().remoteStream || new MediaStream();
+                existing.addTrack(e.track);
+                set({ remoteStream: existing });
             }
-            set({ remoteStream });
         };
 
         pc.onicecandidate = (e) => {
