@@ -45,15 +45,29 @@ body {
 }
 
 /* ── Skeleton loader animation ───────────────────────────── */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+@keyframes shimmer {
+  from { transform: translateX(-150%); }
+  to   { transform: translateX(150%); }
 }
 
 .skeleton {
-  background: #e0e0e0;
+  background-color: #e8e8e8;
   border-radius: 6px;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.6s ease-in-out infinite;
 }
 
 /* ── Page fade-in transition ─────────────────────────────── */

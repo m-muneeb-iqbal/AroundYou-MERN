@@ -1,8 +1,9 @@
-import { Table, InputGroup, Form, Row, Col, Badge, Spinner, Pagination } from "react-bootstrap";
+import { Table, InputGroup, Form, Row, Col, Badge, Pagination } from "react-bootstrap";
 import { Search, Trash2, ArrowUp, ArrowDown, ArrowUpDown, X } from "lucide-react";
 
 import InitialsAvatar from "../../common/InitialsAvatar";
 import { roleBadgeStyle } from "../drawer/DrawerHeader";
+import SkeletonLoader from "../../common/SkeletonLoader";
 
 // ── Highlight matching text in a string
 const Highlighted = ({ text = "", query = "" }) => {
@@ -163,87 +164,81 @@ const UsersTable = ({
             </div>
 
             {/* ── Table */}
-            {loading ? (
+            <Table hover responsive style={{ fontSize: "0.85rem" }}>
 
-                <div className="text-center py-4">
-                    <Spinner animation="border" size="sm" style={{ color: "#04263D" }} />
-                </div>
+                <thead style={{ backgroundColor: "#F8F9FA" }}>
 
-            ) : (
+                    <tr>
+                        <SortHeader label="User" field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
+                        <th>Location</th>
+                        <SortHeader label="Friends" field="friendCount" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
+                        <SortHeader label="Role" field="role" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
+                        <SortHeader label="Joined" field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
+                    </tr>
 
-                <Table hover responsive style={{ fontSize: "0.85rem" }}>
-                    
-                    <thead style={{ backgroundColor: "#F8F9FA" }}>
+                </thead>
+
+                <tbody>
+
+                    {loading ? (
+
+                        <SkeletonLoader variant="table-row" rows={currentLimit || 10} />
+
+                    ) : users.length === 0 ? (
 
                         <tr>
-                            <SortHeader label="User" field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
-                            <th>Location</th>
-                            <SortHeader label="Friends" field="friendCount" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
-                            <SortHeader label="Role" field="role" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
-                            <SortHeader label="Joined" field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
+                            <td colSpan={isSuperAdmin ? 6 : 5} className="text-center text-muted py-4">
+                                No users found
+                            </td>
                         </tr>
 
-                    </thead>
+                    ) : (
 
-                    <tbody>
+                        users.map((user) => (
 
-                        {users.length === 0 ? (
+                            <tr key={user._id} style={{ cursor: "pointer" }} onClick={() => onRowClick(user._id)}>
 
-                            <tr>
-                                <td colSpan={isSuperAdmin ? 6 : 5} className="text-center text-muted py-4">
-                                    No users found
-                                </td>
-                            </tr>
+                                <td>
 
-                        ) : (
+                                    <div className="d-flex align-items-center gap-2">
 
-                            users.map((user) => (
+                                        <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
+                                        <div>
 
-                                <tr key={user._id} style={{ cursor: "pointer" }} onClick={() => onRowClick(user._id)}>
+                                            <div className="fw-bold" style={{ color: "#04263D" }}>
+                                                <Highlighted text={user.fullName} query={search} />
+                                            </div>
 
-                                    <td>
-
-                                        <div className="d-flex align-items-center gap-2">
-
-                                            <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
-                                            <div>
-
-                                                <div className="fw-bold" style={{ color: "#04263D" }}>
-                                                    <Highlighted text={user.fullName} query={search} />
-                                                </div>
-
-                                                <div className="text-muted" style={{ fontSize: "0.72rem" }}>
-                                                    <Highlighted text={user.email} query={search} />
-                                                </div>
-
+                                            <div className="text-muted" style={{ fontSize: "0.72rem" }}>
+                                                <Highlighted text={user.email} query={search} />
                                             </div>
 
                                         </div>
-                                    </td>
 
-                                    <td className="text-muted align-middle">{user.location || "—"}</td>
-                                    <td className="align-middle">{user.friendCount ?? 0}</td>
-                                    <td className="align-middle">
-                                        <Badge pill bg="none" style={{ ...roleBadgeStyle(user.role), fontSize: "0.65rem" }}>
-                                            {user.role}
-                                        </Badge>
-                                    </td>
+                                    </div>
+                                </td>
 
-                                    <td className="text-muted align-middle">
-                                        {new Date(user.createdAt).toLocaleDateString()}
-                                    </td>
+                                <td className="text-muted align-middle">{user.location || "—"}</td>
+                                <td className="align-middle">{user.friendCount ?? 0}</td>
+                                <td className="align-middle">
+                                    <Badge pill bg="none" style={{ ...roleBadgeStyle(user.role), fontSize: "0.65rem" }}>
+                                        {user.role}
+                                    </Badge>
+                                </td>
 
-                                </tr>
+                                <td className="text-muted align-middle">
+                                    {new Date(user.createdAt).toLocaleDateString()}
+                                </td>
 
-                            ))
+                            </tr>
 
-                        )}
+                        ))
 
-                    </tbody>
+                    )}
 
-                </Table>
+                </tbody>
 
-            )}
+            </Table>
 
             {/* ── Pagination */}
             {totalPages > 1 && (
