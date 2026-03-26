@@ -79,34 +79,18 @@ const MessagesPopup = ({ onClose }) => {
             <Card.Header className="position-relative d-flex align-items-center fw-bold">
 
                 {selectedUser ? (
+
                     <>
                         {/* Back button (left) */}
-                        <ArrowLeft
-                            role="button"
-                            size={20}
-                            color="#04263D"
-                            onClick={() => handleCloseConversation()}
-                        />
+                        <ArrowLeft role="button" size={20} color="#04263D" onClick={() => handleCloseConversation()} />
 
                         {/* Title (center) */}
-                        <span
-                            className="position-absolute start-50 translate-middle-x"
-                            style={{ pointerEvents: "none" }}
-                        >
-
+                        <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
                             {selectedUser.fullName}
-
                         </span>
 
                         {/* Phone (right) */}
-                        <Phone
-                            role="button"
-                            size={18}
-                            color="#04263D"
-                            title="Audio call"
-                            onClick={() => startCall(selectedUser, authUser)}
-                            className="ms-auto"
-                        />
+                        <Phone role="button" size={18} color="#04263D" title="Audio call" onClick={() => startCall(selectedUser, authUser)} className="ms-auto" />
 
                     </>
 
@@ -114,23 +98,12 @@ const MessagesPopup = ({ onClose }) => {
 
                     <>
                         {/* Title (center) */}
-                        <span
-                            className="position-absolute start-50 translate-middle-x"
-                            style={{ pointerEvents: "none" }}
-                        >
+                        <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
                             AroundYou
-
                         </span>
 
                         {/* Close button (right) */}
-                        <X
-                            role="button"
-                            className="ms-auto"
-                            onClick={() => {
-                                handleCloseConversation();
-                                onClose?.();
-                            }}
-                        />
+                        <X role="button" className="ms-auto" onClick={() => { handleCloseConversation(); onClose?.(); }} />
 
                     </>
 
@@ -145,26 +118,34 @@ const MessagesPopup = ({ onClose }) => {
                     {isLoadingUsers ? (
 
                         Array.from({ length: 4 }).map((_, i) => (
+
                             <ListGroup.Item key={i} className="d-flex flex-column px-3 py-2 gap-1">
+
                                 <div className="d-flex justify-content-between align-items-center">
                                     <Skeleton width={120} height={14} />
                                     <Skeleton width={40} height={12} />
                                 </div>
+
                                 <div className="d-flex justify-content-between align-items-center">
                                     <Skeleton width={180} height={12} />
                                 </div>
+
                             </ListGroup.Item>
                         ))
 
                     ) : users.length === 0 ? (
+
                         <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5">
                             <MessageSquareDashed size={36} color="#C0C0C0" className="mb-2" />
                             <span style={{ fontSize: "0.82rem" }}>No conversations yet</span>
                         </div>
+
                     ) : (
+
                         users.map((user) => (
                             <UserListItem key={user._id} user={user} onSelect={selectUser} />
                         ))
+
                     )}
 
                 </ListGroup>
@@ -172,37 +153,35 @@ const MessagesPopup = ({ onClose }) => {
             ) : (
 
                 <>
-
                     <Card.Body className="d-flex flex-column p-2 overflow-auto gap-2">
 
                         {isLoadingMessages ? (
 
                             Array.from({ length: 6 }).map((_, i) => {
+
                                 // Alternate sender/receiver for natural look
                                 const isSender = i % 2 === 0;
                                 return (
-                                    <div
-                                        key={i}
-                                        className={`d-flex flex-column ${isSender ? "align-items-end" : "align-items-start"}`}
-                                    >
-                                        <Skeleton
-                                            width={`${Math.floor(Math.random() * 30) + 30}%`}
-                                            height={36}
-                                            borderRadius={15}
-                                        />
+
+                                    <div key={i} className={`d-flex flex-column ${isSender ? "align-items-end" : "align-items-start"}`} >
+                                        <Skeleton width={`${Math.floor(Math.random() * 30) + 30}%`} height={36} borderRadius={15} />
                                         <Skeleton width={60} height={10} className="mt-1" />
                                     </div>
+
                                 );
+                                
                             })
 
                         ) : (
 
                             messages.map((msg, index) => (
+
                                 <MessageBubble
                                     key={`${msg._id}-${index}`}
                                     msg={msg}
                                     isSender={normalizeSenderId(msg.senderId) === authUser._id?.toString()}
                                 />
+                                
                             ))
 
                         )}
