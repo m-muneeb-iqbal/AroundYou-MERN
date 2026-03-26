@@ -3,6 +3,7 @@ import { useAuthStore } from "./store/useAuthStore.js";
 import { useEffect } from "react";
 
 import { SkeletonTheme } from "react-loading-skeleton";
+import HomePageSkeleton from "./components/layout/HomePageSkeleton";
 
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
 import VerifyEmailPage from "./pages/VerifyEmailPage/VerifyEmailPage.jsx";
@@ -20,7 +21,7 @@ import CallModal from "./components/call/CallModal.jsx";
 
 export const App = () => {
 
-    const { authUser, checkAuth } = useAuthStore()
+    const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
     const { initializeCallSocket } = useCallStore();
 
     useEffect (() => {
@@ -32,6 +33,8 @@ export const App = () => {
         const cleanup = initializeCallSocket();
         return cleanup;
     }, [authUser, initializeCallSocket]);
+
+    if (isCheckingAuth) return <HomePageSkeleton />;
 
     return (
 
