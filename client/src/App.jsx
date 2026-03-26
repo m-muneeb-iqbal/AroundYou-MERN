@@ -14,14 +14,13 @@ import AdminRoute from "./components/admin/AdminRoute";
 import AdminPage from "./pages/AdminPage/AdminPage";
 import SettingsPage from "./pages/SettingsPage/SettingsPage.jsx";
 
-import { Loader } from "lucide-react";
 import { useCallStore } from "./store/useCallStore.js";
 import CallNotification from "./components/call/CallNotification.jsx";
 import CallModal from "./components/call/CallModal.jsx";
 
 export const App = () => {
 
-    const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+    const { authUser, checkAuth } = useAuthStore()
     const { initializeCallSocket } = useCallStore();
 
     useEffect (() => {
@@ -33,15 +32,6 @@ export const App = () => {
         const cleanup = initializeCallSocket();
         return cleanup;
     }, [authUser, initializeCallSocket]);
-
-    console.log({ authUser });
-
-    if (isCheckingAuth && !authUser) return (
-
-        <div className="flex items-center justify-center h-screen">
-            <Loader className="size-10 animate-spin" />
-        </div>
-    )
 
     return (
 
