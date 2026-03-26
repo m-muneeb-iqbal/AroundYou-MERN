@@ -5,6 +5,7 @@ import { Users, BriefcaseBusiness, MessageCircleMore, UserRound, LogOut, Search,
 
 import SearchDropdown from "../search/SearchDropdown";
 import MessagesPopup from "../messages/MessagesPopup";
+import FriendListPopup from "../friends/FriendListPopup";
 import NotificationBell from "../common/NotificationBell";
 
 import { useAuthStore } from "../../store/useAuthStore";
@@ -15,6 +16,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
     const { authUser, logout } = useAuthStore();
     const navigate = useNavigate();
     const [showMessagesPopup, setShowMessagesPopup] = useState(false);
+    const [showFriendListPopup, setShowFriendListPopup] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     if (!authUser) return <Navigate to="/" />;
@@ -74,20 +76,23 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                     <Col xs={7} sm={7} md={8} lg={9} className="d-flex justify-content-end align-items-center gap-3 gap-md-4 pe-3" >
 
-                        <Users color="#04263D" size={24} role="button" aria-label="Friends" title="Friends" />
+                        <Users color="#04263D" size={24} role="button" aria-label="Friends" title="Friends" onClick={() => { setShowFriendListPopup((prev) => !prev); setShowMessagesPopup(false); }} />
                         <BriefcaseBusiness color="#04263D" size={24} role="button" aria-label="Jobs" title="Jobs" />
                         <NotificationBell />
 
                         {showMessages && (
+                            <MessageCircleMore color="#04263D" size={24} role="button" aria-label="Messages" title="Messages" onClick={() => { setShowMessagesPopup((prev) => !prev); setShowFriendListPopup(false); }} />
+                        )}
 
-                            <>
-                                <MessageCircleMore color="#04263D" size={24} role="button" aria-label="Messages" title="Messages" onClick={() => setShowMessagesPopup((prev) => !prev)} />
+                        {showMessagesPopup && (
+                            <MessagesPopup onClose={() => setShowMessagesPopup(false)} />
+                        )}
 
-                                {showMessagesPopup && (
-                                    <MessagesPopup onClose={() => setShowMessagesPopup(false)} />
-                                )}
-
-                            </>
+                        {showFriendListPopup && (
+                            <FriendListPopup
+                                onClose={() => setShowFriendListPopup(false)}
+                                onOpenMessages={() => setShowMessagesPopup(true)}
+                            />
                         )}
 
                         <Dropdown align="end">
