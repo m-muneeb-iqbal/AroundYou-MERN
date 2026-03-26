@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 import { SkeletonTheme } from "react-loading-skeleton";
 import HomePageSkeleton from "./components/layout/HomePageSkeleton";
+import ProfilePageSkeleton from "./components/layout/ProfilePageSkeleton.jsx";
 
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
 import VerifyEmailPage from "./pages/VerifyEmailPage/VerifyEmailPage.jsx";
@@ -34,7 +35,11 @@ export const App = () => {
         return cleanup;
     }, [authUser, initializeCallSocket]);
 
-    if (isCheckingAuth) return <HomePageSkeleton />;
+    if (isCheckingAuth) {
+        const path = window.location.pathname;
+        if (path === "/profile") return <ProfilePageSkeleton />;
+        return <HomePageSkeleton />;
+    }
 
     return (
 
