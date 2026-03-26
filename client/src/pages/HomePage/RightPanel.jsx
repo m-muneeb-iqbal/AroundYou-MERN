@@ -1,21 +1,13 @@
-import { useEffect } from "react";
 import { Card, ListGroup } from "react-bootstrap";
 import { useFriendStore } from "../../store/useFriendStore";
 import PersonCard from "../../components/friends/PersonCard";
-import SkeletonLoader from "../../components/common/SkeletonLoader";
 
-const RightPanel = () => {
+const RightPanel = ({ isLoading }) => {
 
-    const { nonFriends, fetchNonFriends, sendFriendRequest, isLoadingNonFriends } = useFriendStore();
-
-    useEffect(() => {
-        fetchNonFriends();
-    }, []);
+    const { nonFriends, sendFriendRequest } = useFriendStore();
 
     return (
-
         <Card className="border-0 shadow-sm">
-
             <Card.Body className="p-3">
 
                 <Card.Title className="mb-3" style={{ fontSize: "0.95rem", color: "#04263D" }}>
@@ -24,9 +16,11 @@ const RightPanel = () => {
 
                 <ListGroup variant="flush">
 
-                    {isLoadingNonFriends ? (
+                    {isLoading ? (
 
-                        <SkeletonLoader rows={3} />
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <PersonCard key={i} isLoading={true} />
+                        ))
 
                     ) : nonFriends.length === 0 ? (
 
@@ -37,8 +31,7 @@ const RightPanel = () => {
                     ) : (
 
                         nonFriends.map((user) => (
-
-                            <PersonCard key={user._id} user={user} onAdd={() => sendFriendRequest(user._id)} />
+                            <PersonCard key={user._id} user={user} onAdd={() => sendFriendRequest(user._id)} isLoading={false} />
                         ))
 
                     )}
@@ -46,11 +39,8 @@ const RightPanel = () => {
                 </ListGroup>
 
             </Card.Body>
-
         </Card>
-
     );
-    
 };
 
 export default RightPanel;

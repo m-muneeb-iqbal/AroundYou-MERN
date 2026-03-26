@@ -1,15 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import { useAuthStore} from "../../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 import { Settings, Bookmark, UserRoundPlus, SquarePlay } from "lucide-react";
 import { Card, ListGroup } from "react-bootstrap";
 
-const LeftPanel = () => {
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
+const LeftPanel = ({ isLoading }) => {
 
     const { authUser } = useAuthStore();
     const navigate = useNavigate();
 
-    if(!authUser) {
+    if (!authUser) {
         navigate("/");
         return null;
     }
@@ -19,19 +22,23 @@ const LeftPanel = () => {
             <Card style={{ width: '18rem' }} className="d-none d-md-block mb-4">
                 <Card.Body>
 
-                    <Card.Title className="text-center">{authUser.fullName}</Card.Title>
+                    <Card.Title className="text-center">
+                        {isLoading ? <Skeleton width="60%" /> : authUser.fullName}
+                    </Card.Title>
+
                     <Card.Subtitle className="text-muted text-center">
-                        {authUser?.jobTitle}
+                        {isLoading ? <Skeleton width="40%" /> : authUser?.jobTitle}
                     </Card.Subtitle>
+
                     <p style={{ fontSize: "0.9em" }} className="text-center">
-                        {authUser?.company}
+                        {isLoading ? <Skeleton width="30%" /> : authUser?.company}
                     </p>
-                    
+
                     <Card.Text className="text-muted">
-                       {authUser?.description}
+                        {isLoading ? <Skeleton count={3} /> : authUser?.description}
                     </Card.Text>
 
-                    {(!authUser?.description && !authUser?.designation) && (
+                    {(!isLoading && !authUser?.description && !authUser?.designation) && (
                         <div
                             role="button"
                             onClick={() => navigate("/profile")}
@@ -41,42 +48,54 @@ const LeftPanel = () => {
                             Complete your profile →
                         </div>
                     )}
-    
+
                 </Card.Body>
             </Card>
 
             <Card style={{ width: '18rem' }} className="d-none d-md-block">
                 <ListGroup variant="flush">
 
-                    <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
-                        <div className="d-flex align-items-center gap-3">
-                            <SquarePlay color = "#797979" size={20}/>
-                            <span className="text-muted">Learning</span>
-                        </div>
-                    </ListGroup.Item>
+                    {isLoading ? (
 
-                    <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
-                        <div className="d-flex align-items-center gap-3">
-                            <Bookmark color = "#797979" size={20}/>
-                            <span className="text-muted">Bookmark</span>
-                        </div>
-                    </ListGroup.Item>
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <ListGroup.Item key={i} className="px-3">
+                                <Skeleton height={20} />
+                            </ListGroup.Item>
+                        ))
 
-                    <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
-                        <div className="d-flex align-items-center gap-3">
-                            <UserRoundPlus color = "#797979" size={20}/>
-                            <span className="text-muted">Find colleagues</span>
-                        </div>
-                    </ListGroup.Item>
+                    ) : (
+                        <>
+                            <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <SquarePlay color="#797979" size={20} />
+                                    <span className="text-muted">Learning</span>
+                                </div>
+                            </ListGroup.Item>
 
-                    <ListGroup.Item action className="px-3 text-start" onClick={() => navigate("/settings")} style={{ cursor: "pointer" }}>
-                        <div className="d-flex align-items-center gap-3">
-                            <Settings color = "#797979" size={20}/>
-                            <span className="text-muted">Settings</span>
-                        </div>
-                    </ListGroup.Item>
+                            <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <Bookmark color="#797979" size={20} />
+                                    <span className="text-muted">Bookmark</span>
+                                </div>
+                            </ListGroup.Item>
 
-                 </ListGroup>
+                            <ListGroup.Item action className="px-3 text-start" style={{ cursor: "pointer" }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <UserRoundPlus color="#797979" size={20} />
+                                    <span className="text-muted">Find colleagues</span>
+                                </div>
+                            </ListGroup.Item>
+
+                            <ListGroup.Item action className="px-3 text-start" onClick={() => navigate("/settings")} style={{ cursor: "pointer" }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <Settings color="#797979" size={20} />
+                                    <span className="text-muted">Settings</span>
+                                </div>
+                            </ListGroup.Item>
+                        </>
+                    )}
+
+                </ListGroup>
             </Card>
         </>
     );

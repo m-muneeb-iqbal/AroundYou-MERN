@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "./store/useAuthStore.js";
 import { useEffect } from "react";
 
+import { SkeletonTheme } from "react-loading-skeleton";
+
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
 import VerifyEmailPage from "./pages/VerifyEmailPage/VerifyEmailPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
@@ -43,29 +45,34 @@ export const App = () => {
 
     return (
 
-        <div className="page-enter">
+        <SkeletonTheme baseColor="#C8CACC" highlightColor="#04263D18">
 
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/signup" element={<LandingPage />} />
-                <Route path="/verify-email" element={<VerifyEmailPage />} />
-                <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
-                <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/home" />} />
-                <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/home" />} />
-                <Route path="/home" element={authUser ? <HomePage /> : <Navigate to="/" />} />
-                <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/" />} />
-                <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-                <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
-            </Routes>
+            <div className="page-enter">
 
-            {authUser && (
-                <>
-                    <CallNotification />
-                    <CallModal />
-                </>
-            )}
-            
-        </div>
+                <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/signup" element={<LandingPage />} />
+                    <Route path="/verify-email" element={<VerifyEmailPage />} />
+                    <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
+                    <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/home" />} />
+                    <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/home" />} />
+                    <Route path="/home" element={authUser ? <HomePage /> : <Navigate to="/" />} />
+                    <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/" />} />
+                    <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+                    <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
+                </Routes>
+
+                {authUser && (
+                    <>
+                        <CallNotification />
+                        <CallModal />
+                    </>
+                )}
+                
+            </div>
+
+        </SkeletonTheme>
+
     );
 }
 
