@@ -27,6 +27,7 @@ const MessagesPopup = ({ onClose }) => {
         initializeSocket,
         handleCloseConversation,
         isLoadingUsers,
+        isLoadingMessages,
     } = useMessageStore();
 
     useEffect(() => { fetchUsers(); }, []);
@@ -46,8 +47,10 @@ const MessagesPopup = ({ onClose }) => {
 
     const messagesEndRef = useRef(null);
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        if (!isLoadingMessages) {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages, isLoadingMessages]);
 
     const [message, setMessage] = useState("");
     const handleSend = (e) => {
@@ -82,10 +85,7 @@ const MessagesPopup = ({ onClose }) => {
                             role="button"
                             size={20}
                             color="#04263D"
-                            onClick={() => {
-                                handleCloseConversation();
-                                onClose?.();
-                            }}
+                            onClick={() => handleCloseConversation()}
                         />
 
                         {/* Title (center) */}
@@ -175,18 +175,40 @@ const MessagesPopup = ({ onClose }) => {
 
                     <Card.Body className="d-flex flex-column p-2 overflow-auto gap-2">
 
-                        {messages.map((msg, index) => (
+                        {isLoadingMessages ? (
 
-                            <MessageBubble
-                                key={`${msg._id}-${index}`}
-                                msg={msg}
-                                isSender={normalizeSenderId(msg.senderId) === authUser._id?.toString()}
-                            />
+                            Array.from({ length: 6 }).map((_, i) => {
+                                // Alternate sender/receiver for natural look
+                                const isSender = i % 2 === 0;
+                                return (
+                                    <div
+                                        key={i}
+                                        className={`d-flex flex-column ${isSender ? "align-items-end" : "align-items-start"}`}
+                                    >
+                                        <Skeleton
+                                            width={`${Math.floor(Math.random() * 30) + 30}%`}
+                                            height={36}
+                                            borderRadius={15}
+                                        />
+                                        <Skeleton width={60} height={10} className="mt-1" />
+                                    </div>
+                                );
+                            })
 
-                        ))}
+                        ) : (
+
+                            messages.map((msg, index) => (
+                                <MessageBubble
+                                    key={`${msg._id}-${index}`}
+                                    msg={msg}
+                                    isSender={normalizeSenderId(msg.senderId) === authUser._id?.toString()}
+                                />
+                            ))
+
+                        )}
 
                         <div ref={messagesEndRef} />
-                        
+
                     </Card.Body>
 
                     <Card.Footer>

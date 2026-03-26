@@ -12,6 +12,7 @@ export const useMessageStore = create((set, get) => ({
     openConversationId: null,
     messageInput: "",
     isLoadingUsers: false,
+    isLoadingMessages: false,
 
     setAuthUser: (user) => set({ authUser: user }),
 
@@ -206,6 +207,7 @@ export const useMessageStore = create((set, get) => ({
             selectedUser: null,
             messages: [],
             openConversationId: null,
+            isLoadingMessages: false,
             users: state.users.map((u) =>
                 u.conversationId === selectedUser.conversationId
                     ? { ...u, unreadCount: 0 }
@@ -222,31 +224,33 @@ export const useMessageStore = create((set, get) => ({
         const selected = user || get().selectedUser;
         if (!selected?.conversationId) return;
 
-        const res = await axiosInstance.get(
-            `/message/${selected._id}?page=1&limit=20`,
-            { withCredentials: true }
-        );
+        set({ isLoadingMessages: true });
 
-        set({ messages: res.data, openConversationId: selected.conversationId });
-        get().markMessagesAsRead(selected.conversationId);
-
-        if (selected.unreadCount > 0) {
-
-            await axiosInstance.put(
-                `/message/read/${selected.conversationId}`,
+        try {
+            const res = await axiosInstance.get(
+                `/message/${selected._id}?page=1&limit=20`,
                 { withCredentials: true }
             );
+            set({ messages: res.data, openConversationId: selected.conversationId });
+            get().markMessagesAsRead(selected.conversationId);
 
-            try {
+            if (selected.unreadCount > 0) {
                 await axiosInstance.put(
                     `/message/read/${selected.conversationId}`,
                     { withCredentials: true }
                 );
-                socket.emit("markAsRead", { conversationId: selected.conversationId });
-            } catch (err) {
-                console.error("Error marking messages as read:", err);
+                try {
+                    await axiosInstance.put(
+                        `/message/read/${selected.conversationId}`,
+                        { withCredentials: true }
+                    );
+                    socket.emit("markAsRead", { conversationId: selected.conversationId });
+                } catch (err) {
+                    console.error("Error marking messages as read:", err);
+                }
             }
-
+        } finally {
+            set({ isLoadingMessages: false });
         }
     },
 
