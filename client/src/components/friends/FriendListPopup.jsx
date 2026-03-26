@@ -37,7 +37,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
         setConfirmUnfriendId(null);
     };
 
-    const skeletonRows = Array.from({ length: 4 });
+    const skeletonRows = Array.from({ length: friends.length });
 
     return (
 

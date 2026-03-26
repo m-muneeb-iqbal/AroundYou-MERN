@@ -9,7 +9,9 @@ import { normalizeSenderId } from "../../lib/utils";
 
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
-import SkeletonLoader from "../common/SkeletonLoader";
+
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const MessagesPopup = ({ onClose }) => {
 
@@ -141,7 +143,19 @@ const MessagesPopup = ({ onClose }) => {
                 <ListGroup variant="flush" className="overflow-auto flex-grow-1 px-2">
 
                     {isLoadingUsers ? (
-                        <SkeletonLoader rows={4} />
+
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <ListGroup.Item key={i} className="d-flex flex-column px-3 py-2 gap-1">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <Skeleton width={120} height={14} />
+                                    <Skeleton width={40} height={12} />
+                                </div>
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <Skeleton width={180} height={12} />
+                                </div>
+                            </ListGroup.Item>
+                        ))
+
                     ) : users.length === 0 ? (
                         <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted py-5">
                             <MessageSquareDashed size={36} color="#C0C0C0" className="mb-2" />
