@@ -251,14 +251,14 @@ const EducationForm = ({ onDirtyChange }) => {
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridPassingYear">
 
                         <Form.Label>Passing Year</Form.Label>
-                        <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" />
+                        <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" autoComplete="off" />
                         
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCGPA">
 
                         <Form.Label>CGPA</Form.Label>
-                        <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" />
+                        <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" autoComplete="off" />
 
                     </Form.Group>
 

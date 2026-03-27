@@ -149,12 +149,12 @@ const ExperienceForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCompany">
                         <Form.Label>Company Name</Form.Label>
-                        <Form.Control value={formData.company} onChange={ handleChange } name="company" type="text" placeholder="Company Name" />
+                        <Form.Control value={formData.company} onChange={ handleChange } name="company" type="text" placeholder="Company Name" autoComplete="organization" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridJobTitle">
                         <Form.Label>Designation</Form.Label>
-                        <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Designation" />
+                        <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Designation" autoComplete="organization-title" />
                     </Form.Group>
 
                 </Row>
@@ -163,12 +163,12 @@ const ExperienceForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridJoiningDate">
                         <Form.Label>Joining Date</Form.Label>
-                        <Form.Control value={formData.joiningDate} onChange={ handleChange } name="joiningDate" type="date" />
+                        <Form.Control value={formData.joiningDate} onChange={ handleChange } name="joiningDate" type="date" autoComplete="off" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridResignationDate">
                         <Form.Label>Resignation Date</Form.Label>
-                        <Form.Control value={formData.resignationDate ?? ""} onChange={ handleChange } name="resignationDate" type="date" disabled={formData.currentlyWorking}/>
+                        <Form.Control value={formData.resignationDate ?? ""} onChange={ handleChange } name="resignationDate" type="date" disabled={formData.currentlyWorking} autoComplete="off" />
                         <Form.Check type="checkbox" id="currentlyWorking" label="Currently working" name="currentlyWorking" className="mt-2" checked={formData.currentlyWorking} onChange={handleChange}/>
                     </Form.Group>
 

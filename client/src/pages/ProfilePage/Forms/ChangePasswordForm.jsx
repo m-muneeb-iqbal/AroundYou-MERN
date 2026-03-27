@@ -147,7 +147,7 @@ const ChangePasswordForm = ({ onDirtyChange }) => {
                             <Form.Label className="fw-bold">Current Password</Form.Label>
                             <InputGroup>
 
-                                <Form.Control type={showPassword.current ? 'text' : 'password'} name="currentPassword" value={formData.currentPassword} onChange={handleChange} placeholder="Enter your current password" isInvalid={!!errors.currentPassword} />
+                                <Form.Control type={showPassword.current ? 'text' : 'password'} name="currentPassword" value={formData.currentPassword} onChange={handleChange} placeholder="Enter your current password" isInvalid={!!errors.currentPassword} autoComplete="current-password" />
                                 <Button  variant="outline-primary" onClick={() => handleTogglePassword('current')} className={styles.resetButton} style={{ padding: '0.375rem 0.75rem' }} >
                                     {showPassword.current ? 'Hide' : 'Show'}
                                 </Button>
@@ -162,7 +162,7 @@ const ChangePasswordForm = ({ onDirtyChange }) => {
                             <Form.Label className="fw-bold">New Password</Form.Label>
                             <InputGroup>
 
-                                <Form.Control type={showPassword.new ? 'text' : 'password'} name="newPassword" value={formData.newPassword} onChange={handleChange} placeholder="Enter your new password" isInvalid={!!errors.newPassword} />
+                                <Form.Control type={showPassword.new ? 'text' : 'password'} name="newPassword" value={formData.newPassword} onChange={handleChange} placeholder="Enter your new password" isInvalid={!!errors.newPassword} autoComplete="new-password" />
                                 <Button variant="outline-primary" onClick={() => handleTogglePassword('new')} className={styles.resetButton} style={{ padding: '0.375rem 0.75rem' }} >
                                     {showPassword.new ? 'Hide' : 'Show'}
                                 </Button>
@@ -177,7 +177,7 @@ const ChangePasswordForm = ({ onDirtyChange }) => {
                             <Form.Label className="fw-bold">Confirm Password</Form.Label>
                             <InputGroup>
 
-                                <Form.Control type={showPassword.confirm ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your new password" isInvalid={!!errors.confirmPassword} />
+                                <Form.Control type={showPassword.confirm ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your new password" isInvalid={!!errors.confirmPassword} autoComplete="new-password" />
                                 <Button variant="outline-primary" onClick={() => handleTogglePassword('confirm')} className={styles.resetButton} style={{ padding: '0.375rem 0.75rem' }} >
                                     {showPassword.confirm ? 'Hide' : 'Show'}
                                 </Button>

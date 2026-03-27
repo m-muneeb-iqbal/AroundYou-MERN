@@ -115,7 +115,7 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} controlId="formGridDescription">
                         <Form.Label>About</Form.Label>
-                        <Form.Control as="textarea" value={formData.description} onChange={ handleChange } name="description" type="text" placeholder="Tell us about yourself" />
+                        <Form.Control as="textarea" value={formData.description} onChange={ handleChange } name="description" type="text" placeholder="Tell us about yourself" autoComplete="off" />
                     </Form.Group>
 
                 </Row>
@@ -124,12 +124,12 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridFullName">
                         <Form.Label>Full Name</Form.Label>
-                        <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" />
+                        <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" autoComplete="name" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridEmail">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control disabled value={authUser?.email || ""} readOnly name="email" type="email" placeholder="yourname@example.com" />
+                        <Form.Control disabled value={authUser?.email || ""} readOnly name="email" type="email" placeholder="yourname@example.com" autoComplete="off" />
                     </Form.Group>
 
                 </Row>
@@ -138,12 +138,12 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridDob">
                         <Form.Label>Date of birth</Form.Label>
-                        <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" />
+                        <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" autoComplete="off" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridNumber">
                         <Form.Label>Phone</Form.Label>
-                        <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" />
+                        <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" autoComplete="off" />
                     </Form.Group>
 
                 </Row>
@@ -152,12 +152,12 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridAge">
                         <Form.Label>Age</Form.Label>
-                        <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" />
+                        <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" autoComplete="off" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCity">
                         <Form.Label>City</Form.Label>
-                        <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" />
+                        <Form.Control value={formData.location} onChange={ handleChange } name="location" type="text" placeholder="Current residence city" autoComplete="off" />
                     </Form.Group>
 
                 </Row>
@@ -166,12 +166,12 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridDesignation">
                         <Form.Label>Designation</Form.Label>
-                        <Form.Control value={formData.designation} onChange={ handleChange } name="designation" type="text" placeholder="Software Engineer" />
+                        <Form.Control value={formData.designation} onChange={ handleChange } name="designation" type="text" placeholder="Software Engineer" autoComplete="organization-title" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridWebsite">
                         <Form.Label>Portfolio/Website</Form.Label>
-                        <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" />
+                        <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" autoComplete="url" />
                     </Form.Group>
 
                 </Row>
