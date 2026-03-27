@@ -73,7 +73,7 @@ const userSchema = new mongoose.Schema (
         //Education
         education: {
             type: String,
-            enum: ["Matriculation/O-Level", "Intermediate/A-Level", "DAE", "Bachelors", "Masters", "PHD/Doctorate", "ACCA", "CA", "CMA"],
+            default: "",
         },
 
         field: {

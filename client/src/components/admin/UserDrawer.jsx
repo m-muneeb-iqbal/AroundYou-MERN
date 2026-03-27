@@ -95,7 +95,23 @@ const UserDrawer = ({ onClose }) => {
         setSaving(true);
         try {
             const skills = skillsInput.split(",").map((s) => s.trim()).filter(Boolean);
-            await updateUser(selectedUser._id, { ...form, ...edu, ...exp, skills });
+
+            // Only send fields that changed from original
+            const allCurrent = { ...form, ...edu, ...exp, skills };
+            const diff = {};
+            Object.keys(allCurrent).forEach((key) => {
+                const cur = allCurrent[key];
+                const orig = key === "skills"
+                    ? (originalData?.skills || "")
+                        .split(",").map((s) => s.trim()).filter(Boolean)
+                    : originalData?.[key];
+                const curNorm = Array.isArray(cur) ? JSON.stringify([...cur].sort()) : cur;
+                const origNorm = Array.isArray(orig) ? JSON.stringify([...orig].sort()) : (orig ?? "");
+                if (curNorm !== origNorm) diff[key] = cur;
+            });
+
+            if (Object.keys(diff).length === 0) return;
+            await updateUser(selectedUser._id, diff);
             setOriginalData(currentData);
             showToast("User updated successfully", "success");
 
