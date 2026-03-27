@@ -22,7 +22,7 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
     
     if(!authUser) return <navigate to = "/" />;
 
-    const { profileData, fetchProfile, updatePersonalInformation } = useProfileStore();
+    const { profileData, fetchProfile, updatePersonalInformation, isUpdating } = useProfileStore();
     
     // Fetch full profile on mount
     const navigate = useNavigate();
@@ -83,32 +83,26 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
         }));
     };
 
-    const [isSaving, setIsSaving] = useState(false);
     const { showToast } = useToast();
 
     const handleUpdatePersonalInformation = async (e) => {
-
         e.preventDefault();
-        setIsSaving(true)
 
         try {
 
             await updatePersonalInformation(formData);
-
-            const normalized = {
+            
+            setOriginalData({
                 ...formData,
                 age: formData.age != null ? String(formData.age) : "",
-            };
+            });
 
-            setOriginalData(normalized);
+            console.log("Personal info updated.");
+            showToast("Profile updated successfully!", "success");
 
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
             showToast("Profile update failed", "danger");
-        }finally {
-            setIsSaving(false); // single flag resets everything
-            console.log("Personal info updated.");
-            showToast("Profile updated successfully!", "success");
         }
     };
 
@@ -179,7 +173,7 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                 <Row className='d-flex justify-content-end'>
                     <Col xs={12} md={2} as={Button} variant='outline-primary' className={styles.submitButton} disabled={ !isFormChanged } type="submit">
-                        {isSaving ? <Spinner animation="border" size="sm" /> : "Save & Next"}
+                        {isUpdating ? <Spinner animation="border" size="sm" /> : "Save & Next"}
                     </Col>
                 </Row>
 
