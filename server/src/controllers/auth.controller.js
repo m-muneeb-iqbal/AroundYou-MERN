@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 import User from "../models/user.model.js";
 
-import { generateToken } from "../lib/utils.js";
+import { generateToken, cookieOptions } from "../lib/utils.js";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../lib/email.js";
 import cloudinary from "../lib/cloudinary.js";
 
@@ -218,12 +218,7 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
 
     try {
-        res.cookie("jwt", "", {
-            maxAge: 0,
-            httpOnly: true,
-            sameSite: "none",
-            secure: process.env.NODE_ENV !== "development",
-        });
+        res.clearCookie("jwt", cookieOptions);
         res.status(200).json({ message: "Logged out successfully" });
 
     } catch (error) {
@@ -633,7 +628,7 @@ export const changePassword = async (req, res) => {
             return res.status(400).json({ message: "Current password is incorrect." });
 
         // Can't use same password
-        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        const isSamePassword = bcrypt.compare(newPassword, user.password);
 
         if (isSamePassword)
             return res.status(400).json({ message: "New password must be different from current password." });
