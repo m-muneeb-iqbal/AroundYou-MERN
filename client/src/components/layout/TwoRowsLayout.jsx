@@ -2,13 +2,13 @@ import { Row, Col } from "react-bootstrap";
 
 import Header from "./Header";
 
-const TwoRowsLayout = ({ top, bottom }) => {
+const TwoRowsLayout = ({ top, bottom, showMessages = false, showSearch = false }) => {
 
     return (
 
         <>
         
-            <Header/>
+            <Header showMessages={showMessages} showSearch={showSearch} />
             
             <Row className="mt-1">
                 {top && <Col xs={12} className="d-flex justify-content-center">{top}</Col>}

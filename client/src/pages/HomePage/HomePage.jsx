@@ -5,7 +5,7 @@ import ThreeColumnLayout from "../../components/layout/ThreeColumnLayout";
 import { useFriendStore } from "../../store/useFriendStore";
 
 import LeftPanel from "./LeftPanel";
-import Middle from "./Middle";
+import Feed from "./Feed";
 import RightPanel from "./RightPanel";
 
 const HomePage = () => {
@@ -23,7 +23,7 @@ const HomePage = () => {
                 showSearch
                 onSearch={(query) => console.log(query)}
                 left={<LeftPanel isLoading={isLoadingNonFriends} />}
-                middle={<Middle />}
+                middle={<Feed />}
                 right={<RightPanel isLoading={isLoadingNonFriends} />}
             />
         </Container>

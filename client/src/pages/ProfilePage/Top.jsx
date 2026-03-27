@@ -1,8 +1,8 @@
-import { axiosInstance } from "../../../lib/axios";
+import { axiosInstance } from "../../lib/axios";
 
 import { useState } from "react";
 
-import ProfileCard from "./ProfileCard";
+import ProfileCard from "./ProfileCard/ProfileCard";
 
 const Top = ({ authUser }) => {
 

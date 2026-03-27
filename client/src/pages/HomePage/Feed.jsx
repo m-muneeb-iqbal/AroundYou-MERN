@@ -1,6 +1,6 @@
 import { House } from "lucide-react";
 
-const Middle = () => {
+const Feed = () => {
     return (
         <div
             className="d-flex flex-column align-items-center justify-content-center py-5 rounded"
@@ -12,4 +12,4 @@ const Middle = () => {
     );
 };
 
-export default Middle;
+export default Feed;

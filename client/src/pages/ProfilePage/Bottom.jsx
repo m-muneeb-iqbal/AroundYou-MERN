@@ -1,13 +1,13 @@
 import { useState, useRef } from "react";
 import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 
-import PersonalInformationForm from "../Forms/PersonalInformationForm";
-import EducationForm from "../Forms/EducationForm";
-import ExperienceForm from "../Forms/ExperienceForm";
-import SkillsForm from "../Forms/SkillsForm";
-import ChangePasswordForm from "../Forms/ChangePasswordForm";
+import PersonalInformationForm from "./Forms/PersonalInformationForm";
+import EducationForm from "./Forms/EducationForm";
+import ExperienceForm from "./Forms/ExperienceForm";
+import SkillsForm from "./Forms/SkillsForm";
+import ChangePasswordForm from "./Forms/ChangePasswordForm";
 
-import styles from "../../../styles/UI/ToggleButtons.module.css";
+import styles from "../../styles/UI/ToggleButtons.module.css";
 
 
 const Bottom = () => {
