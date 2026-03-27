@@ -62,10 +62,10 @@ export const useAdminStore = create((set) => ({
 
     // Update user fields — refreshes both drawer and table row
     updateUser: async (userId, updates) => {
-        const [res] = await Promise.all([
-            axiosInstance.patch(`/admin/users/${userId}`, updates, { withCredentials: true }),
-            new Promise((resolve) => setTimeout(resolve, 800)),
-        ]);
+
+        const res = await axiosInstance.patch(`/admin/users/${userId}`, updates, { 
+            withCredentials: true 
+        });
 
         const fullUser = await axiosInstance.get(`/admin/users/${userId}`, { withCredentials: true });
 

@@ -81,6 +81,7 @@ export const useAuthStore = create((set) => ({
             await axiosInstance.post("/auth/logout", {}, { withCredentials: true });
             socket.disconnect()
             set({ authUser: null });
+            console.log("Logged out successfully");
 
         } catch (error) {
             console.error("Error in logout:", error.response?.data || error.message);
@@ -92,10 +93,10 @@ export const useAuthStore = create((set) => ({
         set({ isChangingPassword: true });
 
         try {
-            const [res] = await Promise.all([
-                axiosInstance.put("/auth/change-password", formData, { withCredentials: true }),
-                new Promise((resolve) => setTimeout(resolve, 800)),
-            ]);
+
+            const res = await axiosInstance.put("/auth/change-password", formData, { 
+                withCredentials: true 
+            });
             return res.data;
 
         } catch (error) {
