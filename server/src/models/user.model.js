@@ -205,7 +205,6 @@ userSchema.methods.toProfileData = function () {
     return {
         _id: this._id,
         fullName: this.fullName,
-        email: this.email,
         profilePic: this.profilePic,
         description: this.description,
         location: this.location,

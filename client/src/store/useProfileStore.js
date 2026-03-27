@@ -9,23 +9,27 @@ export const useProfileStore = create ((set) => ({
     profileData: null,
 
     fetchProfile: async () => {
-        const res = await axiosInstance.get("/auth/profile", { withCredentials: true });
+
+        const res = await axiosInstance.get("/auth/profile", { 
+            withCredentials: true 
+        });
         set({ profileData: res.data });
+
     },
 
     updatePersonalInformation: async (formData) => {
+
         set({ isUpdating: true });
 
         try {
 
-            const [res] = await Promise.all([
-                axiosInstance.put("/auth/update-personal-info", formData, { withCredentials: true }),
-                new Promise((resolve) => setTimeout(resolve, 800)),
-            ]);
+            const res = await axiosInstance.put("/auth/update-personal-info", formData, { 
+                withCredentials: true,
+            });
 
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().checkAuth(); 
-            set({ profileData: res.data })
+            set({ profileData: res.data });
 
         } catch (error) {
             
@@ -38,14 +42,15 @@ export const useProfileStore = create ((set) => ({
     },
 
     updateEducation: async (data) => {
+
         set({ isUpdating: true });
 
         try {
 
-            const [res] = await Promise.all([
-                axiosInstance.put("/auth/update-education", data, { withCredentials: true }),
-                new Promise((resolve) => setTimeout(resolve, 800)),
-            ]);
+            const res = await axiosInstance.put("/auth/update-education", data, { 
+                withCredentials: true 
+            });
+            
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().setAuthUser(res.data);
 
@@ -60,9 +65,11 @@ export const useProfileStore = create ((set) => ({
     },
 
     deleteEducation: async () => {
+
         set({ isDeleting: true });
 
         try {
+
             const res = await axiosInstance.delete("/auth/delete-education",
                 { withCredentials: true }
             );
@@ -82,9 +89,11 @@ export const useProfileStore = create ((set) => ({
     },
 
     deleteCertification: async () => {
+
         set({ isDeleting: true });
 
         try {
+
             const res = await axiosInstance.delete("/auth/delete-certification",
                 { withCredentials: true }
             );
@@ -104,14 +113,14 @@ export const useProfileStore = create ((set) => ({
     },
 
     updateExperience: async (data) => {
+
         set({ isUpdating: true });
 
         try {
 
-            const [res] = await Promise.all([
-                axiosInstance.put("/auth/update-experience", data, { withCredentials: true }),
-                new Promise((resolve) => setTimeout(resolve, 800)),
-            ]);
+            const res = await axiosInstance.put("/auth/update-experience", data, { 
+                withCredentials: true 
+            }); 
 
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().setAuthUser(res.data);
@@ -119,7 +128,7 @@ export const useProfileStore = create ((set) => ({
             return res.data;
 
         } catch (error) {
-            console.error("Update education error:", error.response?.data || error.message);
+            console.error("Update experience error:", error.response?.data || error.message);
             throw error;
         } finally {
             set({ isUpdating: false });
@@ -127,9 +136,11 @@ export const useProfileStore = create ((set) => ({
     },
 
     deleteExperience: async () => {
+
         set({ isDeleting: true });
 
         try {
+
             const res = await axiosInstance.delete("/auth/delete-experience",
                 { withCredentials: true }
             );
@@ -140,7 +151,7 @@ export const useProfileStore = create ((set) => ({
             return res.data;
 
         } catch (error) {
-            console.error("Delete certification error:", error.response?.data || error.message);
+            console.error("Delete experience error:", error.response?.data || error.message);
             throw error;
 
         } finally {
@@ -149,13 +160,14 @@ export const useProfileStore = create ((set) => ({
     },
 
     updateSkills: async (data) => {
+
         set({ isUpdating: true });
 
         try {
-            const [res] = await Promise.all([
-                axiosInstance.put("/auth/update-skills", data, { withCredentials: true }),
-                new Promise((resolve) => setTimeout(resolve, 800)),
-            ]);
+
+            const res = await axiosInstance.put("/auth/update-skills", data, { 
+                withCredentials: true 
+            });
 
             await useProfileStore.getState().fetchProfile();
             await useAuthStore.getState().setAuthUser(res.data);

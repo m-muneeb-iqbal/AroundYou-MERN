@@ -127,9 +127,9 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
                         <Form.Control value={formData.fullName} onChange={ handleChange } name="fullName" type="text" placeholder="Full Name" autoComplete="name" />
                     </Form.Group>
 
-                    <Form.Group as={Col} xs={12} md={6} controlId="formGridEmail">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control disabled value={authUser?.email || ""} readOnly name="email" type="email" placeholder="yourname@example.com" autoComplete="off" />
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridDesignation">
+                        <Form.Label>Designation</Form.Label>
+                        <Form.Control value={formData.designation} onChange={ handleChange } name="designation" type="text" placeholder="Software Engineer" autoComplete="organization-title" />
                     </Form.Group>
 
                 </Row>
@@ -141,18 +141,18 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
                         <Form.Control value={formData.dob} onChange={ handleChange } name="dob" type="date" autoComplete="off" />
                     </Form.Group>
 
-                    <Form.Group as={Col} xs={12} md={6} controlId="formGridNumber">
-                        <Form.Label>Phone</Form.Label>
-                        <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" autoComplete="off" />
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridAge">
+                        <Form.Label>Age</Form.Label>
+                        <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" autoComplete="off" />
                     </Form.Group>
 
                 </Row>
 
                 <Row className="mb-3">
 
-                    <Form.Group as={Col} xs={12} md={6} controlId="formGridAge">
-                        <Form.Label>Age</Form.Label>
-                        <Form.Control value={formData.age} onChange={ handleChange } name="age" type="number" placeholder="21" autoComplete="off" />
+                    <Form.Group as={Col} xs={12} md={6} controlId="formGridNumber">
+                        <Form.Label>Phone</Form.Label>
+                        <Form.Control value={formData.phoneNumber} onChange={ handleChange } name="phoneNumber" type="text" placeholder="(03xx xxx xxx)" autoComplete="off" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCity">
@@ -164,12 +164,7 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
                 <Row className="mb-2">
 
-                    <Form.Group as={Col} xs={12} md={6} controlId="formGridDesignation">
-                        <Form.Label>Designation</Form.Label>
-                        <Form.Control value={formData.designation} onChange={ handleChange } name="designation" type="text" placeholder="Software Engineer" autoComplete="organization-title" />
-                    </Form.Group>
-
-                    <Form.Group as={Col} xs={12} md={6} controlId="formGridWebsite">
+                    <Form.Group as={Col} xs={12}controlId="formGridWebsite">
                         <Form.Label>Portfolio/Website</Form.Label>
                         <Form.Control value={formData.website} onChange={ handleChange } name="website" type="text" placeholder="Personal Website or Portfolio" autoComplete="url" />
                     </Form.Group>
