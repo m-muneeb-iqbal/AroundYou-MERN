@@ -100,7 +100,7 @@ function VerticallyCenteredModal({
                             <Button 
                                 variant="outline-secondary" 
                                 className="w-100" 
-                                onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`}
+                                onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`}
                             >
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ height: "20px", marginRight: "8px" }} />
                                 Sign Up with Google
