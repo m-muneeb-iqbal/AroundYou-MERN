@@ -36,8 +36,6 @@ export const useProfileStore = create ((set) => ({
             console.error("Update personal info error:", error.response?.data || error.message);
             throw error;
 
-        } finally {
-            set({ isUpdating: false });
         }
     },
 

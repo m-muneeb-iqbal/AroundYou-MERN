@@ -92,13 +92,14 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
             await updatePersonalInformation(formData);
 
-            console.log("Personal info updated.");
-            showToast("Profile updated successfully!", "success");
-            
             setOriginalData({
                 ...formData,
                 age: formData.age != null ? String(formData.age) : "",
             });
+            useProfileStore.setState({ isUpdating: false });
+
+            console.log("Personal info updated.");
+            showToast("Profile updated successfully!", "success");
 
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
