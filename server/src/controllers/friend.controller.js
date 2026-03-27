@@ -173,7 +173,7 @@ export const getFriends = async (req, res) => {
             f.requester.toString() === userId.toString() ? f.recipient : f.requester
         );
 
-        const friends = await User.find({ _id: { $in: friendIds } }).select("profilePic fullName designation location");
+        const friends = await User.find({ _id: { $in: friendIds } }).select("profilePic fullName headline location");
         res.status(200).json(friends);
 
     } catch (error) {
@@ -222,7 +222,7 @@ export const getNonFriends = async (req, res) => {
         const pool = await User.find({
             _id: { $nin: Array.from(excludedIds) },
         })
-        .select("profilePic fullName designation location")
+        .select("profilePic fullName headline location")
         .limit(20);
 
         for (let i = pool.length - 1; i > 0; i--) {

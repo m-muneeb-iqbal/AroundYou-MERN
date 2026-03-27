@@ -12,7 +12,7 @@ const PersonalFields = ({ form, onChange, isSuperAdmin }) => (
                 { key: "fullName",    label: "Full Name"   },
                 { key: "email",       label: "Email"       },
                 { key: "location",    label: "Location"    },
-                { key: "designation", label: "Designation" },
+                { key: "headline",    label: "Headline"    },
 
             ].map(({ key, label }) => (
 

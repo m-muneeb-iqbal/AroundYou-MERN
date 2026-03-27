@@ -180,7 +180,7 @@ export const updateUser = async (req, res) => {
 
         // Fields available to both Admin and SuperAdmin
         const sharedFields = [
-            "fullName", "email", "location", "designation", "description",
+            "fullName", "email", "location", "headline", "description",
             "education", "field", "passingYear", "cgpa", "institute",
             "certificate", "provider", "company", "jobTitle", "joiningDate",
             "resignationDate", "currentlyWorking", "skills",

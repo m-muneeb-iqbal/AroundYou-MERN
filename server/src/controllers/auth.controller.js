@@ -273,11 +273,9 @@ export const updatePersonalInformation = async (req, res) => {
             
             "description",
             "fullName",
-            "dob",
             "phoneNumber",
-            "age",
             "location",
-            "designation",
+            "headline",
             "website",
         ];
         const updates = {};

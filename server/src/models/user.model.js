@@ -46,22 +46,16 @@ const userSchema = new mongoose.Schema (
             required: true,
             unique: true
         },
-        dob: {
-            type: Date,
-        },
         phoneNumber: {
             type: String,
             default: "",
             match: [/^\d{11}$/]
         },
-        age: {
-            type: Number,
-        },
         location: {
             type: String,
             default: "",
         },
-        designation: {
+        headline: {
             type: String,
             default: "",
         },
@@ -193,7 +187,7 @@ userSchema.methods.toSafeObject = function () {
         description: this.description,
         fullName: this.fullName,
         company: this.company,
-        designation: this.designation,
+        headline: this.headline,
         location: this.location,
         jobTitle: this.jobTitle,
         isAdmin: this.role === "Admin" || this.role === "SuperAdmin",
@@ -208,7 +202,7 @@ userSchema.methods.toProfileData = function () {
         profilePic: this.profilePic,
         description: this.description,
         location: this.location,
-        designation: this.designation,
+        headline: this.headline,
         website: this.website,
         dob: this.dob,
         phoneNumber: this.phoneNumber,

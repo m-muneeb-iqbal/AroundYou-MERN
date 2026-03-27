@@ -96,6 +96,14 @@ const ExperienceForm = ({ onDirtyChange }) => {
     const handleUpdateExperience = async (e) => {
 
         e.preventDefault();
+        if (!formData.company) {
+            showToast("Company name is required.", "danger");
+            return;
+        }
+        if (!formData.jobTitle) {
+            showToast("Job Title is required.", "danger");
+            return;
+        }
         if (!formData.joiningDate) {
             showToast("Joining Date is required.", "danger");
             return;
@@ -128,14 +136,17 @@ const ExperienceForm = ({ onDirtyChange }) => {
 
             // Reset form after deletion
             setFormData({
-                certificate: "",
-                provider: ""
+                company: "",
+                jobTitle: "",
+                joiningDate: "",
+                resignationDate: "",
+                currentlyWorking: false,
             });
 
             showToast("Experience deleted successfully!", "success");
         } catch (err) {
             console.error("Delete failed:", err.response?.data || err.message);
-            showToast("Failed to delete education", "danger");
+            showToast("Failed to delete experience", "danger");
         }
     };
 
@@ -148,13 +159,13 @@ const ExperienceForm = ({ onDirtyChange }) => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCompany">
-                        <Form.Label>Company Name</Form.Label>
+                        <Form.Label className="fw-bold">Company or organization*</Form.Label>
                         <Form.Control value={formData.company} onChange={ handleChange } name="company" type="text" placeholder="Company Name" autoComplete="organization" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridJobTitle">
-                        <Form.Label>Designation</Form.Label>
-                        <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Designation" autoComplete="organization-title" />
+                        <Form.Label className="fw-bold">Title*</Form.Label>
+                        <Form.Control value={formData.jobTitle} onChange={ handleChange } name="jobTitle" type="text" placeholder="Ex: Power Bi Developer" autoComplete="organization-title" />
                     </Form.Group>
 
                 </Row>
@@ -162,12 +173,12 @@ const ExperienceForm = ({ onDirtyChange }) => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridJoiningDate">
-                        <Form.Label>Joining Date</Form.Label>
+                        <Form.Label className="fw-bold">Joining date*</Form.Label>
                         <Form.Control value={formData.joiningDate} onChange={ handleChange } name="joiningDate" type="date" autoComplete="off" />
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridResignationDate">
-                        <Form.Label>Resignation Date</Form.Label>
+                        <Form.Label className="fw-bold">Resignation date*</Form.Label>
                         <Form.Control value={formData.resignationDate ?? ""} onChange={ handleChange } name="resignationDate" type="date" disabled={formData.currentlyWorking} autoComplete="off" />
                         <Form.Check type="checkbox" id="currentlyWorking" label="Currently working" name="currentlyWorking" className="mt-2" checked={formData.currentlyWorking} onChange={handleChange}/>
                     </Form.Group>

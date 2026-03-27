@@ -24,7 +24,7 @@ const PersonCard = ({ user, onAdd, isLoading }) => (
             </div>
 
             <div className="text-muted text-truncate" style={{ fontSize: "0.72rem" }}>
-                {isLoading ? <Skeleton width="45%" /> : user.designation}
+                {isLoading ? <Skeleton width="45%" /> : user.headline}
             </div>
 
             <div className="text-truncate" style={{ fontSize: "0.68rem", color: "#AAAAAA" }}>

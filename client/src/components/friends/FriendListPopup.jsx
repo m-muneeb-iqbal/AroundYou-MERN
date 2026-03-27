@@ -110,7 +110,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
                                     </div>
 
                                     <div className="text-muted text-truncate" style={{ fontSize: "0.72rem" }}>
-                                        {isLoading ? <Skeleton width="45%" /> : friend.designation}
+                                        {isLoading ? <Skeleton width="45%" /> : friend.headline}
                                     </div>
 
                                     <div className="text-truncate" style={{ fontSize: "0.68rem", color: "#AAAAAA" }}>

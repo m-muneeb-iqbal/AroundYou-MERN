@@ -27,7 +27,7 @@ const LeftPanel = ({ isLoading }) => {
                     </Card.Title>
 
                     <Card.Subtitle className="text-muted text-center">
-                        {isLoading ? <Skeleton width="40%" /> : authUser?.jobTitle}
+                        {isLoading ? <Skeleton width="40%" /> : authUser?.headline}
                     </Card.Subtitle>
 
                     <p style={{ fontSize: "0.9em" }} className="text-center">
@@ -38,7 +38,7 @@ const LeftPanel = ({ isLoading }) => {
                         {isLoading ? <Skeleton count={3} /> : authUser?.description}
                     </Card.Text>
 
-                    {(!isLoading && !authUser?.description && !authUser?.designation) && (
+                    {(!isLoading && !authUser?.description && !authUser?.headline) && (
                         <div
                             role="button"
                             onClick={() => navigate("/profile")}

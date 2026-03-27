@@ -106,7 +106,7 @@ const SkillsForm = ({ onDirtyChange }) => {
                 <Row className="mb-3">
 
                     <Form.Group as={Col} controlId="formGridSkills">
-                        <Form.Label>Skills</Form.Label>
+                        <Form.Label className='fw-bold'>Skills*</Form.Label>
                         <div className="d-flex gap-2">
                             <Form.Select
                                 value={selectedSkill}

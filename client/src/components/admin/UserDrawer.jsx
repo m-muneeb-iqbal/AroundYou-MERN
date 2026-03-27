@@ -21,7 +21,7 @@ const UserDrawer = ({ onClose }) => {
     const [activeTab, setActiveTab] = useState("edit");
     const [saving, setSaving] = useState(false);
     const [confirm, setConfirm] = useState(null);
-    const [form, setForm] = useState({ fullName: "", email: "", location: "", designation: "", description: "", role: "User" });
+    const [form, setForm] = useState({ fullName: "", email: "", location: "", title: "", description: "", role: "User" });
     const [edu, setEdu] = useState({ education: "", field: "", institute: "", passingYear: "", cgpa: "", certificate: "", provider: "" });
     const [exp, setExp] = useState({ company: "", jobTitle: "", joiningDate: "", currentlyWorking: false });
     const [skillsInput, setSkillsInput] = useState("");
@@ -37,7 +37,7 @@ const UserDrawer = ({ onClose }) => {
             fullName: selectedUser.fullName || "",
             email: selectedUser.email || "",
             location: selectedUser.location || "",
-            designation: selectedUser.designation || "",
+            title: selectedUser.title || "",
             description: selectedUser.description || "",
             role: selectedUser.role || "User",
             education: selectedUser.education || "",
@@ -57,7 +57,7 @@ const UserDrawer = ({ onClose }) => {
         // Set both form states and original snapshot
         setForm({
             fullName: populated.fullName, email: populated.email,
-            location: populated.location, designation: populated.designation,
+            location: populated.location, title: populated.title,
             description: populated.description, role: populated.role,
         });
         setEdu({
@@ -83,7 +83,7 @@ const UserDrawer = ({ onClose }) => {
 
     useEffect(() => {
         if (!selectedUser) return;
-        setForm({ fullName: selectedUser.fullName || "", email: selectedUser.email || "", location: selectedUser.location || "", designation: selectedUser.designation || "", description: selectedUser.description || "", role: selectedUser.role || "User" });
+        setForm({ fullName: selectedUser.fullName || "", email: selectedUser.email || "", location: selectedUser.location || "", headline: selectedUser.headline || "", description: selectedUser.description || "", role: selectedUser.role || "User" });
         setEdu({ education: selectedUser.education || "", field: selectedUser.field || "", institute: selectedUser.institute || "", passingYear: selectedUser.passingYear || "", cgpa: selectedUser.cgpa || "", certificate: selectedUser.certificate || "", provider: selectedUser.provider || "" });
         setExp({ company: selectedUser.company || "", jobTitle: selectedUser.jobTitle || "", joiningDate: selectedUser.joiningDate?.slice(0, 10) || "", currentlyWorking: selectedUser.currentlyWorking || false });
         setSkillsInput((selectedUser.skills || []).join(", "));

@@ -215,7 +215,7 @@ const EducationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridEducationalLevel">
 
-                        <Form.Label>Educational Level</Form.Label>
+                        <Form.Label className='fw-bold'>Educational level*</Form.Label>
 
                         <Form.Select value={formData.education} onChange={ handleChange } name="education" >
 
@@ -230,7 +230,7 @@ const EducationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridFieldofStudy">
 
-                        <Form.Label>Field of Study</Form.Label>
+                        <Form.Label className='fw-bold'>Field of study*</Form.Label>
 
                         <Form.Select value={formData.field} onChange={ handleChange } name="field" disabled={!formData.education}>
 
@@ -250,14 +250,14 @@ const EducationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridPassingYear">
 
-                        <Form.Label>Passing Year</Form.Label>
+                        <Form.Label className='fw-bold'>Passing year*</Form.Label>
                         <Form.Control value={formData.passingYear} onChange={ handleChange } name="passingYear" type="number" placeholder="Passing Year" autoComplete="off" />
                         
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCGPA">
 
-                        <Form.Label>CGPA</Form.Label>
+                        <Form.Label className='fw-bold'>CGPA*</Form.Label>
                         <Form.Control value={formData.cgpa} onChange={ handleChange } name="cgpa" type="number" placeholder="CGPA" autoComplete="off" />
 
                     </Form.Group>
@@ -268,7 +268,7 @@ const EducationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridInstitue">
 
-                        <Form.Label>Institute</Form.Label>
+                        <Form.Label className='fw-bold'>Institute*</Form.Label>
                         <Form.Select value={formData.institute} onChange={ handleChange } name="institute" >
                             <option disabled >-- Choose Any --</option>
                             <option>Bahria University</option>
@@ -306,14 +306,14 @@ const EducationForm = ({ onDirtyChange }) => {
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridCertificate">
 
-                        <Form.Label>Certificate/License</Form.Label>
+                        <Form.Label className='fw-bold'>Certificate/License</Form.Label>
                         <Form.Control value={formData.certificate} onChange={ handleChange } name="certificate" type="text" placeholder="Certificate or License" />
 
                     </Form.Group>
 
                     <Form.Group as={Col} xs={12} md={6} controlId="formGridProvider">
 
-                        <Form.Label>Provider</Form.Label>
+                        <Form.Label className='fw-bold'>Provider</Form.Label>
                         <Form.Control value={formData.provider} onChange={ handleChange } name="provider" type="text" placeholder="Provider" />
 
                     </Form.Group>

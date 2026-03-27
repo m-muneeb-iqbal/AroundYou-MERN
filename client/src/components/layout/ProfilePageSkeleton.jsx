@@ -29,7 +29,7 @@ const ProfilePageSkeleton = () => {
                         {/* fullName */}
                         <Skeleton width="60%" height={22} className="mb-2" />
 
-                        {/* designation */}
+                        {/* headline */}
                         <Skeleton width="45%" height={16} className="mb-2" />
 
                         {/* location */}
