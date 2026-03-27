@@ -3,7 +3,6 @@ import { io } from "socket.io-client";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const socketURL = apiUrl?.replace("/api", "") || "http://localhost:5000";
-console.log("Socket connecting to:", socketURL);
 
 export const socket = io(socketURL, {
     transports: ["websocket", "polling"],
