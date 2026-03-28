@@ -38,7 +38,8 @@ export const App = () => {
     if (isCheckingAuth) {
         const path = window.location.pathname;
         if (path === "/profile") return <ProfilePageSkeleton />;
-        return <HomePageSkeleton />;
+        if (path === "/home") return <HomePageSkeleton />;
+        return null;
     }
 
     return (

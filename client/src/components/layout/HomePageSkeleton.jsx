@@ -1,87 +1,69 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Card, ListGroup } from "react-bootstrap";
+import { House } from "lucide-react";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import HeaderSkeleton from "./HeaderSkeleton";
+import ProfileCard from "../../pages/HomePage/ProfileCard/ProfileCard";
+import PersonCard from "../friends/PersonCard";
 
-const HomePageSkeleton = () => {
+const HomePageSkeleton = () => (
 
-    return (
+    <Container>
 
-        <Container>
+        <HeaderSkeleton />
 
-            {/* Header skeleton */}
-            <HeaderSkeleton />
+        <Row className="pt-5">
 
-            <Row className="pt-5">
+            {/* Left panel — mirrors LeftPanel with isLoading */}
+            <Col lg={3} className="d-none d-lg-block">
 
-                {/* Left panel skeleton */}
-                <Col lg={3} className="d-none d-lg-block">
+                <ProfileCard isLoading />
 
-                    {/* Profile card */}
-                    <div className="mb-4 p-3 rounded shadow-sm">
-
-                        <Skeleton width="60%" className="mb-2" />
-                        <Skeleton width="40%" className="mb-1" />
-                        <Skeleton width="30%" className="mb-3" />
-
-                        <Skeleton count={3} />
-                    </div>
-
-                    {/* Nav items */}
-                    <div className="rounded shadow-sm">
-
+                <Card className="d-none d-md-block w-100">
+                    <ListGroup variant="flush">
                         {Array.from({ length: 4 }).map((_, i) => (
-
-                            <div key={i} className="px-3 py-2">
+                            <ListGroup.Item key={i} className="px-3">
                                 <Skeleton height={20} />
-                            </div>
+                            </ListGroup.Item>
                         ))}
+                    </ListGroup>
+                </Card>
 
-                    </div>
+            </Col>
 
-                </Col>
+            {/* Middle — Feed has no loading state, render it as-is */}
+            <Col xs={12} lg={6} className="text-center">
+                <div
+                    className="d-flex flex-column align-items-center justify-content-center py-5 rounded"
+                    style={{ minHeight: "200px", border: "2px dashed #E0E0E0", color: "#C0C0C0" }}
+                >
+                    <House size={40} color="#C0C0C0" />
+                    <p className="mt-3 mb-0" style={{ fontSize: "0.9rem" }}>Feed coming soon</p>
+                </div>
+            </Col>
 
-                {/* Middle skeleton */}
-                <Col xs={12} lg={6}>
-                    <Skeleton height={200} className="rounded" />
-                </Col>
+            {/* Right panel — mirrors RightPanel with isLoading */}
+            <Col lg={3} className="d-none d-lg-block">
+                <Card className="border-0 shadow-sm">
+                    <Card.Body className="p-3">
+                        <Card.Title className="mb-3" style={{ fontSize: "0.95rem", color: "#04263D" }}>
+                            People you may know
+                        </Card.Title>
+                        <ListGroup variant="flush">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <PersonCard key={i} isLoading />
+                            ))}
+                        </ListGroup>
+                    </Card.Body>
+                </Card>
+            </Col>
 
-                {/* Right panel skeleton */}
-                <Col lg={3} className="d-none d-lg-block">
+        </Row>
 
-                    <div className="p-3 rounded shadow-sm">
+    </Container>
 
-                        <Skeleton width="70%" className="mb-3" />
-
-                        {Array.from({ length: 4 }).map((_, i) => (
-
-                            <div key={i} className="d-flex align-items-center gap-2 py-2">
-                                
-                                <Skeleton circle width={36} height={36} />
-
-                                <div className="flex-grow-1">
-                                    <Skeleton width="60%" className="mb-1" />
-                                    <Skeleton width="40%" />
-                                </div>
-
-                                <Skeleton circle width={32} height={32} />
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
-                </Col>
-
-            </Row>
-
-        </Container>
-
-    );
-    
-};
+);
 
 export default HomePageSkeleton;

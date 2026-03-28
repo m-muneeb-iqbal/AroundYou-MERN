@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
-import { socket } from "../lib/socket.js"
+import { socket } from "../lib/socket.js";
+import { useFriendStore } from "./useFriendStore.js"
 
 export const useAuthStore = create((set) => ({
 
@@ -25,6 +26,9 @@ export const useAuthStore = create((set) => ({
 
             socket.connect();
             socket.emit("userOnline", res.data._id);
+
+            // Prefetch alongside auth so data is ready when HomePage mounts
+            useFriendStore.getState().fetchNonFriends();
 
         } catch (error) {
             console.log("Error in checkAuth: ", error);
