@@ -44,7 +44,7 @@ export const App = () => {
 
     return (
 
-        <SkeletonTheme baseColor="#C8CACC" highlightColor="#04263D18">
+        <SkeletonTheme>
 
             <div className="page-enter">
 
