@@ -13,7 +13,6 @@ const HomePage = () => {
     const { fetchNonFriends, isLoadingNonFriends } = useFriendStore();
 
     useEffect(() => {
-        // Skip if checkAuth already kicked off the fetch
         if (!useFriendStore.getState().isLoadingNonFriends) {
             fetchNonFriends();
         }
