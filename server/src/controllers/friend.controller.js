@@ -222,7 +222,7 @@ export const getNonFriends = async (req, res) => {
         const pool = await User.find({
             _id: { $nin: Array.from(excludedIds) },
         })
-        .select("profilePic fullName headline location")
+        .select("profilePic fullName headline location -_id")
         .limit(20);
 
         for (let i = pool.length - 1; i > 0; i--) {
