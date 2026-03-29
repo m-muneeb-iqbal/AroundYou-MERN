@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { Row, Col, Dropdown } from "react-bootstrap";
 import { Users, BriefcaseBusiness, MessageCircleMore, UserRound, LogOut, Search, X } from "lucide-react";
@@ -9,15 +9,21 @@ import FriendListPopup from "../friends/FriendListPopup";
 import NotificationBell from "../common/NotificationBell";
 
 import { useAuthStore } from "../../store/useAuthStore";
+import { useMessageStore } from "../../store/useMessageStore";
 import styles from "../../styles/UI/DropDownItems.module.css";
 
 const Header = ({ showMessages = false, showSearch = false }) => {
 
     const { authUser, logout } = useAuthStore();
+    const { initializeSocket } = useMessageStore();
     const navigate = useNavigate();
     const [showMessagesPopup, setShowMessagesPopup] = useState(false);
     const [showFriendListPopup, setShowFriendListPopup] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+    useEffect(() => {
+        if (authUser) return initializeSocket();
+    }, [authUser]);
 
     if (!authUser) return <Navigate to="/" />;
 

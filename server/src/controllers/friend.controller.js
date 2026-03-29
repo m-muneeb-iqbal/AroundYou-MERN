@@ -117,7 +117,13 @@ export const acceptFriendRequest = async (req, res) => {
             participants: { $all: [request.requester, request.recipient] },
         });
         if (!existingConv) {
-            await Conversation.create({ participants: [request.requester, request.recipient] });
+            await Conversation.create({
+                participants: [request.requester, request.recipient],
+                unreadCounts: [
+                    { userId: request.requester, count: 0 },
+                    { userId: request.recipient, count: 0 },
+                ],
+            });
         }
 
         const [requester, recipient] = await Promise.all([

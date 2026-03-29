@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get("/users",                                protectRoute, getUsersForSidebar);
 router.get("/conversations",                        protectRoute, getConversations);
-router.get("/conversation/:conversationId",         protectRoute, getMessagesByConversation);
-router.post("/send/:id",                            protectRoute, sendMessages);
-router.put("/read/:conversationId",                 protectRoute, markAsRead);
+router.get("/conversation",                         protectRoute, getMessagesByConversation);
+router.post("/send",                               protectRoute, sendMessages);
+router.put("/read",                                protectRoute, markAsRead);
 
 export default router;

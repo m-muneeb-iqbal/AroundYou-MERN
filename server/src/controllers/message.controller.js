@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import Friend from "../models/friend.model.js";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import cloudinary from "../lib/cloudinary.js";
 
 import { saveMessage } from "../services/message.service.js";
 
@@ -47,12 +48,19 @@ export const getUsersForSidebar = async (req, res) => {
                 conv.participants.some((p) => p.toString() === user._id.toString())
             );
 
+            const friendship = friendships.find((f) =>
+                f.requester.toString() === user._id.toString() ||
+                f.recipient.toString() === user._id.toString()
+            );
+
             const lm = conversation?.lastMessage;
 
             return {
 
-                _id: user._id,
+                username: user.username,
                 fullName: user.fullName,
+                profilePic: user.profilePic,
+                friendshipId: friendship?._id || null,
                 conversationId: conversation?._id || null,
                 lastMessage: lm
                     ? { text: lm.text, image: lm.image, status: lm.status, createdAt: lm.createdAt }
@@ -87,31 +95,62 @@ export const getConversations = async (req, res) => {
         const userId = req.user._id;
 
         const conversations = await Conversation.find({ participants: userId })
-            .populate("participants", "-password")
-            .populate("lastMessage")
+            .populate("participants", "username fullName profilePic headline location")
+            .populate("lastMessage", "text image status createdAt senderId")
             .sort({ updatedAt: -1 });
 
-        res.status(200).json(conversations);
+        const result = conversations.map((conv) => {
+
+            const peer = conv.participants.find((p) => p._id.toString() !== userId.toString());
+            const unreadEntry = conv.unreadCounts?.find((u) => u.userId.toString() === userId.toString());
+
+            return {
+                conversationId: conv._id,
+                peer: peer
+                    ? { username: peer.username, fullName: peer.fullNamen }
+                    : null,
+                lastMessage: conv.lastMessage
+                    ? {
+                        text: conv.lastMessage.text,
+                        image: conv.lastMessage.image,
+                        status: conv.lastMessage.status,
+                        createdAt: conv.lastMessage.createdAt,
+                        isMine: conv.lastMessage.senderId.toString() === userId.toString(),
+                      }
+                    : null,
+                unreadCount: unreadEntry?.count || 0,
+                lastActivity: conv.updatedAt,
+            };
+
+        });
+
+        res.status(200).json(result);
 
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
 };
 
-// ─── GET /message/conversation/:conversationId
+// ─── POST /message/conversation
 export const getMessagesByConversation = async (req, res) => {
 
     try {
 
-        const { conversationId } = req.params;
+        const { username } = req.query;
         const userId = req.user._id;
 
+        if (!username) return res.status(400).json({ error: "username is required." });
+
+        const targetUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!targetUser) return res.status(404).json({ error: "User not found." });
+
         const conversation = await Conversation.findOne({
-            _id: conversationId,
-            participants: userId,
+            participants: { $all: [userId, targetUser._id] },
         });
 
-        if (!conversation) return res.status(403).json({ error: "Access denied" });
+        if (!conversation) return res.status(404).json({ error: "Conversation not found." });
+
+        const conversationId = conversation._id;
 
         const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
 
@@ -132,15 +171,21 @@ export const getMessagesByConversation = async (req, res) => {
     }
 };
 
-// ─── POST /message/send/:id
+// ─── POST /message/send
 export const sendMessages = async (req, res) => {
 
     try {
 
-        const { text, image } = req.body;
-        const { id: receiverId } = req.params;
+        const { text, image, username } = req.body;
         const senderId = req.user._id;
         const io = getIO();
+
+        if (!username) return res.status(400).json({ error: "username is required." });
+
+        const targetUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!targetUser) return res.status(404).json({ error: "User not found." });
+
+        const receiverId = targetUser._id;
 
         const friendship = await Friend.findOne({
             $or: [
@@ -198,7 +243,15 @@ export const sendMessages = async (req, res) => {
             });
         }
 
-        res.status(201).json(newMessage);
+        res.status(201).json({
+            _id: newMessage._id,
+            conversationId: newMessage.conversationId,
+            text: newMessage.text,
+            image: newMessage.image,
+            status: newMessage.status,
+            isMine: true,
+            createdAt: newMessage.createdAt,
+        });
 
     } catch (error) {
         console.error("Error in sendMessages controller: ", error.message);
@@ -206,18 +259,27 @@ export const sendMessages = async (req, res) => {
     }
 };
 
-// ─── PUT /message/read/:conversationId
+// ─── PUT /message/read
 export const markAsRead = async (req, res) => {
 
     try {
 
-        const { conversationId } = req.params;
+        const { username } = req.body;
         const userId = req.user._id;
         const io = getIO();
 
-        if (!conversationId || conversationId.length !== 24) {
-            return res.status(400).json({ error: "Invalid conversationId" });
-        }
+        if (!username) return res.status(400).json({ error: "username is required." });
+
+        const targetUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!targetUser) return res.status(404).json({ error: "User not found." });
+
+        const conversation = await Conversation.findOne({
+            participants: { $all: [userId, targetUser._id] },
+        });
+
+        if (!conversation) return res.status(404).json({ error: "Conversation not found." });
+
+        const conversationId = conversation._id;
 
         // Mark all messages as read
         await Message.updateMany(
@@ -237,23 +299,23 @@ export const markAsRead = async (req, res) => {
             { $set: { "unreadCounts.$.count": 0 } }
         );
 
-        const conversation = await Conversation.findById(conversationId);
+        const updatedConversation = await Conversation.findById(conversationId);
 
-        for (const participantId of conversation.participants) {
+        for (const participantId of updatedConversation.participants) {
 
             const socketId = onlineUsers.get(participantId.toString());
             if (!socketId) continue;
 
-            io.to(socketId).emit("messagesRead", conversation._id.toString());
+            io.to(socketId).emit("messagesRead", updatedConversation._id.toString());
 
             io.to(socketId).emit("messagesSeen", {
-                conversationId: conversation._id.toString(),
+                conversationId: updatedConversation._id.toString(),
                 seenBy: userId.toString(),
             });
 
             io.to(socketId).emit("updateUnread", {
-                conversationId: conversation._id.toString(),
-                unreadCount: getUnreadCount(conversation, participantId),
+                conversationId: updatedConversation._id.toString(),
+                unreadCount: getUnreadCount(updatedConversation, participantId),
             });
             
         }

@@ -46,14 +46,17 @@ export const saveMessage = async ({ senderId, receiverId, text, image }) => {
 
     });
 
-    // Increment unreadCount for receiver using subdocument array
+    // Always update lastMessage on the conversation
+    await Conversation.updateOne(
+        { _id: conversation._id },
+        { $set: { lastMessage: newMessage._id } }
+    );
+
+    // Increment unread count for receiver (only if their entry exists)
     await Conversation.updateOne(
 
         { _id: conversation._id, "unreadCounts.userId": receiverId },
-        {
-            $inc: { "unreadCounts.$.count": 1 },
-            $set: { lastMessage: newMessage._id },
-        }
+        { $inc: { "unreadCounts.$.count": 1 } }
 
     );
 

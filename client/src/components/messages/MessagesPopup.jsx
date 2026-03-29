@@ -23,7 +23,6 @@ const MessagesPopup = ({ onClose }) => {
         fetchUsers,
         selectUser,
         sendMessage,
-        initializeSocket,
         handleCloseConversation,
         isLoadingUsers,
         isLoadingMessages,
@@ -32,17 +31,6 @@ const MessagesPopup = ({ onClose }) => {
     useEffect(() => { fetchUsers(); }, []);
 
     const { authUser } = useAuthStore();
-    useEffect(() => {
-        if (authUser) {
-            const cleanup = initializeSocket();
-            return cleanup;
-        }
-    }, [authUser]);
-
-    const { setAuthUser } = useMessageStore();
-    useEffect(() => {
-        if (authUser?._id) setAuthUser(authUser);
-    }, [authUser]);
 
     const messagesEndRef = useRef(null);
     useEffect(() => {
@@ -141,7 +129,7 @@ const MessagesPopup = ({ onClose }) => {
                     ) : (
 
                         users.map((user) => (
-                            <UserListItem key={user._id} user={user} onSelect={selectUser} />
+                            <UserListItem key={user.username} user={user} onSelect={selectUser} />
                         ))
 
                     )}
