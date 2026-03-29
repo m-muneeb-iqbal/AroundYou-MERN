@@ -51,9 +51,7 @@ export const getUsersForSidebar = async (req, res) => {
 
             return {
 
-                _id: user._id,
                 fullName: user.fullName,
-                conversationId: conversation?._id || null,
                 lastMessage: lm
                     ? { text: lm.text, image: lm.image, status: lm.status, createdAt: lm.createdAt }
                     : null,
