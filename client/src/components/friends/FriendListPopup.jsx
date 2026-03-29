@@ -26,14 +26,14 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
     }, [fetchFriends, fetchUsers]);
 
     const handleMessage = (friend) => {
-        const msgUser = users.find((u) => u._id.toString() === friend._id.toString()) || friend;
+        const msgUser = users.find((u) => u.conversationId?.toString() === friend.conversationId?.toString()) || friend;
         selectUser(msgUser);
         onClose();
         onOpenMessages();
     };
 
-    const handleUnfriendConfirm = async (friendId) => {
-        await unfriend(friendId);
+    const handleUnfriendConfirm = async (username) => {
+        await unfriend(username);
         setConfirmUnfriendId(null);
     };
 
@@ -99,7 +99,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
 
                         {friends.map((friend) => (
 
-                            <ListGroup.Item key={friend._id} className="d-flex align-items-center gap-2 px-3 py-2" style={{ borderColor: "#F0F0F0" }} >
+                            <ListGroup.Item key={friend.username} className="d-flex align-items-center gap-2 px-3 py-2" style={{ borderColor: "#F0F0F0" }} >
 
                                 <InitialsAvatar name={friend.fullName} profilePic={friend.profilePic} />
 
@@ -125,11 +125,11 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
                                 </ActionButton>
 
                                 {/* Unfriend */}
-                                {confirmUnfriendId === friend._id ? (
+                                {confirmUnfriendId === friend.username ? (
 
                                     <div className="d-flex gap-1 flex-shrink-0">
 
-                                        <Button variant="danger" style={{ fontSize: "0.68rem", padding: "2px 7px" }} onClick={() => handleUnfriendConfirm(friend._id)} >
+                                        <Button variant="danger" style={{ fontSize: "0.68rem", padding: "2px 7px" }} onClick={() => handleUnfriendConfirm(friend.username)} >
                                             Confirm
                                         </Button>
 
@@ -140,7 +140,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
 
                                 ) : (
 
-                                    <ActionButton color="#DC3545" hoverColor="#B02A37" onClick={() => setConfirmUnfriendId(friend._id)} title="Unfriend" size={32} >
+                                    <ActionButton color="#DC3545" hoverColor="#B02A37" onClick={() => setConfirmUnfriendId(friend.username)} title="Unfriend" size={32} >
                                         <UserRoundX size={15} color="#FFFFFF" />
                                     </ActionButton>
 

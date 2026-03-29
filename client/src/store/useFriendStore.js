@@ -12,6 +12,7 @@ export const useFriendStore = create((set, get) => ({
     fetchNonFriends: async () => {
         set({ isLoadingNonFriends: true });
         try {
+            await new Promise(resolve => setTimeout(resolve, 3000));
             const res = await axiosInstance.get("/friend/non-friends", { withCredentials: true });
             set({ nonFriends: res.data });
         } finally {
@@ -29,11 +30,11 @@ export const useFriendStore = create((set, get) => ({
         set({ friends: res.data });
     },
 
-    sendFriendRequest: async (recipientId) => {
+    sendFriendRequest: async (username) => {
         try {
-            await axiosInstance.post("/friend/request", { recipientId }, { withCredentials: true });
+            await axiosInstance.post("/friend/request", { username }, { withCredentials: true });
             set((state) => ({
-                nonFriends: state.nonFriends.filter((u) => u._id !== recipientId),
+                nonFriends: state.nonFriends.filter((u) => u.username !== username),
             }));
         } catch (err) {
 
@@ -48,29 +49,29 @@ export const useFriendStore = create((set, get) => ({
         }
     },
 
-    acceptFriendRequest: async (requestId, onAccepted) => {
-        await axiosInstance.put(`/friend/accept/${requestId}`, {}, { withCredentials: true });
+    acceptFriendRequest: async (username, onAccepted) => {
+        await axiosInstance.put(`/friend/accept`, { username }, { withCredentials: true });
         set((state) => ({
-            pendingRequests: state.pendingRequests.filter((r) => r._id !== requestId),
+            pendingRequests: state.pendingRequests.filter((r) => r.requester.username !== username),
         }));
         onAccepted?.();
     },
 
-    rejectFriendRequest: async (requestId) => {
-        await axiosInstance.delete(`/friend/reject/${requestId}`, { withCredentials: true });
+    rejectFriendRequest: async (username) => {
+        await axiosInstance.delete(`/friend/reject`, { data: { username }, withCredentials: true });
         set((state) => ({
-            pendingRequests: state.pendingRequests.filter((r) => r._id !== requestId),
+            pendingRequests: state.pendingRequests.filter((r) => r.requester.username !== username),
         }));
     },
 
-    cancelFriendRequest: async (requestId) => {
-        await axiosInstance.delete(`/friend/cancel/${requestId}`, { withCredentials: true });
+    cancelFriendRequest: async (username) => {
+        await axiosInstance.delete(`/friend/cancel`, { data: { username }, withCredentials: true });
     },
 
-    unfriend: async (friendId) => {
-        await axiosInstance.delete(`/friend/unfriend/${friendId}`, { withCredentials: true });
+    unfriend: async (username) => {
+        await axiosInstance.delete(`/friend/unfriend`, { data: { username }, withCredentials: true });
         set((state) => ({
-            friends: state.friends.filter((f) => f._id.toString() !== friendId.toString()),
+            friends: state.friends.filter((f) => f.username !== username),
         }));
     },
 
@@ -104,11 +105,11 @@ export const useFriendStore = create((set, get) => ({
 
                 set((state) => ({
 
-                    pendingRequests: state.pendingRequests.some((r) => r._id === request._id)
+                    pendingRequests: state.pendingRequests.some((r) => r.requester.username === request.requester.username)
                         ? state.pendingRequests
                         : [...state.pendingRequests, request],
                     nonFriends: state.nonFriends.filter(
-                        (u) => u._id.toString() !== request.requester._id.toString()
+                        (u) => u.username !== request.requester.username
                     ),
 
                 }));
@@ -121,11 +122,8 @@ export const useFriendStore = create((set, get) => ({
             set((state) => ({
 
                 nonFriends: state.nonFriends.filter(
-                    (u) => u._id.toString() !== friend._id.toString()
+                    (u) => u.username !== friend.username
                 ),
-                friends: state.friends.some((f) => f._id.toString() === friend._id.toString())
-                    ? state.friends
-                    : [...state.friends, friend],
             }));
 
             get().addNotification({

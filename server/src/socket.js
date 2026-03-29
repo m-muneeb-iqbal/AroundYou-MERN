@@ -175,42 +175,71 @@ export const initSocket = (server) => {
 
         });
 
-        socket.on("callUser", ({ to, offer, callerInfo }) => {
-            const receiverSocketId = onlineUsers.get(to);
+        socket.on("callUser", async ({ to: friendshipId, offer, callerInfo }) => {
+            const friendship = await Friend.findById(friendshipId);
+            if (!friendship) return;
+            const calleeId =
+                friendship.requester.toString() === callerInfo.userId.toString()
+                    ? friendship.recipient.toString()
+                    : friendship.requester.toString();
+            const receiverSocketId = onlineUsers.get(calleeId);
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit("incomingCall", {
-                    from: callerInfo.userId,
+                    friendshipId,
                     offer,
                     callerInfo,
                 });
             }
         });
 
-        socket.on("answerCall", ({ to, answer }) => {
-            const callerSocketId = onlineUsers.get(to);
-            if (callerSocketId) {
-                io.to(callerSocketId).emit("callAnswered", { answer });
+        socket.on("answerCall", async ({ to: friendshipId, answer }) => {
+            const friendship = await Friend.findById(friendshipId);
+            if (!friendship) return;
+            const callerId =
+                friendship.requester.toString() !== onlineUsers.get(friendship.requester.toString())
+                    ? friendship.requester.toString()
+                    : friendship.recipient.toString();
+            // Find caller socket by iterating — simpler: store callerId in friendship lookup
+            // Use callerInfo.userId stored in the event chain instead
+            // We route by emitting to all participants except self
+            for (const participantId of [friendship.requester.toString(), friendship.recipient.toString()]) {
+                const sid = onlineUsers.get(participantId);
+                if (sid && sid !== socket.id) {
+                    io.to(sid).emit("callAnswered", { answer });
+                }
             }
         });
 
-        socket.on("rejectCall", ({ to }) => {
-            const callerSocketId = onlineUsers.get(to);
-            if (callerSocketId) {
-                io.to(callerSocketId).emit("callRejected");
+        socket.on("rejectCall", async ({ to: friendshipId }) => {
+            const friendship = await Friend.findById(friendshipId);
+            if (!friendship) return;
+            for (const participantId of [friendship.requester.toString(), friendship.recipient.toString()]) {
+                const sid = onlineUsers.get(participantId);
+                if (sid && sid !== socket.id) {
+                    io.to(sid).emit("callRejected");
+                }
             }
         });
 
-        socket.on("iceCandidate", ({ to, candidate }) => {
-            const targetSocketId = onlineUsers.get(to);
-            if (targetSocketId) {
-                io.to(targetSocketId).emit("iceCandidate", { candidate });
+        socket.on("iceCandidate", async ({ to: friendshipId, candidate }) => {
+            const friendship = await Friend.findById(friendshipId);
+            if (!friendship) return;
+            for (const participantId of [friendship.requester.toString(), friendship.recipient.toString()]) {
+                const sid = onlineUsers.get(participantId);
+                if (sid && sid !== socket.id) {
+                    io.to(sid).emit("iceCandidate", { candidate });
+                }
             }
         });
 
-        socket.on("endCall", ({ to }) => {
-            const targetSocketId = onlineUsers.get(to);
-            if (targetSocketId) {
-                io.to(targetSocketId).emit("callEnded");
+        socket.on("endCall", async ({ to: friendshipId }) => {
+            const friendship = await Friend.findById(friendshipId);
+            if (!friendship) return;
+            for (const participantId of [friendship.requester.toString(), friendship.recipient.toString()]) {
+                const sid = onlineUsers.get(participantId);
+                if (sid && sid !== socket.id) {
+                    io.to(sid).emit("callEnded");
+                }
             }
         });
 

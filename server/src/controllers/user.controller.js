@@ -15,7 +15,7 @@ export const searchUsers = async (req, res) => {
             _id: { $ne: userId },
             fullName: { $regex: q.trim(), $options: "i" },
         })
-        .select("fullName profilePic jobTitle location")
+        .select("fullName profilePic jobTitle location username")
         .limit(8);
 
         if (users.length === 0) return res.status(200).json([]);
@@ -58,6 +58,7 @@ export const searchUsers = async (req, res) => {
                 profilePic: user.profilePic,
                 jobTitle: user.jobTitle,
                 location: user.location,
+                username: user.username,
                 relationshipStatus,
                 friendshipId: friendship?._id || null,
             };

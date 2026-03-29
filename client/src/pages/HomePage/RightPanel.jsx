@@ -31,7 +31,7 @@ const RightPanel = ({ isLoading }) => {
                     ) : (
 
                         nonFriends.map((user) => (
-                            <PersonCard key={user._id} user={user} onAdd={() => sendFriendRequest(user._id)} isLoading={false} />
+                            <PersonCard key={user.username} user={user} onAdd={() => sendFriendRequest(user.username)} isLoading={false} />
                         ))
 
                     )}

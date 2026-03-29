@@ -33,19 +33,13 @@ export const useCallStore = create((set, get) => ({
     // ── Caller: initiate call
     startCall: async (user, authUser) => {
         if (get().callStatus !== null) {
-            console.log("BLOCKED duplicate call");
             return;
         }
-        set({ callStatus: "calling" }); // lock immediately before anything async
-        console.log("creating peer connection — this should appear only ONCE");
+        set({ callStatus: "calling" });
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             alert("Microphone access not available.");
             return;
         }
-
-        console.log("startCall triggered");
-        console.log("calling user:", user._id);
-        console.log("authUser:", authUser._id);
 
         const pc = createPeerConnection();
         const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -65,9 +59,8 @@ export const useCallStore = create((set, get) => ({
 
         pc.onicecandidate = (e) => {
             if (e.candidate) {
-                console.log("caller sending ICE to:", user._id);
                 socket.emit("iceCandidate", {
-                    to: user._id,
+                    to: user.friendshipId,
                     candidate: e.candidate,
                 });
             }
@@ -77,10 +70,10 @@ export const useCallStore = create((set, get) => ({
         await pc.setLocalDescription(offer);
 
         socket.emit("callUser", {
-            to: user._id,
+            to: user.friendshipId,
             offer,
             callerInfo: {
-                userId: authUser._id, // real userId, not socket.id
+                userId: authUser._id,
                 name: authUser.fullName,
                 profilePic: authUser.profilePic,
             },
@@ -90,7 +83,7 @@ export const useCallStore = create((set, get) => ({
             peerConnection: pc,
             localStream,
             activeCall: {
-                userId: user._id,
+                friendshipId: user.friendshipId,
                 name: user.fullName,
                 profilePic: user.profilePic,
             },
@@ -127,7 +120,7 @@ export const useCallStore = create((set, get) => ({
         pc.onicecandidate = (e) => {
             if (e.candidate) {
                 socket.emit("iceCandidate", {
-                    to: incomingCall.from, // incomingCall.from is now real userId
+                    to: incomingCall.friendshipId,
                     candidate: e.candidate,
                 });
             }
@@ -138,7 +131,7 @@ export const useCallStore = create((set, get) => ({
         await pc.setLocalDescription(answer);
 
         socket.emit("answerCall", {
-            to: incomingCall.from, // real userId
+            to: incomingCall.friendshipId,
             answer,
         });
 
@@ -147,7 +140,7 @@ export const useCallStore = create((set, get) => ({
             localStream,
             incomingCall: null,
             activeCall: {
-                userId: incomingCall.from,
+                friendshipId: incomingCall.friendshipId,
                 name: incomingCall.callerInfo.name,
                 profilePic: incomingCall.callerInfo.profilePic,
             },
@@ -162,7 +155,7 @@ export const useCallStore = create((set, get) => ({
     rejectCall: () => {
         const { incomingCall } = get();
         if (!incomingCall) return;
-        socket.emit("rejectCall", { to: incomingCall.from });
+        socket.emit("rejectCall", { to: incomingCall.friendshipId });
         set({ incomingCall: null });
     },
 
@@ -171,7 +164,7 @@ export const useCallStore = create((set, get) => ({
         const { peerConnection, localStream, activeCall } = get();
 
         if (activeCall) {
-            socket.emit("endCall", { to: activeCall.userId });
+            socket.emit("endCall", { to: activeCall.friendshipId });
         }
 
         localStream?.getTracks().forEach((t) => t.stop());
@@ -199,8 +192,8 @@ export const useCallStore = create((set, get) => ({
     // ── Socket event handlers — registered once in HomePage
     initializeCallSocket: () => {
 
-        const handleIncomingCall = ({ from, offer, callerInfo }) => {
-            set({ incomingCall: { from, offer, callerInfo } });
+        const handleIncomingCall = ({ friendshipId, offer, callerInfo }) => {
+            set({ incomingCall: { friendshipId, offer, callerInfo } });
         };
 
         const handleCallAnswered = async ({ answer }) => {

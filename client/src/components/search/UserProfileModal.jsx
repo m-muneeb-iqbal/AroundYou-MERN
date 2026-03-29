@@ -15,36 +15,36 @@ const UserProfileModal = ({ user, onClose, onActionDone }) => {
 
     //Send request
     const handleSendRequest = async () => {
-        await sendFriendRequest(user._id);
+        await sendFriendRequest(user.username);
         onActionDone?.({ ...user, relationshipStatus: "pending_sent" });
     };
 
     //Accept request
     const handleAccept = async () => {
-        await acceptFriendRequest(user.friendshipId);
+        await acceptFriendRequest(user.username);
         onActionDone?.({ ...user, relationshipStatus: "friends" });
     };
 
     //Reject request
     const handleReject = async () => {
-        await rejectFriendRequest(user.friendshipId);
+        await rejectFriendRequest(user.username);
         onActionDone?.({ ...user, relationshipStatus: "none", friendshipId: null });
     };
 
     // Cancel sent request
     const handleCancel = async () => {
-        await cancelFriendRequest(user.friendshipId);
+        await cancelFriendRequest(user.username);
         onActionDone?.({ ...user, relationshipStatus: "none", friendshipId: null });
     };
 
     // Unfriend
     const handleUnfriend = async () => {
-        await unfriend(user._id);
+        await unfriend(user.username);
         onActionDone?.({ ...user, relationshipStatus: "none", friendshipId: null });
     };
 
     const handleMessage = () => {
-        const storeUser = users.find((u) => u._id.toString() === user._id.toString());
+        const storeUser = users.find((u) => u.conversationId?.toString() === user.conversationId?.toString());
         if (storeUser) {
             selectUser(storeUser);
             onClose();

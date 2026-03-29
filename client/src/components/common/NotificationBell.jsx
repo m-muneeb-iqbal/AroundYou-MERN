@@ -80,22 +80,7 @@ const NotificationBell = () => {
         if (!showDropdown) markNotificationsRead();
     };
 
-    //  Open modal with correct relationship context
     const [modalUser, setModalUser] = useState(null);
-    const handleNotificationClick = (n) => {
-
-        if (n.type === "request_received") {
-
-            setModalUser({
-                ...n.user,
-                relationshipStatus: "pending_received",
-                friendshipId: n.friendshipId,
-            });
-            setShowDropdown(false);
-
-        }
-
-    };
 
     const unreadCount = notifications.filter((n) => !n.read).length;
     const badgeCount = unreadCount + pendingRequests.length;
@@ -163,7 +148,7 @@ const NotificationBell = () => {
                                 {pendingRequests.map((req) => (
 
                                     <div
-                                        key={req._id}
+                                        key={req.requester.username}
                                         role="button"
                                         className="d-flex align-items-center gap-2 px-3 py-2"
                                         style={{
@@ -172,13 +157,10 @@ const NotificationBell = () => {
                                             cursor: "pointer",
                                         }}
                                         onClick={() => {
-
                                             setModalUser({
                                                 ...req.requester,
                                                 relationshipStatus: "pending_received",
-                                                friendshipId: req._id,
                                             });
-
                                             setShowDropdown(false);
                                         }}
                                     >
@@ -211,20 +193,16 @@ const NotificationBell = () => {
 
                                         const meta = notificationMeta[n.type];
                                         const Icon = meta?.icon;
-                                        const isClickable = n.type === "request_received";
 
                                         return (
 
                                             <div
                                                 key={n.id}
-                                                role={isClickable ? "button" : undefined}
                                                 className="d-flex align-items-center gap-2 px-3 py-2"
                                                 style={{
                                                     borderBottom: "1px solid #f5f5f5",
                                                     backgroundColor: n.read ? "white" : "#fafafa",
-                                                    cursor: isClickable ? "pointer" : "default",
                                                 }}
-                                                onClick={() => isClickable && handleNotificationClick(n)}
                                             >
                                                 {/* Avatar with fallback to icon */}
                                                 {n.user ? (

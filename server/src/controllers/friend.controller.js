@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import Friend from "../models/friend.model.js";
+import Conversation from "../models/conversation.model.js";
 import { getIO, onlineUsers } from "../socket.js";
 
 export const sendFriendRequest = async (req, res) => {
@@ -7,9 +8,19 @@ export const sendFriendRequest = async (req, res) => {
     try {
 
         const requester = req.user._id;
-        const { recipientId } = req.body;
+        const { username } = req.body;
 
-        if (requester.toString() === recipientId) {
+        if (!username) {
+            return res.status(400).json({ message: "Username is required." });
+        }
+
+        const recipientUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!recipientUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        const recipientId = recipientUser._id;
+
+        if (requester.toString() === recipientId.toString()) {
             return res.status(400).json({ message: "Cannot add yourself." });
         }
 
@@ -37,7 +48,6 @@ export const sendFriendRequest = async (req, res) => {
         }
 
         res.status(201).json({
-            _id: populated._id,
             requester: populated.requester,
             status: populated.status,
             createdAt: populated.createdAt,
@@ -54,16 +64,22 @@ export const cancelFriendRequest = async (req, res) => {
 
     try {
 
-        const { requestId } = req.params;
-        const request = await Friend.findById(requestId);
+        const { username } = req.body;
 
-        if (!request) return res.status(404).json({ message: "Request not found" });
+        if (!username) return res.status(400).json({ message: "Username is required." });
 
-        if (request.requester.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: "Not authorized" });
-        }
+        const targetUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!targetUser) return res.status(404).json({ message: "User not found." });
 
-        await Friend.findByIdAndDelete(requestId);
+        const request = await Friend.findOne({
+            requester: req.user._id,
+            recipient: targetUser._id,
+            status: "pending",
+        });
+
+        if (!request) return res.status(404).json({ message: "Request not found." });
+
+        await request.deleteOne();
 
         res.status(200).json({ message: "Request cancelled" });
 
@@ -77,14 +93,20 @@ export const acceptFriendRequest = async (req, res) => {
 
     try {
 
-        const { requestId } = req.params;
-        const request = await Friend.findById(requestId);
+        const { username } = req.body;
 
-        if (!request) return res.status(404).json({ message: "Request not found" });
+        if (!username) return res.status(400).json({ message: "Username is required." });
 
-        if (request.recipient.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: "Not authorized" });
-        }
+        const requesterUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!requesterUser) return res.status(404).json({ message: "User not found." });
+
+        const request = await Friend.findOne({
+            requester: requesterUser._id,
+            recipient: req.user._id,
+            status: "pending",
+        });
+
+        if (!request) return res.status(404).json({ message: "Request not found." });
 
         request.status = "accepted";
         await request.save();
@@ -104,7 +126,7 @@ export const acceptFriendRequest = async (req, res) => {
             });
         }
 
-        res.status(200).json(request);
+        res.status(200).json({ message: "Request accepted" });
 
     } catch (error) {
         console.error("Error accepting friend request:", error);
@@ -116,16 +138,22 @@ export const rejectFriendRequest = async (req, res) => {
 
     try {
 
-        const { requestId } = req.params;
-        const request = await Friend.findById(requestId);
+        const { username } = req.body;
 
-        if (!request) return res.status(404).json({ message: "Request not found" });
+        if (!username) return res.status(400).json({ message: "Username is required." });
 
-        if (request.recipient.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: "Not authorized" });
-        }
+        const requesterUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!requesterUser) return res.status(404).json({ message: "User not found." });
 
-        await Friend.findByIdAndDelete(requestId);
+        const request = await Friend.findOne({
+            requester: requesterUser._id,
+            recipient: req.user._id,
+            status: "pending",
+        });
+
+        if (!request) return res.status(404).json({ message: "Request not found." });
+
+        await request.deleteOne();
 
         res.status(200).json({ message: "Request rejected" });
 
@@ -139,18 +167,25 @@ export const unfriend = async (req, res) => {
 
     try {
 
-        const { friendId } = req.params;
+        const { username } = req.body;
         const userId = req.user._id;
 
-        const friendship = await Friend.findOneAndDelete({
+        if (!username) return res.status(400).json({ message: "Username is required." });
+
+        const targetUser = await User.findOne({ username: username.toLowerCase().trim() });
+        if (!targetUser) return res.status(404).json({ message: "User not found." });
+
+        const friendship = await Friend.findOne({
             $or: [
-                { requester: userId, recipient: friendId },
-                { requester: friendId, recipient: userId },
+                { requester: userId, recipient: targetUser._id },
+                { requester: targetUser._id, recipient: userId },
             ],
             status: "accepted",
         });
 
-        if (!friendship) return res.status(404).json({ message: "Friendship not found" });
+        if (!friendship) return res.status(404).json({ message: "Friendship not found." });
+
+        await friendship.deleteOne();
 
         res.status(200).json({ message: "Unfriended successfully" });
 
@@ -174,12 +209,31 @@ export const getFriends = async (req, res) => {
 
         if (friendships.length === 0) return res.status(200).json([]);
 
-        const friendIds = friendships.map((f) =>
-            f.requester.toString() === userId.toString() ? f.recipient : f.requester
+        const friendData = await Promise.all(
+            friendships.map(async (f) => {
+                const friendId =
+                    f.requester.toString() === userId.toString() ? f.recipient : f.requester;
+
+                const [user, conversation] = await Promise.all([
+                    User.findById(friendId).select("profilePic fullName headline location username"),
+                    Conversation.findOne({ participants: { $all: [userId, friendId] } }).select("_id"),
+                ]);
+
+                if (!user) return null;
+
+                return {
+                    friendshipId: f._id,
+                    conversationId: conversation?._id || null,
+                    fullName: user.fullName,
+                    profilePic: user.profilePic,
+                    headline: user.headline,
+                    location: user.location,
+                    username: user.username,
+                };
+            })
         );
 
-        const friends = await User.find({ _id: { $in: friendIds } }).select("profilePic fullName headline location -_id");
-        res.status(200).json(friends);
+        res.status(200).json(friendData.filter(Boolean));
 
     } catch (error) {
         console.error("Error fetching friends:", error);
@@ -196,7 +250,7 @@ export const getPendingRequests = async (req, res) => {
         const requests = await Friend.find({
             recipient: userId,
             status: "pending",
-        }).populate("requester", "fullName profilePic jobTitle");
+        }).populate("requester", "fullName profilePic jobTitle username");
 
         res.status(200).json(requests);
 
@@ -227,7 +281,7 @@ export const getNonFriends = async (req, res) => {
         const pool = await User.find({
             _id: { $nin: Array.from(excludedIds) },
         })
-        .select("profilePic fullName headline location -_id")
+        .select("profilePic fullName headline location username")
         .limit(20);
 
         for (let i = pool.length - 1; i > 0; i--) {
@@ -235,7 +289,13 @@ export const getNonFriends = async (req, res) => {
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
 
-        const nonFriends = pool.slice(0, 4);
+        const nonFriends = pool.slice(0, 4).map((u) => ({
+            username: u.username,
+            fullName: u.fullName,
+            profilePic: u.profilePic,
+            headline: u.headline,
+            location: u.location,
+        }));
 
         res.status(200).json(nonFriends);
 
