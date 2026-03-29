@@ -5,7 +5,6 @@ import { SendHorizonal, X, ArrowLeft, Phone, MessageSquareDashed } from "lucide-
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
 import { useCallStore } from "../../store/useCallStore";
-import { normalizeSenderId } from "../../lib/utils";
 
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
@@ -58,6 +57,7 @@ const MessagesPopup = ({ onClose }) => {
         if (!message.trim() || !selectedUser) return;
         sendMessage({
             senderId: authUser._id,
+            conversationId: selectedUser.conversationId || undefined,
             receiverId: selectedUser._id,
             text: message,
         });
@@ -179,7 +179,7 @@ const MessagesPopup = ({ onClose }) => {
                                 <MessageBubble
                                     key={`${msg._id}-${index}`}
                                     msg={msg}
-                                    isSender={normalizeSenderId(msg.senderId) === authUser._id?.toString()}
+                                    isSender={msg.isMine}
                                 />
                                 
                             ))

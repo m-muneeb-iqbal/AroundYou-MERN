@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { socket } from "../lib/socket";
 import { axiosInstance } from "../lib/axios";
-import { normalizeSenderId } from "../lib/utils";
 
 export const useMessageStore = create((set, get) => ({
 
@@ -20,6 +19,7 @@ export const useMessageStore = create((set, get) => ({
     fetchUsers: async () => {
         set({ isLoadingUsers: true });
         try {
+            await new Promise(resolve => setTimeout(resolve, 3000));
             const res = await axiosInstance.get("/message/users", { withCredentials: true });
             set({ users: res.data });
         } finally {
@@ -34,17 +34,11 @@ export const useMessageStore = create((set, get) => ({
 
         const handleReceiveMessage = (msg) => {
 
-            const { openConversationId, authUser } = get();
-
-            const isSender = normalizeSenderId(msg.senderId) === authUser?._id.toString();
-            
-            const otherUserId = isSender
-                ? msg.receiverId.toString()
-                : normalizeSenderId(msg.senderId);
+            const { openConversationId } = get();
 
             const isCurrentConversation =
                 openConversationId === msg.conversationId ||
-                (openConversationId === null && get().selectedUser?._id?.toString() === otherUserId);
+                (openConversationId === null && !msg.isMine && get().selectedUser !== null);
 
             if (isCurrentConversation) {
 
@@ -62,7 +56,7 @@ export const useMessageStore = create((set, get) => ({
 
                 }));
 
-                if (!isSender && msg.conversationId) {
+                if (!msg.isMine && msg.conversationId) {
 
                     axiosInstance.put(
                         `/message/read/${msg.conversationId}`,
@@ -220,15 +214,16 @@ export const useMessageStore = create((set, get) => ({
 
     // Load messages
     loadMessages: async (user) => {
-
+        
         const selected = user || get().selectedUser;
         if (!selected?.conversationId) return;
 
         set({ isLoadingMessages: true });
 
         try {
+            await new Promise(resolve => setTimeout(resolve, 3000));
             const res = await axiosInstance.get(
-                `/message/${selected._id}?page=1&limit=20`,
+                `/message/conversation/${selected.conversationId}`,
                 { withCredentials: true }
             );
             set({ messages: res.data, openConversationId: selected.conversationId });
@@ -301,8 +296,7 @@ export const useMessageStore = create((set, get) => ({
                 {
                     _id: tempId,
                     tempId,
-                    senderId: payload.senderId,
-                    receiverId: payload.receiverId,
+                    isMine: true,
                     conversationId: state.openConversationId,
                     text: payload.text,
                     status: "sending",
@@ -317,7 +311,15 @@ export const useMessageStore = create((set, get) => ({
             socket.connect();
         }
 
-        socket.emit("sendMessage", { ...payload, tempId });
+        // Prefer conversationId to avoid exposing peer _id; fall back for first messages
+        const socketPayload = { senderId: payload.senderId, text: payload.text, image: payload.image, tempId };
+        if (payload.conversationId) {
+            socketPayload.conversationId = payload.conversationId;
+        } else {
+            socketPayload.receiverId = payload.receiverId;
+        }
+
+        socket.emit("sendMessage", socketPayload);
     },
     
 }));

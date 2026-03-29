@@ -51,7 +51,9 @@ export const getUsersForSidebar = async (req, res) => {
 
             return {
 
+                _id: user._id,
                 fullName: user.fullName,
+                conversationId: conversation?._id || null,
                 lastMessage: lm
                     ? { text: lm.text, image: lm.image, status: lm.status, createdAt: lm.createdAt }
                     : null,
@@ -96,30 +98,34 @@ export const getConversations = async (req, res) => {
     }
 };
 
-// ─── GET /message/:id
-export const getMessages = async (req, res) => {
+// ─── GET /message/conversation/:conversationId
+export const getMessagesByConversation = async (req, res) => {
 
     try {
 
-        const { id: receiverId } = req.params;
-        const senderId = req.user._id;
+        const { conversationId } = req.params;
+        const userId = req.user._id;
 
         const conversation = await Conversation.findOne({
-            participants: { $all: [senderId, receiverId] },
+            _id: conversationId,
+            participants: userId,
         });
 
-        if (!conversation) return res.status(200).json([]);
+        if (!conversation) return res.status(403).json({ error: "Access denied" });
 
-        const messages = await Message.find({
-            conversationId: conversation._id,
-        }).sort({ createdAt: 1 });
+        const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
 
-        const messagesWithConvId = messages.map((msg) => ({
-            ...msg.toObject(),
-            conversationId: conversation._id.toString(),
+        const result = messages.map((msg) => ({
+            _id: msg._id,
+            conversationId: conversationId,
+            isMine: msg.senderId.toString() === userId.toString(),
+            text: msg.text,
+            image: msg.image,
+            status: msg.status,
+            createdAt: msg.createdAt,
         }));
 
-        res.status(200).json(messagesWithConvId);
+        res.status(200).json(result);
 
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
@@ -170,17 +176,21 @@ export const sendMessages = async (req, res) => {
         const senderSocketId = onlineUsers.get(senderId.toString());
         const receiverSocketId = onlineUsers.get(receiverId.toString());
 
-        const payload = {
-            ...newMessage.toObject(),
+        const basePayload = {
+            _id: newMessage._id,
             conversationId: conv._id.toString(),
+            text: newMessage.text,
+            image: newMessage.image,
+            status: newMessage.status,
+            createdAt: newMessage.createdAt,
         };
 
         if (senderSocketId) {
-            io.to(senderSocketId).emit("receiveMessage", payload);
+            io.to(senderSocketId).emit("receiveMessage", { ...basePayload, isMine: true });
         }
 
         if (receiverSocketId) {
-            io.to(receiverSocketId).emit("receiveMessage", payload);
+            io.to(receiverSocketId).emit("receiveMessage", { ...basePayload, isMine: false });
 
             io.to(receiverSocketId).emit("updateUnread", {
                 conversationId: conv._id.toString(),

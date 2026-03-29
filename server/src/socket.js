@@ -86,9 +86,20 @@ export const initSocket = (server) => {
 
         socket.on("sendMessage", async (data) => {
 
-            const { senderId, receiverId, text, image, tempId } = data;
+            const { senderId, text, image, tempId } = data;
+            let { receiverId, conversationId } = data;
 
             try {
+
+                // Derive receiverId from conversationId when provided (avoids exposing peer _id)
+                if (!receiverId && conversationId) {
+                    const conv = await Conversation.findById(conversationId);
+                    if (!conv) {
+                        socket.emit("messagingError", { message: "Conversation not found." });
+                        return;
+                    }
+                    receiverId = conv.participants.find((p) => p.toString() !== senderId.toString());
+                }
 
                 const friendship = await Friend.findOne({
 
@@ -123,21 +134,25 @@ export const initSocket = (server) => {
 
                 const unreadCount = receiverEntry?.count || 0;
 
-                const payload = {
-                    ...newMessage.toObject(),
+                const basePayload = {
+                    _id: newMessage._id,
                     conversationId: newMessage.conversationId.toString(),
-                    tempId
+                    text: newMessage.text,
+                    image: newMessage.image,
+                    status: newMessage.status,
+                    createdAt: newMessage.createdAt,
+                    tempId,
                 };
 
                 // Emit to sender for instant update
-                socket.emit("receiveMessage", payload);
+                socket.emit("receiveMessage", { ...basePayload, isMine: true });
 
                 // Emit to receiver using their socketId
                 const receiverSocketId = onlineUsers.get(receiverId.toString());
 
                 if (receiverSocketId) {
 
-                    io.to(receiverSocketId).emit("receiveMessage", payload);
+                    io.to(receiverSocketId).emit("receiveMessage", { ...basePayload, isMine: false });
                     io.to(receiverSocketId).emit("updateUnread", {
                         conversationId: newMessage.conversationId.toString(),
                         unreadCount,
