@@ -18,7 +18,7 @@ export const useMessageStore = create((set, get) => ({
     fetchUsers: async () => {
         set({ isLoadingUsers: true });
         try {
-            const res = await axiosInstance.get("/message/users");
+            const res = await axiosInstance.get("/conversations");
             set({ users: res.data });
         } finally {
             set({ isLoadingUsers: false });
@@ -56,7 +56,7 @@ export const useMessageStore = create((set, get) => ({
 
                     const peer = get().users.find((u) => u.conversationId === msg.conversationId);
                     if (peer?.username) {
-                        axiosInstance.put(`/message/read`, { username: peer.username })
+                        axiosInstance.put(`/conversations/message/read`, { username: peer.username })
                             .catch((err) => console.error("Error marking as read on receive:", err));
                     }
                 }
@@ -162,7 +162,7 @@ export const useMessageStore = create((set, get) => ({
 
         if (selectedUser.conversationId) {
             try {
-                await axiosInstance.put(`/message/read`, { username: selectedUser.username });
+                await axiosInstance.put(`/conversations/message/read`, { username: selectedUser.username });
             } catch (err) {
                 console.error("Error marking as read on close:", err);
             }
@@ -194,14 +194,14 @@ export const useMessageStore = create((set, get) => ({
 
         try {
             const res = await axiosInstance.get(
-                `/message/conversation`,
+                `/conversations/message`,
                 { params: { username: selected.username } }
             );
             set({ messages: res.data, openConversationId: selected.conversationId });
             get().markMessagesAsRead(selected.conversationId);
 
             if (selected.unreadCount > 0) {
-                axiosInstance.put(`/message/read`, { username: selected.username })
+                axiosInstance.put(`/conversations/message/read`, { username: selected.username })
                     .catch((err) => console.error("Error marking messages as read:", err));
             }
         } finally {

@@ -1,39 +1,10 @@
 import Message from "../models/message.model.js";
 import Conversation from "../models/conversation.model.js";
+import { findOrCreateConversation } from "./conversation.service.js";
 
 export const saveMessage = async ({ senderId, receiverId, text, image }) => {
 
-    // Query for existing conversation - $all matches regardless of order
-    let conversation = await Conversation.findOne({
-        participants: { $all: [senderId, receiverId] },
-    });
-
-    if (!conversation) {
-        try {
-            // Create with unsorted participants - order doesn't matter for $all queries
-            conversation = await Conversation.create({
-                participants: [senderId, receiverId],
-                unreadCounts: [
-                    { userId: senderId, count: 0 },
-                    { userId: receiverId, count: 0 },
-                ],
-            });
-
-        } catch (err) {
-            if (err.code !== 11000) console.error("Error creating conversation:", err.message);
-            
-            // If duplicate error, retry the find
-            if (err.code === 11000) {
-                conversation = await Conversation.findOne({
-                    participants: { $all: [senderId, receiverId] },
-                });
-            }
-            
-            if (!conversation) {
-                throw err;
-            }
-        }
-    }
+    const conversation = await findOrCreateConversation(senderId, receiverId);
 
     const newMessage = await Message.create({
 
