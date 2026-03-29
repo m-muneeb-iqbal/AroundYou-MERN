@@ -173,7 +173,7 @@ export const getFriends = async (req, res) => {
             f.requester.toString() === userId.toString() ? f.recipient : f.requester
         );
 
-        const friends = await User.find({ _id: { $in: friendIds } }).select("profilePic fullName headline location");
+        const friends = await User.find({ _id: { $in: friendIds } }).select("profilePic fullName headline location -_id");
         res.status(200).json(friends);
 
     } catch (error) {
