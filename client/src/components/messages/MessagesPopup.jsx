@@ -33,8 +33,8 @@ const MessagesPopup = ({ onClose }) => {
 
     const { authUser } = useAuthStore();
     useEffect(() => {
-        if (authUser?._id) {
-            const cleanup = initializeSocket(authUser._id);
+        if (authUser) {
+            const cleanup = initializeSocket();
             return cleanup;
         }
     }, [authUser]);
@@ -56,9 +56,7 @@ const MessagesPopup = ({ onClose }) => {
         e.preventDefault();
         if (!message.trim() || !selectedUser) return;
         sendMessage({
-            senderId: authUser._id,
-            conversationId: selectedUser.conversationId || undefined,
-            receiverId: selectedUser._id,
+            conversationId: selectedUser.conversationId,
             text: message,
         });
         setMessage("");

@@ -73,7 +73,6 @@ export const useCallStore = create((set, get) => ({
             to: user.friendshipId,
             offer,
             callerInfo: {
-                userId: authUser._id,
                 name: authUser.fullName,
                 profilePic: authUser.profilePic,
             },

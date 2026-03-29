@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Friend from "../models/friend.model.js";
 import Conversation from "../models/conversation.model.js";
+import Message from "../models/message.model.js";
 import { getIO, onlineUsers } from "../socket.js";
 
 export const sendFriendRequest = async (req, res) => {
@@ -111,6 +112,14 @@ export const acceptFriendRequest = async (req, res) => {
         request.status = "accepted";
         await request.save();
 
+        // Eagerly create conversation so both users always have a conversationId
+        const existingConv = await Conversation.findOne({
+            participants: { $all: [request.requester, request.recipient] },
+        });
+        if (!existingConv) {
+            await Conversation.create({ participants: [request.requester, request.recipient] });
+        }
+
         const [requester, recipient] = await Promise.all([
             User.findById(request.requester).select("-password -role -verificationToken -verificationTokenExpiry"),
             User.findById(request.recipient).select("-password -role -verificationToken -verificationTokenExpiry"),
@@ -185,7 +194,16 @@ export const unfriend = async (req, res) => {
 
         if (!friendship) return res.status(404).json({ message: "Friendship not found." });
 
+        const conversation = await Conversation.findOne({
+            participants: { $all: [userId, targetUser._id] },
+        });
+
         await friendship.deleteOne();
+
+        if (conversation) {
+            await Message.deleteMany({ conversationId: conversation._id });
+            await conversation.deleteOne();
+        }
 
         res.status(200).json({ message: "Unfriended successfully" });
 

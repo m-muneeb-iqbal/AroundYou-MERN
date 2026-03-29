@@ -28,9 +28,7 @@ export const useMessageStore = create((set, get) => ({
     },
 
     // Initialize socket
-    initializeSocket: (authUserId) => {
-
-        if (!authUserId) return;
+    initializeSocket: () => {
 
         const handleReceiveMessage = (msg) => {
 
@@ -310,15 +308,12 @@ export const useMessageStore = create((set, get) => ({
             socket.connect();
         }
 
-        // Prefer conversationId to avoid exposing peer _id; fall back for first messages
-        const socketPayload = { senderId: payload.senderId, text: payload.text, image: payload.image, tempId };
-        if (payload.conversationId) {
-            socketPayload.conversationId = payload.conversationId;
-        } else {
-            socketPayload.receiverId = payload.receiverId;
-        }
-
-        socket.emit("sendMessage", socketPayload);
+        socket.emit("sendMessage", {
+            conversationId: payload.conversationId,
+            text: payload.text,
+            image: payload.image,
+            tempId,
+        });
     },
     
 }));

@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import { saveMessage } from "./services/message.service.js";
+import jwt from "jsonwebtoken";
+import User from "./models/user.model.js";
 
 import Friend from "./models/friend.model.js";
 import Conversation from "./models/conversation.model.js";
@@ -23,13 +25,32 @@ export const initSocket = (server) => {
         pingTimeout: 5000,
     });
 
+    // Authenticate every socket connection via JWT cookie
+    io.use(async (socket, next) => {
+        try {
+            const cookie = socket.handshake.headers.cookie || "";
+            const match = cookie.match(/(?:^|;\s*)jwt=([^;]+)/);
+            if (!match) return next(new Error("Unauthorized"));
+
+            const decoded = jwt.verify(match[1], process.env.JWT_SECRET);
+            const user = await User.findById(decoded.userId).select("_id");
+            if (!user) return next(new Error("Unauthorized"));
+
+            socket.data.userId = user._id.toString();
+            next();
+        } catch {
+            next(new Error("Unauthorized"));
+        }
+    });
+
     io.on("connection", (socket) => {
 
-        // User connected
+        // Register authenticated user as online immediately
+        const userId = socket.data.userId;
+        onlineUsers.set(userId, socket.id);
 
-        socket.on("userOnline", async (userId) => {
-            onlineUsers.set(userId, socket.id);
-
+        // Deliver any messages that arrived while this user was offline
+        (async () => {
             try {
 
                 const undeliveredMessages = await Message.find({
@@ -39,67 +60,50 @@ export const initSocket = (server) => {
 
                 if (undeliveredMessages.length === 0) return;
 
-                // Upgrade all to delivered in DB
                 await Message.updateMany(
                     { receiverId: userId, status: "sent" },
                     { $set: { status: "delivered" } }
                 );
 
-                // Notify each sender whose message is now delivered
-                // Group by senderId to send one event per sender, not one per message
                 const senderMap = new Map();
-
                 for (const msg of undeliveredMessages) {
-
-                    const senderId = msg.senderId.toString();
-
-                    if (!senderMap.has(senderId)) {
-                        senderMap.set(senderId, []);
-                    }
-                    senderMap.get(senderId).push(msg._id.toString());
+                    const sid = msg.senderId.toString();
+                    if (!senderMap.has(sid)) senderMap.set(sid, []);
+                    senderMap.get(sid).push(msg._id.toString());
                 }
 
                 for (const [senderId, messageIds] of senderMap) {
-
                     const senderSocketId = onlineUsers.get(senderId);
-                    if (!senderSocketId) continue; // sender is offline, they'll see it on next load
-
+                    if (!senderSocketId) continue;
                     for (const messageId of messageIds) {
-
                         io.to(senderSocketId).emit("messageDelivered", {
-
                             messageId,
                             conversationId: undeliveredMessages
                                 .find(m => m._id.toString() === messageId)
                                 ?.conversationId.toString(),
-
                         });
-
                     }
-
                 }
 
             } catch (error) {
                 console.error("Error upgrading undelivered messages:", error);
             }
-        });
+        })();
 
         socket.on("sendMessage", async (data) => {
 
-            const { senderId, text, image, tempId } = data;
-            let { receiverId, conversationId } = data;
+            const senderId = socket.data.userId;
+            const { text, image, tempId, conversationId } = data;
 
             try {
 
-                // Derive receiverId from conversationId when provided (avoids exposing peer _id)
-                if (!receiverId && conversationId) {
-                    const conv = await Conversation.findById(conversationId);
-                    if (!conv) {
-                        socket.emit("messagingError", { message: "Conversation not found." });
-                        return;
-                    }
-                    receiverId = conv.participants.find((p) => p.toString() !== senderId.toString());
+                const conv = await Conversation.findById(conversationId);
+                if (!conv) {
+                    socket.emit("messagingError", { message: "Conversation not found." });
+                    return;
                 }
+
+                const receiverId = conv.participants.find((p) => p.toString() !== senderId);
 
                 const friendship = await Friend.findOne({
 
@@ -126,9 +130,9 @@ export const initSocket = (server) => {
                 const newMessage = await saveMessage({ senderId, receiverId, text, image });
 
                 // Fetch fresh conversation to get accurate unread count
-                const conv = await Conversation.findById(newMessage.conversationId);
+                const updatedConv = await Conversation.findById(newMessage.conversationId);
 
-                const receiverEntry = conv.unreadCounts?.find(
+                const receiverEntry = updatedConv.unreadCounts?.find(
                     (u) => u.userId.toString() === receiverId.toString()
                 );
 
@@ -179,7 +183,7 @@ export const initSocket = (server) => {
             const friendship = await Friend.findById(friendshipId);
             if (!friendship) return;
             const calleeId =
-                friendship.requester.toString() === callerInfo.userId.toString()
+                friendship.requester.toString() === socket.data.userId
                     ? friendship.recipient.toString()
                     : friendship.requester.toString();
             const receiverSocketId = onlineUsers.get(calleeId);
@@ -195,13 +199,6 @@ export const initSocket = (server) => {
         socket.on("answerCall", async ({ to: friendshipId, answer }) => {
             const friendship = await Friend.findById(friendshipId);
             if (!friendship) return;
-            const callerId =
-                friendship.requester.toString() !== onlineUsers.get(friendship.requester.toString())
-                    ? friendship.requester.toString()
-                    : friendship.recipient.toString();
-            // Find caller socket by iterating — simpler: store callerId in friendship lookup
-            // Use callerInfo.userId stored in the event chain instead
-            // We route by emitting to all participants except self
             for (const participantId of [friendship.requester.toString(), friendship.recipient.toString()]) {
                 const sid = onlineUsers.get(participantId);
                 if (sid && sid !== socket.id) {

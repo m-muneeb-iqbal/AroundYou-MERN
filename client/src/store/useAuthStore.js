@@ -25,7 +25,6 @@ export const useAuthStore = create((set) => ({
             set({ authUser: res.data });
 
             socket.connect();
-            socket.emit("userOnline", res.data._id);
 
             // Prefetch alongside auth so data is ready when HomePage mounts
             useFriendStore.getState().fetchNonFriends();
@@ -62,9 +61,7 @@ export const useAuthStore = create((set) => ({
     },
 
     login: async (data) => {
-
         set({ isLoggingIn: true });
-        
         try {
             const res = await axiosInstance.post("/auth/login", data, {
                 withCredentials: true,
