@@ -73,9 +73,8 @@ export const useMessageStore = create((set, get) => ({
                 const updatedUsers = state.users.map ((u) => {
 
                     const matchByConvId = u.conversationId === msg.conversationId;
-                    const matchByUserId = !u.conversationId && u._id.toString() === otherUserId;
 
-                    if (!matchByConvId && !matchByUserId) return u;
+                    if (!matchByConvId) return u;
 
                     return {
 
