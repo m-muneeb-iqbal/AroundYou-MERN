@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { socket } from "../lib/socket";
 import { axiosInstance } from "../lib/axios";
+import { useFriendStore } from "./useFriendStore";
 
 export const useMessageStore = create((set, get) => ({
 
@@ -61,6 +62,26 @@ export const useMessageStore = create((set, get) => ({
                     }
                 }
 
+            }
+
+            // Fire a bell notification when a message arrives outside the open conversation
+            if (!msg.isMine && !isCurrentConversation) {
+                const peer = get().users.find((u) => u.conversationId === msg.conversationId);
+                if (peer) {
+                    useFriendStore.getState().addNotification({
+                        type: "new_message",
+                        user: {
+                            fullName: peer.fullName,
+                            profilePic: peer.profilePic,
+                            username: peer.username,
+                        },
+                        message: `New message from ${peer.fullName}`,
+                        preview: msg.text
+                            ? msg.text.length > 60 ? msg.text.slice(0, 60) + "…" : msg.text
+                            : "📷 Photo",
+                        conversationId: msg.conversationId,
+                    });
+                }
             }
 
             set((state) => {

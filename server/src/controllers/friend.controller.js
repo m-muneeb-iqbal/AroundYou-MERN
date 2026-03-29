@@ -39,7 +39,7 @@ export const sendFriendRequest = async (req, res) => {
         const friendRequest = await Friend.create({ requester, recipient: recipientId });
 
         // Populate requester
-        const populated = await friendRequest.populate("requester", "fullName profilePic headline");
+        const populated = await friendRequest.populate("requester", "fullName profilePic headline username");
 
         // Notify recipient live if online
         const io = getIO();
@@ -81,6 +81,18 @@ export const cancelFriendRequest = async (req, res) => {
         if (!request) return res.status(404).json({ message: "Request not found." });
 
         await request.deleteOne();
+
+        // Notify recipient that the request was cancelled
+        const io = getIO();
+        const recipientSocketId = onlineUsers.get(targetUser._id.toString());
+        if (recipientSocketId) {
+            io.to(recipientSocketId).emit("friendRequestCancelled", {
+                requester: {
+                    username: req.user.username,
+                    fullName: req.user.fullName,
+                },
+            });
+        }
 
         res.status(200).json({ message: "Request cancelled" });
 
@@ -170,6 +182,19 @@ export const rejectFriendRequest = async (req, res) => {
 
         await request.deleteOne();
 
+        // Notify requester that their request was rejected
+        const io = getIO();
+        const requesterSocketId = onlineUsers.get(requesterUser._id.toString());
+        if (requesterSocketId) {
+            io.to(requesterSocketId).emit("friendRequestRejected", {
+                recipient: {
+                    username: req.user.username,
+                    fullName: req.user.fullName,
+                    profilePic: req.user.profilePic,
+                },
+            });
+        }
+
         res.status(200).json({ message: "Request rejected" });
 
     } catch (error) {
@@ -209,6 +234,19 @@ export const unfriend = async (req, res) => {
         if (conversation) {
             await Message.deleteMany({ conversationId: conversation._id });
             await conversation.deleteOne();
+        }
+
+        // Notify the unfriended user in real-time
+        const io = getIO();
+        const targetSocketId = onlineUsers.get(targetUser._id.toString());
+        if (targetSocketId) {
+            io.to(targetSocketId).emit("unfriended", {
+                unfriender: {
+                    username: req.user.username,
+                    fullName: req.user.fullName,
+                    profilePic: req.user.profilePic,
+                },
+            });
         }
 
         res.status(200).json({ message: "Unfriended successfully" });

@@ -1,53 +1,85 @@
-import { createContext, useContext, useState, useCallback } from "react";
-import { Toast, ToastContainer } from "react-bootstrap";
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import { CheckCircle, XCircle, AlertTriangle, Info, X } from "lucide-react";
+import styles from "../styles/UI/Toast.module.css";
 
 const ToastContext = createContext();
 
+const defaultTitles = {
+    success: "Success",
+    danger: "Error",
+    warning: "Warning",
+    info: "Info",
+};
+
+const variantIcons = {
+    success: CheckCircle,
+    danger:  XCircle,
+    warning: AlertTriangle,
+    info:    Info,
+};
+
+const DURATION = 4000;
+
+const ToastItem = ({ toast, onDismiss }) => {
+    const [hiding, setHiding] = useState(false);
+    const timerRef = useRef(null);
+
+    const dismiss = useCallback(() => {
+        setHiding(true);
+        setTimeout(() => onDismiss(toast.id), 250);
+    }, [toast.id, onDismiss]);
+
+    useEffect(() => {
+        timerRef.current = setTimeout(dismiss, DURATION);
+        return () => clearTimeout(timerRef.current);
+    }, [dismiss]);
+
+    const Icon = variantIcons[toast.variant] ?? Info;
+
+    return (
+        <div
+            className={[styles.toast, styles[toast.variant], hiding ? styles.hiding : ""].join(" ")}
+            role="alert"
+        >
+            <div className={styles.iconWrapper}>
+                <Icon size={18} />
+            </div>
+
+            <div className={styles.content}>
+                <div className={styles.title}>{toast.title}</div>
+                <div className={styles.message}>{toast.message}</div>
+            </div>
+
+            <button className={styles.closeBtn} onClick={dismiss} aria-label="Dismiss">
+                <X size={15} />
+            </button>
+
+            <div className={styles.progress} />
+        </div>
+    );
+};
+
 export const ToastProvider = ({ children }) => {
+    const [toasts, setToasts] = useState([]);
 
-    const [toast, setToast] = useState({
-        show: false,
-        message: "",
-        variant: "success"
-    });
+    const showToast = useCallback((message, variant = "success", title) => {
+        const id = Date.now();
+        setToasts((prev) => [
+            ...prev,
+            { id, message, variant, title: title || defaultTitles[variant] || "Notice" },
+        ]);
+    }, []);
 
-    const showToast = useCallback((message, variant = "success") => {
-        setToast({ show: true, message, variant });
-
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, show: false }));
-        }, 4000);
+    const dismiss = useCallback((id) => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
     }, []);
 
     return (
         <ToastContext.Provider value={{ showToast }}>
             {children}
-
-            {/* Global Toast UI */}
-            <ToastContainer
-                position="top-end"
-                className="p-3"
-                style={{ zIndex: 9999 }}
-            >
-                <Toast
-                    show={toast.show}
-                    bg={toast.variant}
-                    onClose={() => setToast(prev => ({ ...prev, show: false }))}
-                    autohide
-                    delay={3000}
-                >
-                    <Toast.Header>
-                        <strong className="me-auto">
-                            {toast.variant === "success" ? "Success" : "Error"}
-                        </strong>
-                        <small>Just now</small>
-                    </Toast.Header>
-                    <Toast.Body className="text-white">
-                        {toast.message}
-                    </Toast.Body>
-                </Toast>
-            </ToastContainer>
-
+            {toasts.map((t) => (
+                <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
+            ))}
         </ToastContext.Provider>
     );
 };

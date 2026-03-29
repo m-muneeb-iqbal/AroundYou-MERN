@@ -7,6 +7,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
+import { useToast } from "../../context/ToastContext";
 import InitialsAvatar from "../common/InitialsAvatar";
 import ActionButton from "../common/ActionButton";
 
@@ -14,6 +15,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
 
     const { friends, fetchFriends, unfriend } = useFriendStore();
     const { users, fetchUsers, selectUser } = useMessageStore();
+    const { showToast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [confirmUnfriendId, setConfirmUnfriendId] = useState(null);
 
@@ -32,9 +34,10 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
         onOpenMessages();
     };
 
-    const handleUnfriendConfirm = async (username) => {
+    const handleUnfriendConfirm = async (username, fullName) => {
         await unfriend(username);
         setConfirmUnfriendId(null);
+        showToast(`You unfriended ${fullName}.`, "warning", "Unfriended");
     };
 
     const skeletonRows = Array.from({ length: 4 });
@@ -129,7 +132,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
 
                                     <div className="d-flex gap-1 flex-shrink-0">
 
-                                        <Button variant="danger" style={{ fontSize: "0.68rem", padding: "2px 7px" }} onClick={() => handleUnfriendConfirm(friend.username)} >
+                                        <Button variant="danger" style={{ fontSize: "0.68rem", padding: "2px 7px" }} onClick={() => handleUnfriendConfirm(friend.username, friend.fullName)} >
                                             Confirm
                                         </Button>
 

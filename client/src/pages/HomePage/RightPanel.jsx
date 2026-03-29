@@ -1,10 +1,28 @@
+import { useState } from "react";
 import { Card, ListGroup } from "react-bootstrap";
 import { useFriendStore } from "../../store/useFriendStore";
+import { useToast } from "../../context/ToastContext";
 import PersonCard from "../../components/friends/PersonCard";
 
 const RightPanel = ({ isLoading }) => {
 
-    const { nonFriends, sendFriendRequest } = useFriendStore();
+    const { nonFriends, sendFriendRequest, sentRequests } = useFriendStore();
+    const { showToast } = useToast();
+    const [loadingUserId, setLoadingUserId] = useState(null);
+
+    const handleAdd = async (username, fullName) => {
+        setLoadingUserId(username);
+        try {
+            await sendFriendRequest(username);
+            showToast(`Friend request sent to ${fullName}!`, "success", "Friend Request Sent");
+        } catch (err) {
+            if (err.response?.status !== 400) {
+                showToast("Failed to send request. Please try again.", "danger", "Error");
+            }
+        } finally {
+            setLoadingUserId(null);
+        }
+    };
 
     return (
         <Card className="border-0 shadow-sm">
@@ -31,7 +49,14 @@ const RightPanel = ({ isLoading }) => {
                     ) : (
 
                         nonFriends.map((user) => (
-                            <PersonCard key={user.username} user={user} onAdd={() => sendFriendRequest(user.username)} isLoading={false} />
+                            <PersonCard
+                                key={user.username}
+                                user={user}
+                                onAdd={() => handleAdd(user.username, user.fullName)}
+                                isLoading={false}
+                                isPending={sentRequests.includes(user.username)}
+                                isAdding={loadingUserId === user.username}
+                            />
                         ))
 
                     )}

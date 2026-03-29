@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, UserRoundPlus, UserRoundCheck } from "lucide-react";
+import { Bell, UserRoundPlus, UserRoundCheck, UserRoundX, MessageCircle } from "lucide-react";
 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
+import { useToast } from "../../context/ToastContext";
 import { socket } from "../../lib/socket";
 
 import InitialsAvatar from "./InitialsAvatar";
@@ -10,9 +11,12 @@ import UserProfileModal from "../search/UserProfileModal";
 
 const notificationMeta = {
 
-    request_received:  { icon: UserRoundPlus,  color: "#04263D",  label: "Friend Request"   },
-    request_accepted:  { icon: UserRoundCheck, color: "#198754",  label: "Request Accepted" }, 
-    already_sent:      { icon: UserRoundCheck, color: "#f0ad4e",  label: "Already Sent"     },
+    request_received: { icon: UserRoundPlus,  color: "#04263D", label: "Friend Request"     },
+    request_accepted: { icon: UserRoundCheck, color: "#198754", label: "Request Accepted"   },
+    already_sent:     { icon: UserRoundCheck, color: "#f0ad4e", label: "Already Sent"       },
+    request_rejected: { icon: UserRoundX,     color: "#dc3545", label: "Request Declined"   },
+    unfriended:       { icon: UserRoundX,     color: "#6c757d", label: "Removed Friend"     },
+    new_message:      { icon: MessageCircle,  color: "#0d6efd", label: "New Message"        },
 
 };
 
@@ -34,6 +38,8 @@ const NotificationBell = () => {
         markNotificationsRead,
         initializeFriendSocket,
     } = useFriendStore();
+
+    const { showToast } = useToast();
 
     const ref = useRef(null);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -61,19 +67,51 @@ const NotificationBell = () => {
         const {
             handleFriendRequestReceived,
             handleFriendRequestAccepted,
+            handleFriendRequestCancelled,
+            handleFriendRequestRejected,
+            handleUnfriended,
         } = initializeFriendSocket();
 
         const onAccepted = (data) => handleFriendRequestAccepted(data, fetchUsers);
 
         socket.on("friendRequestReceived", handleFriendRequestReceived);
         socket.on("friendRequestAccepted", onAccepted);
+        socket.on("friendRequestCancelled", handleFriendRequestCancelled);
+        socket.on("friendRequestRejected", handleFriendRequestRejected);
+        socket.on("unfriended", handleUnfriended);
 
         return () => {
             socket.off("friendRequestReceived", handleFriendRequestReceived);
             socket.off("friendRequestAccepted", onAccepted);
+            socket.off("friendRequestCancelled", handleFriendRequestCancelled);
+            socket.off("friendRequestRejected", handleFriendRequestRejected);
+            socket.off("unfriended", handleUnfriended);
         };
 
     }, []);
+
+    // Fire a toast for each new unread notification as it arrives
+    const prevNotifCountRef = useRef(0);
+    useEffect(() => {
+        const unread = notifications.filter((n) => !n.read);
+        if (unread.length > prevNotifCountRef.current) {
+            const latest = unread[0];
+            if (latest) {
+                const toastConfig = {
+                    request_accepted: { variant: "success", title: "Request Accepted" },
+                    request_rejected: { variant: "warning", title: "Request Declined" },
+                    unfriended:       { variant: "warning", title: "Removed Friend"   },
+                    new_message:      { variant: "info",    title: "New Message"      },
+                    already_sent:     { variant: "warning", title: "Already Sent"     },
+                };
+                const cfg = toastConfig[latest.type];
+                if (cfg) {
+                    showToast(latest.message, cfg.variant, cfg.title);
+                }
+            }
+        }
+        prevNotifCountRef.current = unread.length;
+    }, [notifications]);
 
     const handleOpen = () => {
         setShowDropdown((prev) => !prev);
@@ -201,23 +239,32 @@ const NotificationBell = () => {
                                                 className="d-flex align-items-center gap-2 px-3 py-2"
                                                 style={{
                                                     borderBottom: "1px solid #f5f5f5",
-                                                    backgroundColor: n.read ? "white" : "#fafafa",
+                                                    backgroundColor: n.read ? "white" : "#f8fbff",
                                                 }}
                                             >
-                                                {/* Avatar with fallback to icon */}
-                                                {n.user ? (
-
-                                                    <InitialsAvatar name={n.user.fullName} profilePic={n.user.profilePic} size={38} />
-
-                                                ) : (
-
-                                                    <div className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style={{ width: 38, height: 38, backgroundColor: `${meta?.color}18` }} >
-
-                                                        {Icon && <Icon size={16} color={meta.color} />}
-
-                                                    </div>
-
-                                                )}
+                                                {/* Avatar with icon badge for type */}
+                                                <div className="position-relative flex-shrink-0">
+                                                    {n.user ? (
+                                                        <InitialsAvatar name={n.user.fullName} profilePic={n.user.profilePic} size={38} />
+                                                    ) : (
+                                                        <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 38, height: 38, backgroundColor: `${meta?.color}18` }}>
+                                                            {Icon && <Icon size={16} color={meta.color} />}
+                                                        </div>
+                                                    )}
+                                                    {meta && (
+                                                        <div
+                                                            className="position-absolute d-flex align-items-center justify-content-center rounded-circle"
+                                                            style={{
+                                                                bottom: -2, right: -2,
+                                                                width: 16, height: 16,
+                                                                backgroundColor: meta.color,
+                                                                border: "1.5px solid white",
+                                                            }}
+                                                        >
+                                                            {Icon && <Icon size={9} color="white" />}
+                                                        </div>
+                                                    )}
+                                                </div>
 
                                                 <div className="flex-grow-1 overflow-hidden">
 
@@ -225,7 +272,13 @@ const NotificationBell = () => {
                                                         {n.message}
                                                     </div>
 
-                                                    <div className="text-muted" style={{ fontSize: "0.7rem" }}>
+                                                    {n.type === "new_message" && n.preview && (
+                                                        <div className="text-truncate text-muted" style={{ fontSize: "0.72rem", maxWidth: "180px" }}>
+                                                            {n.preview}
+                                                        </div>
+                                                    )}
+
+                                                    <div className="text-muted" style={{ fontSize: "0.68rem" }}>
                                                         {timeAgo(n.timestamp)}
                                                     </div>
 
