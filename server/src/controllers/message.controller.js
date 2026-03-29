@@ -47,12 +47,16 @@ export const getUsersForSidebar = async (req, res) => {
                 conv.participants.some((p) => p.toString() === user._id.toString())
             );
 
+            const lm = conversation?.lastMessage;
+
             return {
 
                 _id: user._id,
                 fullName: user.fullName,
                 conversationId: conversation?._id || null,
-                lastMessage: conversation?.lastMessage || null,
+                lastMessage: lm
+                    ? { text: lm.text, image: lm.image, status: lm.status, createdAt: lm.createdAt }
+                    : null,
                 unreadCount: conversation ? getUnreadCount(conversation, userId) : 0,
                 lastActivity: conversation?.updatedAt || null,
 
