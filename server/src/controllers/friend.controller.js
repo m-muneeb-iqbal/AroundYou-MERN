@@ -26,8 +26,8 @@ export const sendFriendRequest = async (req, res) => {
 
         const friendRequest = await Friend.create({ requester, recipient: recipientId });
 
-        // Populate requester so recipient gets full user details in the event
-        const populated = await friendRequest.populate("requester", "-password -role -verificationToken -verificationTokenExpiry");
+        // Populate requester
+        const populated = await friendRequest.populate("requester", "fullName profilePic headline");
 
         // Notify recipient live if online
         const io = getIO();
@@ -36,7 +36,12 @@ export const sendFriendRequest = async (req, res) => {
             io.to(recipientSocketId).emit("friendRequestReceived", populated);
         }
 
-        res.status(201).json(populated);
+        res.status(201).json({
+            _id: populated._id,
+            requester: populated.requester,
+            status: populated.status,
+            createdAt: populated.createdAt,
+        });
 
     } catch (error) {
         console.error("Error sending friend request:", error);
@@ -191,7 +196,7 @@ export const getPendingRequests = async (req, res) => {
         const requests = await Friend.find({
             recipient: userId,
             status: "pending",
-        }).populate("requester", "-password -role -verificationToken -verificationTokenExpiry");
+        }).populate("requester", "fullName profilePic jobTitle");
 
         res.status(200).json(requests);
 
