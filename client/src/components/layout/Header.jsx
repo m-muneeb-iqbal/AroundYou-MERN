@@ -15,14 +15,18 @@ import styles from "../../styles/UI/DropDownItems.module.css";
 const Header = ({ showMessages = false, showSearch = false }) => {
 
     const { authUser, logout } = useAuthStore();
-    const { initializeSocket } = useMessageStore();
+    const { initializeSocket, fetchUsers, users } = useMessageStore();
+    const unreadConversations = users.filter((u) => (u.unreadCount || 0) > 0).length;
     const navigate = useNavigate();
     const [showMessagesPopup, setShowMessagesPopup] = useState(false);
     const [showFriendListPopup, setShowFriendListPopup] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     useEffect(() => {
-        if (authUser) return initializeSocket();
+        if (!authUser) return;
+        const cleanup = initializeSocket();
+        fetchUsers();
+        return cleanup;
     }, [authUser]);
 
     if (!authUser) return <Navigate to="/" />;
@@ -87,7 +91,17 @@ const Header = ({ showMessages = false, showSearch = false }) => {
                         <NotificationBell />
 
                         {showMessages && (
-                            <MessageCircleMore color="#04263D" size={24} role="button" aria-label="Messages" title="Messages" onClick={() => { setShowMessagesPopup((prev) => !prev); setShowFriendListPopup(false); }} />
+                            <div className="position-relative d-inline-flex" style={{ cursor: "pointer" }} onClick={() => { setShowMessagesPopup((prev) => !prev); setShowFriendListPopup(false); }}>
+                                <MessageCircleMore color="#04263D" size={24} role="button" aria-label="Messages" title="Messages" />
+                                {unreadConversations > 0 && (
+                                    <span
+                                        className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                                        style={{ fontSize: "0.6rem", minWidth: "16px", height: "16px", lineHeight: "16px", padding: "0 4px", backgroundColor: "#ef4444", color: "#fff", pointerEvents: "none" }}
+                                    >
+                                        {unreadConversations > 99 ? "99+" : unreadConversations}
+                                    </span>
+                                )}
+                            </div>
                         )}
 
                         {showMessagesPopup && (

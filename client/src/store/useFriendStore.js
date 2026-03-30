@@ -40,6 +40,11 @@ export const useFriendStore = create((set, get) => ({
                     ? state.sentRequests
                     : [...state.sentRequests, username],
             }));
+            // Replenish right-panel suggestions
+            try {
+                const res = await axiosInstance.get("/friend/non-friends", { withCredentials: true });
+                set({ nonFriends: res.data });
+            } catch (_) {}
         } catch (err) {
 
             if (err.response?.status === 400) {
@@ -112,7 +117,6 @@ export const useFriendStore = create((set, get) => ({
 
     initializeFriendSocket: () => {
 
-        // Only update pendingRequests — bell already shows them, no need for notification entry
         const handleFriendRequestReceived = (request) => {
 
                 set((state) => ({
@@ -125,6 +129,12 @@ export const useFriendStore = create((set, get) => ({
                     ),
 
                 }));
+
+                get().addNotification({
+                    type: "request_received",
+                    user: request.requester,
+                    message: `${request.requester.fullName} sent you a friend request.`,
+                });
 
             };
 
@@ -161,11 +171,6 @@ export const useFriendStore = create((set, get) => ({
             set((state) => ({
                 sentRequests: state.sentRequests.filter((u) => u !== recipient.username),
             }));
-            get().addNotification({
-                type: "request_rejected",
-                user: recipient,
-                message: `${recipient.fullName} declined your friend request.`,
-            });
         };
 
         // Receives this when someone unfriends you
@@ -173,11 +178,6 @@ export const useFriendStore = create((set, get) => ({
             set((state) => ({
                 friends: state.friends.filter((f) => f.username !== unfriender.username),
             }));
-            get().addNotification({
-                type: "unfriended",
-                user: unfriender,
-                message: `${unfriender.fullName} removed you from their friends.`,
-            });
         };
 
         return {

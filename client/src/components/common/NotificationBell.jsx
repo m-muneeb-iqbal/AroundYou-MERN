@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, UserRoundPlus, UserRoundCheck, UserRoundX, MessageCircle } from "lucide-react";
+import { Bell, UserRoundPlus, UserRoundCheck, UserRoundX } from "lucide-react";
 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
@@ -16,7 +16,6 @@ const notificationMeta = {
     already_sent:     { icon: UserRoundCheck, color: "#f0ad4e", label: "Already Sent"       },
     request_rejected: { icon: UserRoundX,     color: "#dc3545", label: "Request Declined"   },
     unfriended:       { icon: UserRoundX,     color: "#6c757d", label: "Removed Friend"     },
-    new_message:      { icon: MessageCircle,  color: "#0d6efd", label: "New Message"        },
 
 };
 
@@ -98,10 +97,10 @@ const NotificationBell = () => {
             const latest = unread[0];
             if (latest) {
                 const toastConfig = {
+                    request_received: { variant: "info",    title: "Friend Request"   },
                     request_accepted: { variant: "success", title: "Request Accepted" },
                     request_rejected: { variant: "warning", title: "Request Declined" },
                     unfriended:       { variant: "warning", title: "Removed Friend"   },
-                    new_message:      { variant: "info",    title: "New Message"      },
                     already_sent:     { variant: "warning", title: "Already Sent"     },
                 };
                 const cfg = toastConfig[latest.type];
@@ -272,11 +271,7 @@ const NotificationBell = () => {
                                                         {n.message}
                                                     </div>
 
-                                                    {n.type === "new_message" && n.preview && (
-                                                        <div className="text-truncate text-muted" style={{ fontSize: "0.72rem", maxWidth: "180px" }}>
-                                                            {n.preview}
-                                                        </div>
-                                                    )}
+                                
 
                                                     <div className="text-muted" style={{ fontSize: "0.68rem" }}>
                                                         {timeAgo(n.timestamp)}
