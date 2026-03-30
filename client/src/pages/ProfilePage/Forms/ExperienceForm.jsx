@@ -77,12 +77,12 @@ const ExperienceForm = ({ onDirtyChange }) => {
         const { name, type, value, checked } = e.target;
 
         if (name === "currentlyWorking" && checked && !formData.joiningDate) {
-            showToast("You must enter Joining Date before marking as Currently working", "danger");
+            showToast("You must enter Joining Date before marking as Currently working", "danger", "Validation Error");
             return;
         }
 
         if (name === "resignationDate" && value && !formData.joiningDate) {
-            showToast("You must enter Joining Date before entering Resignation Date", "danger");
+            showToast("You must enter Joining Date before entering Resignation Date", "danger", "Validation Error");
             return;
         }
 
@@ -97,20 +97,20 @@ const ExperienceForm = ({ onDirtyChange }) => {
 
         e.preventDefault();
         if (!formData.company) {
-            showToast("Company name is required.", "danger");
+            showToast("Company name is required.", "danger", "Validation Error");
             return;
         }
         if (!formData.jobTitle) {
-            showToast("Job Title is required.", "danger");
+            showToast("Job Title is required.", "danger", "Validation Error");
             return;
         }
         if (!formData.joiningDate) {
-            showToast("Joining Date is required.", "danger");
+            showToast("Joining Date is required.", "danger", "Validation Error");
             return;
         }
 
         if (!formData.currentlyWorking && !formData.resignationDate) {
-            showToast("Either tick 'Currently working' or enter Resignation Date", "danger");
+            showToast("Either tick 'Currently working' or enter Resignation Date", "danger", "Validation Error");
             return;
         }
 
@@ -119,12 +119,12 @@ const ExperienceForm = ({ onDirtyChange }) => {
             await updateExperience(formData);
 
             console.log("Experience updated.");
-            showToast("Profile updated successfully!", "success");
+            showToast("Profile updated successfully!", "success", "Update Success");
 
             setOriginalData(formData);
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            showToast("Profile update failed", "danger");
+            showToast("Profile update failed", "danger", "Update Failed");
         }
     };
 
@@ -143,10 +143,10 @@ const ExperienceForm = ({ onDirtyChange }) => {
                 currentlyWorking: false,
             });
 
-            showToast("Experience deleted successfully!", "success");
+            showToast("Experience deleted successfully!", "success", "Delete Success");
         } catch (err) {
             console.error("Delete failed:", err.response?.data || err.message);
-            showToast("Failed to delete experience", "danger");
+            showToast("Failed to delete experience", "danger", "Delete Failed");
         }
     };
 

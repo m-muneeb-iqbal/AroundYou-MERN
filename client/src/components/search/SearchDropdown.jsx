@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 
 import { axiosInstance } from "../../lib/axios";
 
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 import UserProfileModal from "./UserProfileModal";
 
 const relationshipLabel = {
@@ -149,7 +149,7 @@ const SearchDropdown = ({ fullWidth = false }) => {
 
                                     <ListGroup.Item key={user._id} action className="d-flex align-items-center gap-2 py-2 px-3" style={{ cursor: "pointer", borderColor: "#F5F5F5" }} onClick={() => handleSelect(user)} >
 
-                                        <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
+                                        <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
 
                                         <div className="flex-grow-1 overflow-hidden">
 

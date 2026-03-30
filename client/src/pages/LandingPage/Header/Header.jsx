@@ -129,7 +129,7 @@ const Header = () => {
 
             form.classList.remove("was-validated");
 
-            showToast("Logged in successfully!", "success");
+            showToast("Logged in successfully!", "success", "Login Success");
             setIsNavigating(true);
 
             setTimeout(async () => {
@@ -146,16 +146,16 @@ const Header = () => {
             const isUnverified = err.response?.data?.unverified;
 
             if (isUnverified) {
-                showToast("Please verify your email before logging in. Check your inbox.", "danger");
+                showToast("Please verify your email before logging in. Check your inbox.", "danger", "Email Not Verified");
             }
             else if (status === 400 && message?.includes("credentials")) {
-                showToast("Incorrect email or password.", "danger");
+                showToast("Incorrect email or password.", "danger", "Login Failed");
             } else if (status === 500) {
-                showToast("Server error. Please try again later.", "danger");
+                showToast("Server error. Please try again later.", "danger", "Server Error");
             } else if (!navigator.onLine) {
-                showToast("No internet connection.", "danger");
+                showToast("No internet connection.", "danger", "Network Error");
             } else {
-                showToast(message || "Login failed. Please try again.", "danger");
+                showToast(message || "Login failed. Please try again.", "danger", "Login Failed");
             }
         }
     }

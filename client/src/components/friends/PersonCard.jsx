@@ -4,7 +4,7 @@ import { UserRoundPlus, Clock } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 import ActionButton from "../common/ActionButton";
 
 const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
@@ -14,7 +14,7 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
         {isLoading ? (
             <Skeleton circle width={36} height={36} className="flex-shrink-0" />
         ) : (
-            <InitialsAvatar name={user.fullName} profilePic={user.profilePic} />
+            <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={36} />
         )}
 
         <div className="flex-grow-1 overflow-hidden">

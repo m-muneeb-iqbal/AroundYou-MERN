@@ -5,8 +5,7 @@ import { UserRoundPlus, UserRoundMinus, MessageCircleMore, Check, X, Ban } from 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
 import { useToast } from "../../context/ToastContext";
-
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 
 const UserProfileModal = ({ user, onClose, onActionDone }) => {
 
@@ -78,24 +77,7 @@ const UserProfileModal = ({ user, onClose, onActionDone }) => {
             <Modal.Body className="text-center px-4 pb-4">
 
                 <div className="d-flex justify-content-center mb-3">
-
-                    {user.profilePic ? (
-                        
-                        <img
-                            src={user.profilePic}
-                            alt={user.fullName}
-                            style={{
-                                width: 80, height: 80,
-                                borderRadius: "50%",
-                                objectFit: "cover",
-                                border: "3px solid #DEE2E6",
-                            }}
-                        />
-
-                    ) : (
-                        <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={80} />
-                    )}
-
+                    <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={80} border="3px solid #DEE2E6" />
                 </div>
 
                 <h5 className="fw-bold mb-1" style={{ color: "#04263D" }}>

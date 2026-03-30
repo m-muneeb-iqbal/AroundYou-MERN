@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ListGroup, Spinner } from "react-bootstrap";
 import { Check, X } from "lucide-react";
 
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 import ActionButton from "../common/ActionButton";
 
 const FriendRequestItem = ({ request, onAccept, onReject }) => {
@@ -26,7 +26,7 @@ const FriendRequestItem = ({ request, onAccept, onReject }) => {
 
         <ListGroup.Item className="d-flex align-items-center gap-2 px-0 py-2" style={{ borderColor: "#f0f0f0" }} >
 
-            <InitialsAvatar name={request.requester.fullName} profilePic={request.requester.profilePic}/>
+            <PlaceholderAvatar name={request.requester.fullName} profilePic={request.requester.profilePic} size={36} />
 
             <div className="flex-grow-1 overflow-hidden">
 

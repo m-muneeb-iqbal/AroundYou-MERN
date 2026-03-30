@@ -60,12 +60,12 @@ const SkillsForm = ({ onDirtyChange }) => {
     const handleAddSkill = (e) => {
 
         if (!selectedSkill) {
-            showToast("Please select a skill before adding.", "danger");
+            showToast("Please select a skill before adding.", "danger", "Validation Error");
             return;
         }
 
         if (skills.includes(selectedSkill)) {
-            showToast("Skill already added", "danger");
+            showToast("Skill already added", "danger", "Validation Error");
             return;
         }
 
@@ -91,9 +91,10 @@ const SkillsForm = ({ onDirtyChange }) => {
         try {
             await updateSkills({ skills });
             originalSkillsRef.current = skills;
-            showToast("Profile updated successfully!", "success");
+            showToast("Profile updated successfully!", "success", "Update Success");
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
+            showToast("Profile update failed", "danger", "Update Failed");
         }
     };
 

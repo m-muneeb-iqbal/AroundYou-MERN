@@ -8,7 +8,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
 import { useToast } from "../../context/ToastContext";
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 import ActionButton from "../common/ActionButton";
 
 const FriendListPopup = ({ onClose, onOpenMessages }) => {
@@ -104,7 +104,7 @@ const FriendListPopup = ({ onClose, onOpenMessages }) => {
 
                             <ListGroup.Item key={friend.username} className="d-flex align-items-center gap-2 px-3 py-2" style={{ borderColor: "#F0F0F0" }} >
 
-                                <InitialsAvatar name={friend.fullName} profilePic={friend.profilePic} />
+                                <PlaceholderAvatar name={friend.fullName} profilePic={friend.profilePic} size={36} />
 
                                 <div className="flex-grow-1 overflow-hidden">
 

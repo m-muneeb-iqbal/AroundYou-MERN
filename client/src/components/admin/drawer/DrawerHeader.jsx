@@ -1,6 +1,6 @@
 import { Badge } from "react-bootstrap";
 
-import InitialsAvatar from "../../common/InitialsAvatar";
+import PlaceholderAvatar from "../../common/PlaceholderAvatar";
 
 export const roleBadgeStyle = (role) => {
 
@@ -14,7 +14,7 @@ const DrawerHeader = ({ user }) => (
 
     <div className="d-flex align-items-center gap-3 w-100">
 
-        <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={42} />
+        <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={42} />
         <div className="flex-grow-1 overflow-hidden">
 
             <div className="fw-bold text-truncate" style={{ color: "#04263D" }}>

@@ -84,7 +84,7 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
             await updatePersonalInformation(formData);
 
             console.log("Personal info updated.");
-            showToast("Profile updated successfully!", "success");
+            showToast("Profile updated successfully!", "success", "Update Success");
             
             setOriginalData({
                 ...formData,
@@ -93,7 +93,7 @@ const PersonalInformationForm = ({ onDirtyChange }) => {
 
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            showToast("Profile update failed", "danger");
+            showToast("Profile update failed", "danger", "Update Failed");
         }
     };
 

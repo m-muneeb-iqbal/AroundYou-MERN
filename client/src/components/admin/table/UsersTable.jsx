@@ -1,9 +1,40 @@
 import { Table, InputGroup, Form, Row, Col, Badge, Pagination } from "react-bootstrap";
 import { Search, Trash2, ArrowUp, ArrowDown, ArrowUpDown, X } from "lucide-react";
 
-import InitialsAvatar from "../../common/InitialsAvatar";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
+import PlaceholderAvatar from "../../common/PlaceholderAvatar";
 import { roleBadgeStyle } from "../drawer/DrawerHeader";
-import SkeletonLoader from "../../common/SkeletonLoader";
+
+const TABLE_WIDTHS = [
+    ["62%", "42%", "55%", "52%", "44%"],
+    ["50%", "35%", "40%", "58%", "40%"],
+    ["68%", "50%", "45%", "46%", "48%"],
+    ["55%", "38%", "50%", "62%", "36%"],
+    ["60%", "45%", "48%", "50%", "42%"],
+];
+
+const TableRowSkeleton = ({ index = 0 }) => {
+    const [w1, w2, w3, w4, w5] = TABLE_WIDTHS[index % TABLE_WIDTHS.length];
+    return (
+        <tr>
+            <td style={{ verticalAlign: "middle", padding: "10px 8px" }}>
+                <div className="d-flex align-items-center gap-2">
+                    <Skeleton circle width={32} height={32} />
+                    <div className="flex-grow-1">
+                        <Skeleton width={w1} height={11} />
+                        <Skeleton width={w2} height={9} />
+                    </div>
+                </div>
+            </td>
+            <td style={{ verticalAlign: "middle" }}><Skeleton width={w3} height={11} /></td>
+            <td style={{ verticalAlign: "middle" }}><Skeleton width={28} height={11} /></td>
+            <td style={{ verticalAlign: "middle" }}><Skeleton width={w4} height={20} borderRadius={50} /></td>
+            <td style={{ verticalAlign: "middle" }}><Skeleton width={w5} height={11} /></td>
+        </tr>
+    );
+};
 
 // ── Highlight matching text in a string
 const Highlighted = ({ text = "", query = "" }) => {
@@ -182,7 +213,7 @@ const UsersTable = ({
 
                     {loading ? (
 
-                        <SkeletonLoader variant="table-row" rows={currentLimit || 10} />
+                        <>{Array.from({ length: currentLimit || 10 }).map((_, i) => <TableRowSkeleton key={i} index={i} />)}</>
 
                     ) : users.length === 0 ? (
 
@@ -202,7 +233,7 @@ const UsersTable = ({
 
                                     <div className="d-flex align-items-center gap-2">
 
-                                        <InitialsAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
+                                        <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={32} />
                                         <div>
 
                                             <div className="fw-bold" style={{ color: "#04263D" }}>

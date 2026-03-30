@@ -1,7 +1,7 @@
 import { Table } from "react-bootstrap";
 import { Trash2 } from "lucide-react";
 
-import InitialsAvatar from "../../common/InitialsAvatar";
+import PlaceholderAvatar from "../../common/PlaceholderAvatar";
 
 const FriendRequestsTable = ({ friendRequests, onDelete }) => (
 
@@ -36,14 +36,14 @@ const FriendRequestsTable = ({ friendRequests, onDelete }) => (
 
                         <td>
                             <div className="d-flex align-items-center gap-2">
-                                <InitialsAvatar name={req.requester.fullName} profilePic={req.requester.profilePic} size={28} />
+                                <PlaceholderAvatar name={req.requester.fullName} profilePic={req.requester.profilePic} size={28} />
                                 <span>{req.requester.fullName}</span>
                             </div>
                         </td>
 
                         <td>
                             <div className="d-flex align-items-center gap-2">
-                                <InitialsAvatar name={req.recipient.fullName} profilePic={req.recipient.profilePic} size={28} />
+                                <PlaceholderAvatar name={req.recipient.fullName} profilePic={req.recipient.profilePic} size={28} />
                                 <span>{req.recipient.fullName}</span>
                             </div>
                         </td>

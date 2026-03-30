@@ -6,7 +6,7 @@ import { useMessageStore } from "../../store/useMessageStore";
 import { useToast } from "../../context/ToastContext";
 import { socket } from "../../lib/socket";
 
-import InitialsAvatar from "./InitialsAvatar";
+import PlaceholderAvatar from "./PlaceholderAvatar";
 import UserProfileModal from "../search/UserProfileModal";
 
 const notificationMeta = {
@@ -221,7 +221,7 @@ const NotificationBell = () => {
                                             setShowDropdown(false);
                                         }}
                                     >
-                                        <InitialsAvatar name={req.requester.fullName} profilePic={req.requester.profilePic} size={38} />
+                                        <PlaceholderAvatar name={req.requester.fullName} profilePic={req.requester.profilePic} size={38} />
 
                                         <div className="flex-grow-1 overflow-hidden">
 
@@ -275,7 +275,7 @@ const NotificationBell = () => {
                                                 {/* Avatar with icon badge for type */}
                                                 <div className="position-relative flex-shrink-0">
                                                     {n.user ? (
-                                                        <InitialsAvatar name={n.user.fullName} profilePic={n.user.profilePic} size={38} />
+                                                        <PlaceholderAvatar name={n.user.fullName} profilePic={n.user.profilePic} size={38} />
                                                     ) : (
                                                         <div className="d-flex align-items-center justify-content-center rounded-circle" style={{ width: 38, height: 38, backgroundColor: `${meta?.color}18` }}>
                                                             {Icon && <Icon size={16} color={meta.color} />}

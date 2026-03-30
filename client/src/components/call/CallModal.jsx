@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { PhoneOff, Mic, MicOff } from "lucide-react";
 import { useCallStore } from "../../store/useCallStore";
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 
 const CallModal = () => {
 
@@ -36,7 +36,7 @@ const CallModal = () => {
             }}
         >
 
-            <InitialsAvatar
+            <PlaceholderAvatar
                 name={activeCall.name}
                 profilePic={activeCall.profilePic}
                 size={64}

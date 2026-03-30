@@ -150,7 +150,7 @@ const EducationForm = ({ onDirtyChange }) => {
             await updateEducation(formData);
 
             console.log("Education updated.");
-            showToast("Profile updated successfully!", "success");
+            showToast("Profile updated successfully!", "success", "Update Success");
 
             setOriginalData({
                 ...formData,
@@ -160,7 +160,7 @@ const EducationForm = ({ onDirtyChange }) => {
 
         } catch (err) {
             console.error("Update failed:", err.response?.data || err.message);
-            showToast("Profile update failed", "danger");
+            showToast("Profile update failed", "danger", "Update Failed");
         }
     };
 
@@ -179,10 +179,10 @@ const EducationForm = ({ onDirtyChange }) => {
                 institute: ""
             });
 
-            showToast("Education deleted successfully!", "success");
+            showToast("Education deleted successfully!", "success", "Delete Success");
         } catch (err) {
             console.error("Delete failed:", err.response?.data || err.message);
-            showToast("Failed to delete education", "danger");
+            showToast("Failed to delete education", "danger", "Delete Failed");
         }
     };
 
@@ -190,7 +190,7 @@ const EducationForm = ({ onDirtyChange }) => {
         try {
             await deleteCertification();
 
-            console.log("Education deleted.");
+            console.log("Certification deleted.");
 
             // Reset form after deletion
             setFormData({
@@ -198,10 +198,10 @@ const EducationForm = ({ onDirtyChange }) => {
                 provider: ""
             });
 
-            showToast("Certification deleted successfully!", "success");
+            showToast("Certification deleted successfully!", "success", "Delete Success");
         } catch (err) {
             console.error("Delete failed:", err.response?.data || err.message);
-            showToast("Failed to delete education", "danger");
+            showToast("Failed to delete certification", "danger", "Delete Failed");
         }
     };
 

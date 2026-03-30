@@ -2,7 +2,6 @@ import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import { ArrowLeftCircle} from "lucide-react";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { useGoogleLogin } from '@react-oauth/google';
 
 import { useAuthStore } from "../../../store/useAuthStore";
 
@@ -184,13 +183,13 @@ const Section1 = () => {
             const isUnverified = err.response?.data?.unverified;
 
             if (isUnverified) {
-                setSignupDone(true); // ✅ treat as success, new email was sent
+                setSignupDone(true); // treat as success, new email was sent
             } else if (message?.includes("Email already exists")) {
-                showToast("An account with this email already exists.", "danger");
+                showToast("An account with this email already exists.", "danger", "Email Already Registered");
             } else if (message?.includes("Username already taken")) {
-                showToast("This username is already taken.", "danger");
+                showToast("This username is already taken.", "danger", "Username Already Taken");
             } else {
-                showToast(message || "Registration failed. Please try again.", "danger");
+                showToast(message || "Registration failed. Please try again.", "danger", "Registration Failed");
             }
         }
 

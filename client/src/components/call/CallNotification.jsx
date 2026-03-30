@@ -1,6 +1,6 @@
 import { Phone, PhoneOff } from "lucide-react";
 import { useCallStore } from "../../store/useCallStore";
-import InitialsAvatar from "../common/InitialsAvatar";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 
 const CallNotification = () => {
 
@@ -19,7 +19,7 @@ const CallNotification = () => {
                 border: "1px solid #E0E0E0",
             }}
         >
-            <InitialsAvatar
+            <PlaceholderAvatar
                 name={incomingCall.callerInfo.name}
                 profilePic={incomingCall.callerInfo.profilePic}
                 size={44}

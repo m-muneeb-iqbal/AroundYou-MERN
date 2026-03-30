@@ -35,28 +35,28 @@ const ChangePasswordForm = ({ onDirtyChange }) => {
 
         if (!formData.currentPassword.trim()) {
             newErrors.currentPassword = 'Current password is required';
-            showToast(newErrors.currentPassword, "danger");
+            showToast(newErrors.currentPassword, "danger", "Validation Error");
         }
 
         if (!formData.newPassword.trim()) {
             newErrors.newPassword = 'New password is required';
-            showToast(newErrors.newPassword, "danger");
+            showToast(newErrors.newPassword, "danger", "Validation Error");
         } else if (formData.newPassword.length < 8) {
             newErrors.newPassword = 'Password must be at least 8 characters';
-            showToast(newErrors.newPassword, "danger");
+            showToast(newErrors.newPassword, "danger", "Validation Error");
         }
 
         if (!formData.confirmPassword.trim()) {
             newErrors.confirmPassword = 'Please confirm your password';
-            showToast(newErrors.confirmPassword, "danger");
+            showToast(newErrors.confirmPassword, "danger", "Validation Error");
         } else if (formData.newPassword !== formData.confirmPassword) {
             newErrors.confirmPassword = 'Passwords do not match';
-            showToast(newErrors.confirmPassword, "danger");
+            showToast(newErrors.confirmPassword, "danger", "Validation Error");
         }
 
-        if (formData.currentPassword === formData.newPassword) {
+        if (formData.currentPassword === 'formData.newPassword') {
             newErrors.newPassword = 'New password must be different from current password';
-            showToast(newErrors.newPassword, "danger");
+            showToast(newErrors.newPassword, "danger", "Validation Error");
         }
 
         return newErrors;
@@ -105,7 +105,7 @@ const ChangePasswordForm = ({ onDirtyChange }) => {
                 newPassword: formData.newPassword,
             });
 
-            showToast('Password changed successfully!', 'success');
+            showToast('Password changed successfully!', 'success', 'Change Password Success');
             setFormData({
                 currentPassword: '',
                 newPassword: '',
@@ -115,7 +115,7 @@ const ChangePasswordForm = ({ onDirtyChange }) => {
         } catch (error) {
             const errorMessage =
                 error.response?.data?.message || 'Failed to change password';
-            showToast(errorMessage, 'danger');
+            showToast(errorMessage, 'danger', 'Change Password Failed');
         }
 
     };
