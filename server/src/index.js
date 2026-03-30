@@ -6,7 +6,7 @@ import passport from "passport";
 
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import messageRoutes from "./routes/message.routes.js";
+import conversationRoutes from "./routes/conversation.routes.js";
 import friendRoutes from "./routes/friend.routes.js";
 import userRoutes from "./routes/user.routes.js";
 
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use(
     cors({
-        origin: "https://aroundyou-one.vercel.app",
+        origin: true,
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
@@ -38,7 +38,7 @@ app.use(
 app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/message", messageRoutes);
+app.use("/api/conversations", conversationRoutes);
 app.use("/api/friend", friendRoutes);
 app.use("/api/user", userRoutes);
 
