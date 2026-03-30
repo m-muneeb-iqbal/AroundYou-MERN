@@ -18,7 +18,7 @@ const variantIcons = {
     info:    Info,
 };
 
-const DURATION = 4000;
+const DURATION = 3000;
 
 const ToastItem = ({ toast, onDismiss }) => {
     const [hiding, setHiding] = useState(false);

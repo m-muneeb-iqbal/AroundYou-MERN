@@ -1,9 +1,14 @@
 import Notification from "../models/notification.model.js";
+import { getIO } from "../socket.js";
 
 // GET /api/notifications
+// request_received types are handled by the pending-requests UI — exclude them here
 export const getNotifications = async (req, res) => {
     try {
-        const notifications = await Notification.find({ recipient: req.user._id })
+        const notifications = await Notification.find({
+            recipient: req.user._id,
+            type: { $ne: "request_received" },
+        })
             .sort({ createdAt: -1 })
             .limit(50)
             .populate("actor", "fullName profilePic username headline");
@@ -25,6 +30,11 @@ export const markNotificationRead = async (req, res) => {
         );
 
         if (!notification) return res.status(404).json({ message: "Notification not found" });
+
+        // Broadcast to all other tabs of this user so read-state stays in sync
+        getIO()
+            .to(`user:${req.user._id}`)
+            .emit("notificationRead", { id: req.params.id });
 
         res.status(200).json(notification);
     } catch (error) {

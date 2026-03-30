@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, UserRoundPlus, UserRoundCheck, UserRoundX } from "lucide-react";
+import { Bell, UserRoundPlus, UserRoundCheck } from "lucide-react";
 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
@@ -11,11 +11,9 @@ import UserProfileModal from "../search/UserProfileModal";
 
 const notificationMeta = {
 
-    request_received: { icon: UserRoundPlus,  color: "#04263D", label: "Friend Request"     },
-    request_accepted: { icon: UserRoundCheck, color: "#198754", label: "Request Accepted"   },
-    already_sent:     { icon: UserRoundCheck, color: "#f0ad4e", label: "Already Sent"       },
-    request_rejected: { icon: UserRoundX,     color: "#dc3545", label: "Request Declined"   },
-    unfriended:       { icon: UserRoundX,     color: "#6c757d", label: "Removed Friend"     },
+    request_received: { icon: UserRoundPlus,  color: "#04263D", label: "Friend Request"   },
+    request_accepted: { icon: UserRoundCheck, color: "#198754", label: "Request Accepted" },
+    already_sent:     { icon: UserRoundCheck, color: "#f0ad4e", label: "Already Sent"     },
 
 };
 
@@ -73,6 +71,7 @@ const NotificationBell = () => {
             handleFriendRequestCancelled,
             handleFriendRequestRejected,
             handleUnfriended,
+            handleNotificationRead,
         } = initializeFriendSocket();
 
         const onAccepted = (data) => handleFriendRequestAccepted(data, fetchUsers);
@@ -82,6 +81,7 @@ const NotificationBell = () => {
         socket.on("friendRequestCancelled", handleFriendRequestCancelled);
         socket.on("friendRequestRejected", handleFriendRequestRejected);
         socket.on("unfriended", handleUnfriended);
+        socket.on("notificationRead", handleNotificationRead);
 
         return () => {
             socket.off("friendRequestReceived", handleFriendRequestReceived);
@@ -89,6 +89,7 @@ const NotificationBell = () => {
             socket.off("friendRequestCancelled", handleFriendRequestCancelled);
             socket.off("friendRequestRejected", handleFriendRequestRejected);
             socket.off("unfriended", handleUnfriended);
+            socket.off("notificationRead", handleNotificationRead);
         };
 
     }, []);
@@ -103,8 +104,6 @@ const NotificationBell = () => {
                 const toastConfig = {
                     request_received: { variant: "info",    title: "Friend Request"   },
                     request_accepted: { variant: "success", title: "Request Accepted" },
-                    request_rejected: { variant: "warning", title: "Request Declined" },
-                    unfriended:       { variant: "warning", title: "Removed Friend"   },
                     already_sent:     { variant: "warning", title: "Already Sent"     },
                 };
                 const cfg = toastConfig[latest.type];

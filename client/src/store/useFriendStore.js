@@ -3,9 +3,8 @@ import { axiosInstance } from "../lib/axios";
 
 const buildMessage = (type, fullName) => {
     switch (type) {
+        case "request_received": return `${fullName} sent you a friend request.`;
         case "request_accepted": return `${fullName} accepted your friend request.`;
-        case "request_rejected": return `${fullName} declined your friend request.`;
-        case "unfriended":       return `${fullName} removed you as a friend.`;
         default:                 return "";
     }
 };
@@ -33,7 +32,15 @@ export const useFriendStore = create((set, get) => ({
 
     fetchPendingRequests: async () => {
         const res = await axiosInstance.get("/friend/pending", { withCredentials: true });
-        set({ pendingRequests: res.data });
+        const pending = res.data;
+        const activeUsernames = new Set(pending.map((r) => r.requester.username));
+        set((state) => {
+            const pruned = state.readPendingRequests.filter((u) => activeUsernames.has(u));
+            if (pruned.length !== state.readPendingRequests.length) {
+                localStorage.setItem("readPendingRequests", JSON.stringify(pruned));
+            }
+            return { pendingRequests: pending, readPendingRequests: pruned };
+        });
     },
 
     fetchFriends: async () => {
@@ -182,26 +189,25 @@ export const useFriendStore = create((set, get) => ({
 
     initializeFriendSocket: () => {
 
-        const handleFriendRequestReceived = (request) => {
+        const handleFriendRequestReceived = ({ requester, notificationId }) => {
 
-                set((state) => ({
+            set((state) => ({
+                pendingRequests: state.pendingRequests.some((r) => r.requester.username === requester.username)
+                    ? state.pendingRequests
+                    : [...state.pendingRequests, { requester, createdAt: new Date().toISOString() }],
+                nonFriends: state.nonFriends.filter(
+                    (u) => u.username !== requester.username
+                ),
+            }));
 
-                    pendingRequests: state.pendingRequests.some((r) => r.requester.username === request.requester.username)
-                        ? state.pendingRequests
-                        : [...state.pendingRequests, request],
-                    nonFriends: state.nonFriends.filter(
-                        (u) => u.username !== request.requester.username
-                    ),
+            get().addNotification({
+                id: notificationId,
+                type: "request_received",
+                user: requester,
+                message: `${requester.fullName} sent you a friend request.`,
+            });
 
-                }));
-
-                get().addNotification({
-                    type: "request_received",
-                    user: request.requester,
-                    message: `${request.requester.fullName} sent you a friend request.`,
-                });
-
-            };
+        };
 
         // Only requester (User A) receives this socket event
         const handleFriendRequestAccepted = ({ friend, notificationId }, fetchUsers) => {
@@ -238,29 +244,26 @@ export const useFriendStore = create((set, get) => ({
         };
 
         // Only requester receives this — their request was rejected
-        const handleFriendRequestRejected = ({ recipient, notificationId }) => {
+        const handleFriendRequestRejected = ({ recipient }) => {
             set((state) => ({
                 sentRequests: state.sentRequests.filter((u) => u !== recipient.username),
             }));
-            get().addNotification({
-                id: notificationId,
-                type: "request_rejected",
-                user: recipient,
-                message: `${recipient.fullName} declined your friend request.`,
-            });
         };
 
         // Receives this when someone unfriends you
-        const handleUnfriended = ({ unfriender, notificationId }) => {
+        const handleUnfriended = ({ unfriender }) => {
             set((state) => ({
                 friends: state.friends.filter((f) => f.username !== unfriender.username),
             }));
-            get().addNotification({
-                id: notificationId,
-                type: "unfriended",
-                user: unfriender,
-                message: `${unfriender.fullName} removed you as a friend.`,
-            });
+        };
+
+        // Marks a notification read in all other open tabs of the same user
+        const handleNotificationRead = ({ id }) => {
+            set((state) => ({
+                notifications: state.notifications.map((n) =>
+                    String(n.id) === String(id) ? { ...n, read: true } : n
+                ),
+            }));
         };
 
         return {
@@ -269,6 +272,7 @@ export const useFriendStore = create((set, get) => ({
             handleFriendRequestCancelled,
             handleFriendRequestRejected,
             handleUnfriended,
+            handleNotificationRead,
         };
     },
 

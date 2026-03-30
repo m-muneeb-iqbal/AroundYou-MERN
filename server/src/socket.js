@@ -49,6 +49,9 @@ export const initSocket = (server) => {
         const userId = socket.data.userId;
         onlineUsers.set(userId, socket.id);
 
+        // Join a user-specific room so we can broadcast to all tabs of this user
+        socket.join(`user:${userId}`);
+
         // Deliver any messages that arrived while this user was offline
         (async () => {
             try {

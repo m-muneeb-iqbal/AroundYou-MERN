@@ -42,11 +42,21 @@ export const sendFriendRequest = async (req, res) => {
         // Populate requester
         const populated = await friendRequest.populate("requester", "fullName profilePic headline username");
 
+        // Persist notification so offline recipients see it on next load
+        const notification = await Notification.create({
+            recipient: recipientId,
+            type: "request_received",
+            actor: requester,
+        });
+
         // Notify recipient live if online
         const io = getIO();
         const recipientSocketId = onlineUsers.get(recipientId.toString());
         if (recipientSocketId) {
-            io.to(recipientSocketId).emit("friendRequestReceived", populated);
+            io.to(recipientSocketId).emit("friendRequestReceived", {
+                ...populated.toObject(),
+                notificationId: notification._id,
+            });
         }
 
         res.status(201).json({
@@ -82,6 +92,13 @@ export const cancelFriendRequest = async (req, res) => {
         if (!request) return res.status(404).json({ message: "Request not found." });
 
         await request.deleteOne();
+
+        // Remove the request_received notification so recipient's history stays clean
+        await Notification.deleteOne({
+            type: "request_received",
+            actor: req.user._id,
+            recipient: targetUser._id,
+        });
 
         // Notify recipient that the request was cancelled
         const io = getIO();
@@ -124,6 +141,13 @@ export const acceptFriendRequest = async (req, res) => {
 
         request.status = "accepted";
         await request.save();
+
+        // Remove the request_received notification — it's been resolved
+        await Notification.deleteOne({
+            type: "request_received",
+            actor: requesterUser._id,
+            recipient: req.user._id,
+        });
 
         // Eagerly create conversation so both users always have a conversationId
         const existingConv = await Conversation.findOne({
@@ -191,15 +215,15 @@ export const rejectFriendRequest = async (req, res) => {
 
         await request.deleteOne();
 
+        // Remove the request_received notification — it's been resolved
+        await Notification.deleteOne({
+            type: "request_received",
+            actor: requesterUser._id,
+            recipient: req.user._id,
+        });
+
         // Notify requester that their request was rejected
         const io = getIO();
-
-        // Persist notification for requester
-        const notification = await Notification.create({
-            recipient: requesterUser._id,
-            type: "request_rejected",
-            actor: req.user._id,
-        });
 
         const requesterSocketId = onlineUsers.get(requesterUser._id.toString());
         if (requesterSocketId) {
@@ -209,7 +233,6 @@ export const rejectFriendRequest = async (req, res) => {
                     fullName: req.user.fullName,
                     profilePic: req.user.profilePic,
                 },
-                notificationId: notification._id,
             });
         }
 
@@ -257,13 +280,6 @@ export const unfriend = async (req, res) => {
         // Notify the unfriended user in real-time
         const io = getIO();
 
-        // Persist notification for the unfriended user
-        const notification = await Notification.create({
-            recipient: targetUser._id,
-            type: "unfriended",
-            actor: userId,
-        });
-
         const targetSocketId = onlineUsers.get(targetUser._id.toString());
         if (targetSocketId) {
             io.to(targetSocketId).emit("unfriended", {
@@ -272,7 +288,6 @@ export const unfriend = async (req, res) => {
                     fullName: req.user.fullName,
                     profilePic: req.user.profilePic,
                 },
-                notificationId: notification._id,
             });
         }
 

@@ -10,7 +10,7 @@ const notificationSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ["request_accepted", "request_rejected", "unfriended"],
+            enum: ["request_received", "request_accepted"],
             required: true,
         },
         actor: {
