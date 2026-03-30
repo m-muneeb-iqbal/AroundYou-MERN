@@ -9,6 +9,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
 import friendRoutes from "./routes/friend.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 import { initSocket } from "./socket.js";
 
@@ -41,6 +42,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/friend", friendRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const server = createServer (app);
 initSocket (server);

@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import Friend from "../models/friend.model.js";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import Notification from "../models/notification.model.js";
 import { getIO, onlineUsers } from "../socket.js";
 
 export const sendFriendRequest = async (req, res) => {
@@ -145,11 +146,19 @@ export const acceptFriendRequest = async (req, res) => {
 
         const io = getIO();
 
+        // Persist notification for requester
+        const notification = await Notification.create({
+            recipient: request.requester,
+            type: "request_accepted",
+            actor: req.user._id,
+        });
+
         // Only notify requester
         const requesterSocketId = onlineUsers.get(request.requester.toString());
         if (requesterSocketId) {
             io.to(requesterSocketId).emit("friendRequestAccepted", {
                 friend: recipient,
+                notificationId: notification._id,
             });
         }
 
@@ -184,6 +193,14 @@ export const rejectFriendRequest = async (req, res) => {
 
         // Notify requester that their request was rejected
         const io = getIO();
+
+        // Persist notification for requester
+        const notification = await Notification.create({
+            recipient: requesterUser._id,
+            type: "request_rejected",
+            actor: req.user._id,
+        });
+
         const requesterSocketId = onlineUsers.get(requesterUser._id.toString());
         if (requesterSocketId) {
             io.to(requesterSocketId).emit("friendRequestRejected", {
@@ -192,6 +209,7 @@ export const rejectFriendRequest = async (req, res) => {
                     fullName: req.user.fullName,
                     profilePic: req.user.profilePic,
                 },
+                notificationId: notification._id,
             });
         }
 
@@ -238,6 +256,14 @@ export const unfriend = async (req, res) => {
 
         // Notify the unfriended user in real-time
         const io = getIO();
+
+        // Persist notification for the unfriended user
+        const notification = await Notification.create({
+            recipient: targetUser._id,
+            type: "unfriended",
+            actor: userId,
+        });
+
         const targetSocketId = onlineUsers.get(targetUser._id.toString());
         if (targetSocketId) {
             io.to(targetSocketId).emit("unfriended", {
@@ -246,6 +272,7 @@ export const unfriend = async (req, res) => {
                     fullName: req.user.fullName,
                     profilePic: req.user.profilePic,
                 },
+                notificationId: notification._id,
             });
         }
 

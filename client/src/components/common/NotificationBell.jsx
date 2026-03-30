@@ -34,7 +34,10 @@ const NotificationBell = () => {
     const {
         pendingRequests,
         notifications,
-        markNotificationsRead,
+        readPendingRequests,
+        markNotificationRead,
+        markPendingRequestRead,
+        pruneOldNotifications,
         initializeFriendSocket,
     } = useFriendStore();
 
@@ -58,6 +61,7 @@ const NotificationBell = () => {
 
     useEffect(() => {
         useFriendStore.getState().fetchPendingRequests();
+        useFriendStore.getState().fetchNotifications();
     }, []);
 
     const { fetchUsers } = useMessageStore();
@@ -114,13 +118,29 @@ const NotificationBell = () => {
 
     const handleOpen = () => {
         setShowDropdown((prev) => !prev);
-        if (!showDropdown) markNotificationsRead();
+        if (!showDropdown) {
+            pruneOldNotifications();
+        }
     };
 
     const [modalUser, setModalUser] = useState(null);
 
-    const unreadCount = notifications.filter((n) => !n.read).length;
-    const badgeCount = unreadCount + pendingRequests.length;
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    const isPendingRequestUnread = (req) => !readPendingRequests.includes(req.requester.username);
+
+    const visibleNotifications = notifications
+        .filter((n) => now - new Date(n.timestamp).getTime() < SEVEN_DAYS_MS)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    // Pending requests are always shown regardless of age; sort latest first
+    const visiblePendingRequests = [...pendingRequests]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const unreadCount = visibleNotifications.filter((n) => !n.read && n.type !== "request_received").length;
+    const unreadPendingCount = visiblePendingRequests.filter(isPendingRequestUnread).length;
+    const badgeCount = unreadCount + unreadPendingCount;
 
     return (
 
@@ -172,7 +192,7 @@ const NotificationBell = () => {
                             Notifications
                         </div>
 
-                        {notifications.length === 0 && pendingRequests.length === 0 ? (
+                        {visibleNotifications.length === 0 && visiblePendingRequests.length === 0 ? (
 
                             <div className="text-muted text-center py-4" style={{ fontSize: "0.82rem" }}>
                                 No notifications yet
@@ -182,7 +202,7 @@ const NotificationBell = () => {
 
                             <>
                                 {/* Pending requests as clickable notifications */}
-                                {pendingRequests.map((req) => (
+                                {visiblePendingRequests.map((req) => (
 
                                     <div
                                         key={req.requester.username}
@@ -190,10 +210,11 @@ const NotificationBell = () => {
                                         className="d-flex align-items-center gap-2 px-3 py-2"
                                         style={{
                                             borderBottom: "1px solid #F5F5F5",
-                                            backgroundColor: "#F0F8FF",
+                                            backgroundColor: isPendingRequestUnread(req) ? "#F0F8FF" : "white",
                                             cursor: "pointer",
                                         }}
                                         onClick={() => {
+                                            markPendingRequestRead(req.requester.username);
                                             setModalUser({
                                                 ...req.requester,
                                                 relationshipStatus: "pending_received",
@@ -218,13 +239,15 @@ const NotificationBell = () => {
                                             </div>
 
                                         </div>
-                                        {/* Unread dot */}
-                                        <div className="rounded-circle flex-shrink-0" style={{ width: 7, height: 7, backgroundColor: "#5BC8F5" }} />
+                                        {/* Unread dot — hidden once clicked or bell was opened after this request arrived */}
+                                        {isPendingRequestUnread(req) && (
+                                            <div className="rounded-circle flex-shrink-0" style={{ width: 7, height: 7, backgroundColor: "#5BC8F5" }} />
+                                        )}
                                     </div>
                                 ))}
 
                                 {/* Notification history */}
-                                {notifications
+                                {visibleNotifications
                                     .filter((n) => n.type !== "request_received")
                                     .map((n) => {
 
@@ -235,10 +258,19 @@ const NotificationBell = () => {
 
                                             <div
                                                 key={n.id}
+                                                role="button"
                                                 className="d-flex align-items-center gap-2 px-3 py-2"
                                                 style={{
                                                     borderBottom: "1px solid #f5f5f5",
                                                     backgroundColor: n.read ? "white" : "#f8fbff",
+                                                    cursor: "pointer",
+                                                }}
+                                                onClick={() => {
+                                                    markNotificationRead(n.id);
+                                                    if (n.user) {
+                                                        setModalUser({ ...n.user, relationshipStatus: n.type === "request_accepted" ? "friends" : "none" });
+                                                        setShowDropdown(false);
+                                                    }
                                                 }}
                                             >
                                                 {/* Avatar with icon badge for type */}
