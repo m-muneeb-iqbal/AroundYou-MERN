@@ -82,7 +82,7 @@
     left: 0;
     height: 3px;
     border-radius: 0 0 10px 10px;
-    animation: progress 4s linear both;
+    animation: progress 2s linear both;
     transform-origin: left;
 }
 
