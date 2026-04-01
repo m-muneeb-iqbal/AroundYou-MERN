@@ -47,7 +47,7 @@ export const getConversations = async (req, res) => {
                     friendshipId: friendship?._id || null,
                     conversationId: conversation?._id || null,
                     lastMessage: lm
-                        ? { text: lm.text, image: lm.image, status: lm.status, createdAt: lm.createdAt }
+                        ? { _id: lm._id, text: lm.text, image: lm.image, status: lm.status ?? "sent", createdAt: lm.createdAt, isMine: lm.senderId.toString() === userId.toString() }
                         : null,
                     unreadCount: conversation ? getUnreadCount(conversation, userId) : 0,
                     lastActivity: conversation?.updatedAt || null,
