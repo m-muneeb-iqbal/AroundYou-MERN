@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { socket } from "../lib/socket";
 import { axiosInstance } from "../lib/axios";
+import { useAuthStore } from "./useAuthStore";
 
 export const useMessageStore = create((set, get) => ({
 
@@ -11,8 +12,6 @@ export const useMessageStore = create((set, get) => ({
     messageInput: "",
     isLoadingUsers: false,
     isLoadingMessages: false,
-
-    setAuthUser: (_user) => {},
 
     // Fetch users
     fetchUsers: async () => {
@@ -77,7 +76,7 @@ export const useMessageStore = create((set, get) => ({
 
                         ...u,
                         conversationId: msg.conversationId,
-                        lastMessage: msg,
+                        lastMessage: msg,  // msg should already have isMine property from socket
                         lastActivity: msg.createdAt || new Date().toISOString(),
                         unreadCount: isCurrentConversation
                             ? 0
@@ -120,18 +119,22 @@ export const useMessageStore = create((set, get) => ({
 
         };
 
-        const handleMessagesSeen = ({ conversationId }) => {
+        const handleMessagesSeen = ({ conversationId, seenBy }) => {
+
+            const myId = useAuthStore.getState().authUser?._id?.toString();
+            // Only update when someone ELSE read the conversation (not ourselves)
+            if (!seenBy || seenBy === myId) return;
 
             set((state) => ({
 
                 messages: state.messages.map((m) =>
-                    m.conversationId?.toString() === conversationId?.toString()
+                    m.conversationId?.toString() === conversationId?.toString() && m.isMine
                         ? { ...m, status: "seen" }
                         : m
                 ),
 
                 users: state.users.map((u) =>
-                    u.conversationId?.toString() === conversationId?.toString() && u.lastMessage
+                    u.conversationId?.toString() === conversationId?.toString() && u.lastMessage?.isMine
                         ? { ...u, lastMessage: { ...u.lastMessage, status: "seen" } }
                         : u
                 ),
@@ -259,24 +262,33 @@ export const useMessageStore = create((set, get) => ({
     // Send message
     sendMessage: (payload) => {
         const tempId = `temp_${Date.now()}`;
+        const newMessage = {
+            _id: tempId,
+            tempId,
+            isMine: true,
+            conversationId: payload.conversationId,
+            text: payload.text,
+            status: "sending",
+            createdAt: new Date().toISOString(),
+        };
 
         set((state) => ({
 
             messages: [
-
                 ...state.messages,
-
-                {
-                    _id: tempId,
-                    tempId,
-                    isMine: true,
-                    conversationId: state.openConversationId,
-                    text: payload.text,
-                    status: "sending",
-                    createdAt: new Date().toISOString(),
-                },
-
+                newMessage,
             ],
+
+            // Optimistic update: update lastMessage in users array immediately
+            users: state.users.map((u) =>
+                u.conversationId === payload.conversationId
+                    ? {
+                        ...u,
+                        lastMessage: newMessage,
+                        lastActivity: newMessage.createdAt,
+                    }
+                    : u
+            ),
             
         }));
 

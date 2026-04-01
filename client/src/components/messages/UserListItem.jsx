@@ -39,7 +39,7 @@ const UserListItem = ({ user, onSelect }) => {
                         </span>
 
                         <div className="d-flex align-items-center gap-2" style={{ flexShrink: 0 }}>
-                            {user.lastMessage?.status && (
+                            {user.lastMessage?.isMine && user.lastMessage?.status && (
                                 <MessageStatus status={user.lastMessage.status} />
                             )}
                             {hasUnread && (
