@@ -56,8 +56,8 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
                 <Spinner animation="border" size="sm" style={{ width: 14, height: 14, borderWidth: 2, color: "#FFFFFF" }} />
             </ActionButton>
         ) : (
-            <ActionButton color="#04263D" hoverColor="#063D5C" onClick={onAdd} title="Add friend" size={32}>
-                <UserRoundPlus size={16} color="#FFFFFF" />
+            <ActionButton color="#FFFFFF" hoverColor="#E6E6E6" onClick={onAdd} title="Add friend" size={32}>
+                <UserRoundPlus size={16} color="#04263D" />
             </ActionButton>
         )}
 

@@ -1,11 +1,17 @@
-import { Table, InputGroup, Form, Row, Col, Badge, Pagination } from "react-bootstrap";
-import { Search, Trash2, ArrowUp, ArrowDown, ArrowUpDown, X } from "lucide-react";
+import { Table, InputGroup, Form, Row, Col, Badge, Button } from "react-bootstrap";
+import { Search, ArrowUp, ArrowDown, ArrowUpDown, X } from "lucide-react";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import PlaceholderAvatar from "../../common/PlaceholderAvatar";
 import { roleBadgeStyle } from "../drawer/DrawerHeader";
+
+const paginationButtonStyles = `
+  .pagination-btn:not(:disabled):hover {
+    background-color: #e0e0e0 !important;
+  }
+`;
 
 const TABLE_WIDTHS = [
     ["62%", "42%", "55%", "52%", "44%"],
@@ -16,24 +22,37 @@ const TABLE_WIDTHS = [
 ];
 
 const TableRowSkeleton = ({ index = 0 }) => {
+
     const [w1, w2, w3, w4, w5] = TABLE_WIDTHS[index % TABLE_WIDTHS.length];
+
     return (
+
         <tr>
+
             <td style={{ verticalAlign: "middle", padding: "10px 8px" }}>
+
                 <div className="d-flex align-items-center gap-2">
+
                     <Skeleton circle width={32} height={32} />
+
                     <div className="flex-grow-1">
                         <Skeleton width={w1} height={11} />
                         <Skeleton width={w2} height={9} />
                     </div>
+
                 </div>
+
             </td>
+
             <td style={{ verticalAlign: "middle" }}><Skeleton width={w3} height={11} /></td>
             <td style={{ verticalAlign: "middle" }}><Skeleton width={28} height={11} /></td>
             <td style={{ verticalAlign: "middle" }}><Skeleton width={w4} height={20} borderRadius={50} /></td>
             <td style={{ verticalAlign: "middle" }}><Skeleton width={w5} height={11} /></td>
+
         </tr>
     );
+
+
 };
 
 // ── Highlight matching text in a string
@@ -42,13 +61,16 @@ const Highlighted = ({ text = "", query = "" }) => {
     if (!query.trim()) return <>{text}</>;
     const regex = new RegExp(`(${query.trim()})`, "gi");
     const parts = text.split(regex);
+
     return (
         <>
+
             {parts.map((part, i) =>
                 regex.test(part)
                     ? <mark key={i} style={{ backgroundColor: "#fff3cd", padding: 0 }}>{part}</mark>
                     : part
             )}
+
         </>
     );
 
@@ -118,6 +140,7 @@ const UsersTable = ({
     return (
 
         <>
+            <style>{paginationButtonStyles}</style>
             {/* ── Search + result count */}
             <Row className="g-2 mb-2 align-items-center">
 
@@ -273,47 +296,56 @@ const UsersTable = ({
 
             {/* ── Pagination */}
             {totalPages > 1 && (
+                <div className="d-flex justify-content-center align-items-center mt-3 gap-3 fs-6">
+                    <Button 
+                        variant="outline-dark" 
+                        size="sm"
+                        onClick={() => onPageChange(1)} 
+                        disabled={currentPage === 1}
+                        className="px-2 py-1 pagination-btn"
+                        style={{ color: "#04263D", border: "none", fontWeight: "bold" }}
+                    >
+                        First
+                    </Button>
 
-                <div className="d-flex justify-content-center mt-3">
+                    <Button 
+                        variant="outline-dark" 
+                        size="sm"
+                        onClick={() => onPageChange(currentPage - 1)} 
+                        disabled={currentPage === 1}
+                        className="px-2 py-1 pagination-btn"
+                        style={{ color: "#04263D", border: "none", fontWeight: "bold" }}
+                    >
+                        Previous
+                    </Button>
 
-                    <Pagination size="sm">
+                    <span className="fw-bold" style={{ color: "#04263D" }}>
+                        {Math.min((currentPage - 1) * currentLimit + 1, totalUsers)}-{Math.min(currentPage * currentLimit, totalUsers)} 
+                        <span className="ms-1">of {totalUsers}</span>
+                    </span>
 
-                        {/* First */}
-                        <Pagination.First onClick={() => onPageChange(1)} disabled={currentPage === 1} />
-                        {/* Prev */}
-                        <Pagination.Prev onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} />
+                    <Button 
+                        variant="outline-dark" 
+                        size="sm"
+                        onClick={() => onPageChange(currentPage + 1)} 
+                        disabled={currentPage === totalPages}
+                        className="px-2 py-1 pagination-btn"
+                        style={{ color: "#04263D", border: "none", fontWeight: "bold" }}
+                    >
+                        Next
+                    </Button>
 
-                        {/* Page numbers — show window of 5 around current */}
-                        {Array.from({ length: totalPages }, (_, i) => i + 1)
-                            .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
-                            .reduce((acc, p, i, arr) => {
-
-                                if (i > 0 && p - arr[i - 1] > 1) acc.push("...");
-                                acc.push(p);
-                                return acc;
-                            }, [])
-
-                            .map((p, i) =>
-
-                                p === "..." ? (
-                                    <Pagination.Ellipsis key={`ellipsis-${i}`} disabled />
-                                ) : (
-                                    <Pagination.Item key={p} active={p === currentPage} onClick={() => onPageChange(p)}>
-                                        {p}
-                                    </Pagination.Item>
-                                )
-
-                            )}
-
-                        {/* Next */}
-                        <Pagination.Next onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                        {/* Last */}
-                        <Pagination.Last onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages} />
-
-                    </Pagination>
-
+                    <Button 
+                        variant="outline-dark" 
+                        size="sm"
+                        onClick={() => onPageChange(totalPages)} 
+                        disabled={currentPage === totalPages}
+                        className="px-2 py-1 pagination-btn"
+                        style={{ color: "#04263D", border: "none", fontWeight: "bold" }}
+                    >
+                        Last
+                    </Button>
                 </div>
-
             )}
 
         </>

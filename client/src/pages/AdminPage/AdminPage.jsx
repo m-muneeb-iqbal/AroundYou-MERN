@@ -28,8 +28,8 @@ const AdminPage = () => {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("");
     const [location, setLocation] = useState("");
-    const [sortBy, setSortBy] = useState("createdAt");
-    const [sortOrder, setSortOrder] = useState("desc");
+    const [sortBy, setSortBy] = useState("fullName");
+    const [sortOrder, setSortOrder] = useState("asc");
     const [limit, setLimit] = useState(10);
 
     const [activeTab, setActiveTab]         = useState("users");
