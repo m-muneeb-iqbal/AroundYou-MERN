@@ -12,9 +12,9 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
     <ListGroup.Item className="d-flex align-items-center gap-2 px-0 py-2" style={{ borderColor: "#F0F0F0" }}>
 
         {isLoading ? (
-            <Skeleton circle width={36} height={36} className="flex-shrink-0" />
+            <Skeleton circle width={57} height={57} className="flex-shrink-0" />
         ) : (
-            <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={50} />
+            <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={57} />
         )}
 
         <div className="flex-grow-1 overflow-hidden">
