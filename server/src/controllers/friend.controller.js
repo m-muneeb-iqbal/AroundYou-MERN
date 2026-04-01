@@ -40,7 +40,7 @@ export const sendFriendRequest = async (req, res) => {
         const friendRequest = await Friend.create({ requester, recipient: recipientId });
 
         // Populate requester
-        const populated = await friendRequest.populate("requester", "fullName profilePic headline username");
+        const populated = await friendRequest.populate("requester", "fullName profilePic headline jobTitle location username");
 
         // Persist notification so offline recipients see it on next load
         const notification = await Notification.create({
@@ -354,7 +354,7 @@ export const getPendingRequests = async (req, res) => {
         const requests = await Friend.find({
             recipient: userId,
             status: "pending",
-        }).populate("requester", "fullName profilePic jobTitle username");
+        }).populate("requester", "fullName profilePic jobTitle location username");
 
         res.status(200).json(requests);
 

@@ -14,7 +14,7 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
         {isLoading ? (
             <Skeleton circle width={36} height={36} className="flex-shrink-0" />
         ) : (
-            <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={36} />
+            <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={50} />
         )}
 
         <div className="flex-grow-1 overflow-hidden">
@@ -34,7 +34,7 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
         </div>
 
         {isLoading ? (
-            <Skeleton circle width={36} height={36} className="flex-shrink-0" />
+            <Skeleton circle width={50} height={50} className="flex-shrink-0" />
         ) : isPending ? (
             <div
                 className="d-flex align-items-center gap-1 flex-shrink-0 rounded px-2 py-1"
@@ -57,7 +57,7 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
             </ActionButton>
         ) : (
             <ActionButton color="#FFFFFF" hoverColor="#E6E6E6" onClick={onAdd} title="Add friend" size={32}>
-                <UserRoundPlus size={16} color="#04263D" />
+                <UserRoundPlus size={21} color="#04263D" />
             </ActionButton>
         )}
 

@@ -5,12 +5,12 @@ import { UserRoundPlus, UserRoundMinus, MessageCircleMore, Check, X, Ban } from 
 import { useFriendStore } from "../../store/useFriendStore";
 import { useMessageStore } from "../../store/useMessageStore";
 import { useToast } from "../../context/ToastContext";
-import PlaceholderAvatar from "../common/PlaceholderAvatar";
+import PlaceholderAvatar from "./PlaceholderAvatar";
 
-const UserProfileModal = ({ user, onClose, onActionDone }) => {
+const UserProfileModal = ({ user, onClose, onActionDone, onOpenMessages }) => {
 
     const { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, cancelFriendRequest, unfriend } = useFriendStore();
-    const { users, selectUser } = useMessageStore();
+    const { users, selectUser, fetchUsers } = useMessageStore();
     const { showToast } = useToast();
     const [loading, setLoading] = useState(null); // "send" | "accept" | "reject" | "cancel" | "unfriend"
 
@@ -56,11 +56,28 @@ const UserProfileModal = ({ user, onClose, onActionDone }) => {
         onActionDone?.({ ...user, relationshipStatus: "none", friendshipId: null });
     });
 
-    const handleMessage = () => {
-        const storeUser = users.find((u) => u.conversationId?.toString() === user.conversationId?.toString());
-        if (storeUser) {
-            selectUser(storeUser);
-            onClose();
+    const handleMessage = async () => {
+        setLoading("message");
+        try {
+            // Refresh conversations to ensure this user is included
+            await fetchUsers();
+            
+            // Find the user in the updated conversations list
+            const storeUser = users.find((u) => u.username === user.username);
+            
+            if (storeUser) {
+                selectUser(storeUser);
+                onClose();
+                // Open messages popup after close
+                if (onOpenMessages) {
+                    onOpenMessages();
+                }
+            }
+        } catch (error) {
+            console.error("Error loading conversation:", error);
+            showToast("Failed to open conversation", "error", "Error");
+        } finally {
+            setLoading(null);
         }
     };
 
@@ -76,17 +93,17 @@ const UserProfileModal = ({ user, onClose, onActionDone }) => {
 
             <Modal.Body className="text-center px-4 pb-4">
 
-                <div className="d-flex justify-content-center mb-3">
-                    <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={80} border="3px solid #DEE2E6" />
+                <div className="d-flex justify-content-center mb-2">
+                    <PlaceholderAvatar name={user.fullName} profilePic={user.profilePic} size={130} border="3px solid #DEE2E6" />
                 </div>
 
-                <h5 className="fw-bold mb-1" style={{ color: "#04263D" }}>
+                <h5 className="fw-bold mb-0" style={{ color: "#04263D" }}>
                     {user.fullName}
                 </h5>
 
                 {user.jobTitle && (
 
-                    <p className="text-muted mb-1" style={{ fontSize: "0.85rem" }}>
+                    <p className="text-muted mb-0" style={{ fontSize: "0.85rem" }}>
                         {user.jobTitle}
                     </p>
 
@@ -124,13 +141,13 @@ const UserProfileModal = ({ user, onClose, onActionDone }) => {
                     {user.relationshipStatus === "pending_received" && (
 
                         <>
-                            <Button size="sm" variant="outline-primary" onClick={handleAccept} disabled={!!loading}>
+                            <Button size="sm" style={{ backgroundColor: "#04263D", border: "none", color: "white" }} onClick={handleAccept} disabled={!!loading}>
                                 {spin("accept")}
                                 {!spin("accept") && <Check size={15} className="me-1" />}
                                 Accept
                             </Button>
 
-                            <Button size="sm" variant="outline-danger" onClick={handleReject} disabled={!!loading}>
+                            <Button size="sm" style={{ backgroundColor: "#dc3545", border: "none", color: "white" }} onClick={handleReject} disabled={!!loading}>
                                 {spin("reject")}
                                 {!spin("reject") && <X size={15} className="me-1" />}
                                 Reject
@@ -145,8 +162,9 @@ const UserProfileModal = ({ user, onClose, onActionDone }) => {
 
                         <>
 
-                            <Button size="sm" style={{ backgroundColor: "#04263D", border: "none" }} onClick={handleMessage} >
-                                <MessageCircleMore size={15} className="me-1" />
+                            <Button size="sm" style={{ backgroundColor: "#04263D", border: "none" }} onClick={handleMessage} disabled={loading === "message"} >
+                                {spin("message")}
+                                {!spin("message") && <MessageCircleMore size={15} className="me-1" />}
                                 Message
                             </Button>
 

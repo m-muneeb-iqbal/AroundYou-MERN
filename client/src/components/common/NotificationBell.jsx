@@ -7,7 +7,7 @@ import { useToast } from "../../context/ToastContext";
 import { socket } from "../../lib/socket";
 
 import PlaceholderAvatar from "./PlaceholderAvatar";
-import UserProfileModal from "../search/UserProfileModal";
+import UserProfileModal from "./UserProfileModal";
 
 const notificationMeta = {
 
@@ -27,7 +27,7 @@ const timeAgo = (timestamp) => {
 
 };
 
-const NotificationBell = () => {
+const NotificationBell = ({ onOpenMessages }) => {
     
     const {
         pendingRequests,
@@ -343,6 +343,8 @@ const NotificationBell = () => {
                         setModalUser(null);
                         if (updatedUser.relationshipStatus === "friends") fetchUsers();
                     }}
+
+                    onOpenMessages={onOpenMessages}
 
                 />
                 

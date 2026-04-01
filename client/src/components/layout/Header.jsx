@@ -44,7 +44,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                         <div className="d-flex align-items-center gap-2 w-100 d-lg-none">
 
-                            <SearchDropdown fullWidth />
+                            <SearchDropdown fullWidth onOpenMessages={() => { setShowMessagesPopup(true); setMobileSearchOpen(false); }} />
                             <X size={20} color="#04263D" role="button" onClick={() => setMobileSearchOpen(false)} />
 
                         </div>
@@ -63,7 +63,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
                             {showSearch && (
 
                                 <div className="d-none d-lg-block">
-                                    <SearchDropdown />
+                                    <SearchDropdown onOpenMessages={() => setShowMessagesPopup(true)} />
                                 </div>
 
                             )}
@@ -88,7 +88,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                         <Users color="#04263D" size={24} role="button" aria-label="Friends" title="Friends" onClick={() => { setShowFriendListPopup((prev) => !prev); setShowMessagesPopup(false); }} />
                         <BriefcaseBusiness color="#04263D" size={24} role="button" aria-label="Jobs" title="Jobs" />
-                        <NotificationBell />
+                        <NotificationBell onOpenMessages={() => setShowMessagesPopup(true)} />
 
                         {showMessages && (
                             <div className="position-relative d-inline-flex" style={{ cursor: "pointer" }} onClick={() => { setShowMessagesPopup((prev) => !prev); setShowFriendListPopup(false); }}>

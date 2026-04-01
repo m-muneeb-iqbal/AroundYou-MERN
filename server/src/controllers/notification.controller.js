@@ -11,7 +11,7 @@ export const getNotifications = async (req, res) => {
         })
             .sort({ createdAt: -1 })
             .limit(50)
-            .populate("actor", "fullName profilePic username headline");
+            .populate("actor", "fullName profilePic username headline location");
 
         res.status(200).json(notifications);
     } catch (error) {

@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { axiosInstance } from "../../lib/axios";
 
 import PlaceholderAvatar from "../common/PlaceholderAvatar";
-import UserProfileModal from "./UserProfileModal";
+import UserProfileModal from "../common/UserProfileModal";
 
 const relationshipLabel = {
     none: { text: "Add Friend", color: "#04263D" },
@@ -14,7 +14,7 @@ const relationshipLabel = {
     friends: { text: "Friends ✓", color: "#198754" }
 };
 
-const SearchDropdown = ({ fullWidth = false }) => {
+const SearchDropdown = ({ fullWidth = false, onOpenMessages }) => {
 
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
@@ -189,6 +189,7 @@ const SearchDropdown = ({ fullWidth = false }) => {
                     user={selectedUser}
                     onClose={() => setSelectedUser(null)}
                     onActionDone={handleActionDone}
+                    onOpenMessages={onOpenMessages}
                 />
 
             )}
