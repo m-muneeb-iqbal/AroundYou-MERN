@@ -2,6 +2,7 @@ import { ListGroup, Col } from "react-bootstrap";
 import { formatMessageTime } from "../../lib/utils";
 
 import PlaceholderAvatar from "../common/PlaceholderAvatar";
+import MessageStatus from "./MessageStatus";
 
 const UserListItem = ({ user, onSelect }) => {
 
@@ -31,19 +32,24 @@ const UserListItem = ({ user, onSelect }) => {
 
                     </div>
 
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex justify-content-between align-items-center gap-2">
 
                         <span className={`text-truncate ${hasUnread ? "fw-bold" : "text-secondary"}`} style={{ fontSize: "0.7rem", maxWidth: "200px", color: hasUnread ? "#000000" : undefined, }} >
                             {user.lastMessage?.text || "Start conversation"}
                         </span>
 
-                        {hasUnread && (
+                        <div className="d-flex align-items-center gap-2" style={{ flexShrink: 0 }}>
+                            {user.lastMessage?.status && (
+                                <MessageStatus status={user.lastMessage.status} />
+                            )}
+                            {hasUnread && (
 
-                            <span className="badge rounded-circle ms-2" style={{ backgroundColor: "#04263D", fontSize: "0.6rem", flexShrink: 0 }} >
-                                {user.unreadCount}
-                            </span>
-                            
-                        )}
+                                <span className="badge rounded-circle" style={{ backgroundColor: "#04263D", fontSize: "0.6rem", flexShrink: 0 }} >
+                                    {user.unreadCount}
+                                </span>
+                                
+                            )}
+                        </div>
 
                     </div>
 

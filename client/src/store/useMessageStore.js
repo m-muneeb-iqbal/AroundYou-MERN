@@ -110,6 +110,12 @@ export const useMessageStore = create((set, get) => ({
                         : m
                 ),
 
+                users: state.users.map((u) =>
+                    u.lastMessage?._id?.toString() === messageId?.toString()
+                        ? { ...u, lastMessage: { ...u.lastMessage, status: "delivered" } }
+                        : u
+                ),
+
             }));
 
         };
@@ -122,6 +128,12 @@ export const useMessageStore = create((set, get) => ({
                     m.conversationId?.toString() === conversationId?.toString()
                         ? { ...m, status: "seen" }
                         : m
+                ),
+
+                users: state.users.map((u) =>
+                    u.conversationId?.toString() === conversationId?.toString() && u.lastMessage
+                        ? { ...u, lastMessage: { ...u.lastMessage, status: "seen" } }
+                        : u
                 ),
 
             }));
