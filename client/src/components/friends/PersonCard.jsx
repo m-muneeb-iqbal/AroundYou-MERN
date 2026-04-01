@@ -34,7 +34,7 @@ const PersonCard = ({ user, onAdd, isLoading, isPending, isAdding }) => (
         </div>
 
         {isLoading ? (
-            <Skeleton circle width={50} height={50} className="flex-shrink-0" />
+            <Skeleton circle width={32} height={32} className="flex-shrink-0" />
         ) : isPending ? (
             <div
                 className="d-flex align-items-center gap-1 flex-shrink-0 rounded px-2 py-1"
