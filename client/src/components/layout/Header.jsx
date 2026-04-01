@@ -139,7 +139,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                                 <Dropdown.Divider />
 
-                                <Dropdown.Item className={styles.dropDownItem} onClick={async () => { await logout(); navigate("/"); }} >
+                                <Dropdown.Item className={styles.dropDownItem} onClick={async () => { await logout(); navigate("/home"); }} >
                                     Logout <LogOut color="#FF0000" size={18} className="mx-2" />
                                 </Dropdown.Item>
 

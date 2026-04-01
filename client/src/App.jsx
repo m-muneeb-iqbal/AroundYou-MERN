@@ -38,7 +38,7 @@ export const App = () => {
     if (isCheckingAuth) {
         const path = window.location.pathname;
         if (path === "/profile") return <ProfilePageSkeleton />;
-        if (path === "/home") return <HomePageSkeleton />;
+        if (path === "/") return <HomePageSkeleton />;
         return null;
     }
 
@@ -49,16 +49,16 @@ export const App = () => {
             <div className="page-enter">
 
                 <Routes>
-                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
                     <Route path="/signup" element={<LandingPage />} />
                     <Route path="/verify-email" element={<VerifyEmailPage />} />
-                    <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
-                    <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/home" />} />
-                    <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/home" />} />
-                    <Route path="/home" element={authUser ? <HomePage /> : <Navigate to="/" />} />
-                    <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/" />} />
+                    <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
+                    <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />} />
+                    <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />} />
+                    <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/home" />} />
+                    <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/home" />} />
                     <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-                    <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
+                    <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/home" />} />
                 </Routes>
 
                 {authUser && (

@@ -134,7 +134,7 @@ const Header = () => {
 
             setTimeout(async () => {
                 await checkAuth();
-                navigate("/home");
+                navigate("/");
                 setIsNavigating(false);
             }, 3300);
             
