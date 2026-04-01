@@ -63,7 +63,7 @@ const MessagesPopup = ({ onClose }) => {
 
         <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "min(410px, calc(100vw - 1.5rem))", height: "min(460px, calc(100vh - 6rem))", zIndex: "var(--z-popup, 1100)" }}>
 
-            <Card.Header className="d-flex align-items-center fw-bold gap-3">
+            <Card.Header className="position-relative d-flex align-items-center fw-bold gap-3">
 
                 {selectedUser ? (
 
@@ -83,8 +83,8 @@ const MessagesPopup = ({ onClose }) => {
                 ) : (
 
                     <>
-                        {/* Title (left) */}
-                        <span style={{ fontSize: "1rem" }}>AroundYou</span>
+                        {/* Title (centered) */}
+                        <span className="position-absolute start-50 translate-middle-x" style={{ fontSize: "1rem", pointerEvents: "none" }}>AroundYou</span>
 
                         {/* Close button (right) */}
                         <X role="button" className="ms-auto" onClick={() => { handleCloseConversation(); onClose?.(); }} style={{ cursor: "pointer" }} />

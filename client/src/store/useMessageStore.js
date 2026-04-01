@@ -158,18 +158,11 @@ export const useMessageStore = create((set, get) => ({
     },
 
     // Close conversation
-    handleCloseConversation: async () => {
+    handleCloseConversation: () => {
         const { selectedUser } = get();
         if (!selectedUser) return;
 
-        if (selectedUser.conversationId) {
-            try {
-                await axiosInstance.put(`/conversations/message/read`, { username: selectedUser.username });
-            } catch (err) {
-                console.error("Error marking as read on close:", err);
-            }
-        }
-
+        // Immediately clear UI (optimistic update) - no await, instant response
         set((state) => ({
 
             selectedUser: null,
@@ -183,6 +176,12 @@ export const useMessageStore = create((set, get) => ({
             ),
 
         }));
+
+        // Mark as read in background (non-blocking)
+        if (selectedUser.conversationId) {
+            axiosInstance.put(`/conversations/message/read`, { username: selectedUser.username })
+                .catch((err) => console.error("Error marking as read on close:", err));
+        }
 
     },
 
