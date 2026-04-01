@@ -17,6 +17,7 @@ const VerifyEmailPage = () => {
     useEffect(() => {
         const token = searchParams.get("token");
         if (!token) {
+            navigate("/home", { replace: true });
             return;
         }
         verifyToken(token);

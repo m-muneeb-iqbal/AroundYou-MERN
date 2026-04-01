@@ -23,7 +23,7 @@ const ResetPasswordPage = () => {
 
     useEffect(() => {
         if (!token) {
-            setStatus('invalid');
+            navigate('/forgot-password', { replace: true });
             return;
         }
         // Basic validation - in production, could make a request to validate token

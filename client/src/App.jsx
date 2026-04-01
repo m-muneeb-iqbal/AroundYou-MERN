@@ -50,8 +50,8 @@ export const App = () => {
 
                 <Routes>
                     <Route path="/home" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
-                    <Route path="/signup" element={<LandingPage />} />
-                    <Route path="/verify-email" element={<VerifyEmailPage />} />
+                    <Route path="/signup" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
+                    <Route path="/verify-email" element={!authUser ? <VerifyEmailPage /> : <Navigate to="/" />} />
                     <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
                     <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />} />
                     <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />} />
