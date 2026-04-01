@@ -8,6 +8,7 @@ import { useCallStore } from "../../store/useCallStore";
 
 import MessageBubble from "./MessageBubble";
 import UserListItem from "./UserListItem";
+import PlaceholderAvatar from "../common/PlaceholderAvatar";
 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -62,34 +63,31 @@ const MessagesPopup = ({ onClose }) => {
 
         <Card border="light" className="position-fixed d-flex flex-column shadow" style={{ bottom: "20px", right: "20px", width: "min(410px, calc(100vw - 1.5rem))", height: "min(460px, calc(100vh - 6rem))", zIndex: "var(--z-popup, 1100)" }}>
 
-            <Card.Header className="position-relative d-flex align-items-center fw-bold">
+            <Card.Header className="d-flex align-items-center fw-bold gap-3">
 
                 {selectedUser ? (
 
                     <>
-                        {/* Back button (left) */}
-                        <ArrowLeft role="button" size={20} color="#04263D" onClick={() => handleCloseConversation()} />
-
-                        {/* Title (center) */}
-                        <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
-                            {selectedUser.fullName}
-                        </span>
+                        {/* Back button + Avatar + Name (left) */}
+                        <div className="d-flex align-items-center gap-2">
+                            <ArrowLeft role="button" size={22} color="#04263D" onClick={() => handleCloseConversation()} style={{ cursor: "pointer", flexShrink: 0 }} />
+                            <PlaceholderAvatar name={selectedUser.fullName} profilePic={selectedUser.profilePic} size={40} />
+                            <span style={{ fontSize: "0.95rem" }}>{selectedUser.fullName}</span>
+                        </div>
 
                         {/* Phone (right) */}
-                        <Phone role="button" size={18} color="#04263D" title="Audio call" onClick={() => startCall(selectedUser, authUser)} className="ms-auto" />
+                        <Phone role="button" size={22} color="#04263D" title="Audio call" onClick={() => startCall(selectedUser, authUser)} className="ms-auto" style={{ cursor: "pointer" }} />
 
                     </>
 
                 ) : (
 
                     <>
-                        {/* Title (center) */}
-                        <span className="position-absolute start-50 translate-middle-x" style={{ pointerEvents: "none" }} >
-                            AroundYou
-                        </span>
+                        {/* Title (left) */}
+                        <span style={{ fontSize: "1rem" }}>AroundYou</span>
 
                         {/* Close button (right) */}
-                        <X role="button" className="ms-auto" onClick={() => { handleCloseConversation(); onClose?.(); }} />
+                        <X role="button" className="ms-auto" onClick={() => { handleCloseConversation(); onClose?.(); }} style={{ cursor: "pointer" }} />
 
                     </>
 
@@ -105,14 +103,17 @@ const MessagesPopup = ({ onClose }) => {
 
                         Array.from({ length: 4 }).map((_, i) => (
 
-                            <ListGroup.Item key={i} className="d-flex flex-column px-3 py-2 gap-1">
+                            <ListGroup.Item key={i} className="d-flex align-items-center px-3 py-2 gap-3">
 
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <Skeleton width={120} height={14} />
-                                    <Skeleton width={40} height={12} />
-                                </div>
+                                {/* Avatar skeleton */}
+                                <Skeleton circle width={45} height={45} />
 
-                                <div className="d-flex justify-content-between align-items-center">
+                                {/* User info skeleton */}
+                                <div className="flex-grow-1">
+                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                        <Skeleton width={120} height={14} />
+                                        <Skeleton width={40} height={12} />
+                                    </div>
                                     <Skeleton width={180} height={12} />
                                 </div>
 
