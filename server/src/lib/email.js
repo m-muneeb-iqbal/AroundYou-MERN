@@ -1,8 +1,16 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 dotenv.config();
 
 const EMAIL_TIMEOUT_MS = Number(process.env.EMAIL_TIMEOUT_MS || 10000);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@aroundyou.online";
+
+if (!RESEND_API_KEY) {
+    console.warn("Warning: RESEND_API_KEY is not set. Email functionality will not work.");
+}
+
+const resend = new Resend(RESEND_API_KEY);
 
 const withTimeout = (promise, timeoutMs, operation) => new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -20,21 +28,12 @@ const withTimeout = (promise, timeoutMs, operation) => new Promise((resolve, rej
         });
 });
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
-
 export const sendVerificationEmail = async ({ to, fullName, token }) => {
 
     const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 
-    await withTimeout(transporter.sendMail({
-        
-        from: `"AroundYou" <${process.env.EMAIL_USER}>`,
+    await withTimeout(resend.emails.send({
+        from: `AroundYou <${FROM_EMAIL}>`,
         to,
         subject: "Verify your AroundYou account",
         html: `
@@ -61,7 +60,6 @@ export const sendVerificationEmail = async ({ to, fullName, token }) => {
 
             </div>
         `,
-
     }), EMAIL_TIMEOUT_MS, "Verification email send");
 
 };
@@ -70,9 +68,8 @@ export const sendPasswordResetEmail = async ({ to, fullName, token }) => {
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
 
-    await withTimeout(transporter.sendMail({
-        
-        from: `"AroundYou" <${process.env.EMAIL_USER}>`,
+    await withTimeout(resend.emails.send({
+        from: `AroundYou <${FROM_EMAIL}>`,
         to,
         subject: "Reset your AroundYou password",
         html: `
@@ -99,7 +96,6 @@ export const sendPasswordResetEmail = async ({ to, fullName, token }) => {
 
             </div>
         `,
-
     }), EMAIL_TIMEOUT_MS, "Password reset email send");
 
 };
