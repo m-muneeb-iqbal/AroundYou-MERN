@@ -5,7 +5,7 @@ const AdminRoute = ({ children }) => {
 
     const { authUser } = useAuthStore();
     if (!authUser) return <Navigate to="/" />;
-    if (!authUser.isAdmin && !authUser.isSuperAdmin) return <Navigate to="/home" />;
+    if (!authUser.isAdmin && !authUser.isSuperAdmin) return <Navigate to="/" />;
     return children;
     
 };

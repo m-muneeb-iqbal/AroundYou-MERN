@@ -17,7 +17,7 @@ const VerifyEmailPage = () => {
     useEffect(() => {
         const token = searchParams.get("token");
         if (!token) {
-            navigate("/home", { replace: true });
+            navigate("/", { replace: true });
             return;
         }
         verifyToken(token);
@@ -41,7 +41,7 @@ const VerifyEmailPage = () => {
                 setCountdown(count);
                 if (count === 0) {
                     clearInterval(interval);
-                    navigate("/home");
+                    navigate("/");
                 }
             }, 1000);
 
@@ -90,7 +90,7 @@ const VerifyEmailPage = () => {
                         Redirecting in <strong>{countdown}</strong>s...
                     </p>
                     <Button
-                        onClick={() => navigate("/home")}
+                        onClick={() => navigate("/")}
                         style={{ backgroundColor: "#04263D", borderColor: "#04263D", minWidth: "180px" }}
                     >
                         Continue to Dashboard

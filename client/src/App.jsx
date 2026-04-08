@@ -38,7 +38,7 @@ export const App = () => {
     if (isCheckingAuth) {
         const path = window.location.pathname;
         if (path === "/profile") return <ProfilePageSkeleton />;
-        if (path === "/") return <HomePageSkeleton />;
+        if (path === "/" && localStorage.getItem("wasAuthenticated")) return <HomePageSkeleton />;
         return null;
     }
 
@@ -49,16 +49,15 @@ export const App = () => {
             <div className="page-enter">
 
                 <Routes>
-                    <Route path="/home" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
+                    <Route path="/" element={!authUser ? <LandingPage /> : <HomePage />} />
                     <Route path="/signup" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
                     <Route path="/verify-email" element={!authUser ? <VerifyEmailPage /> : <Navigate to="/" />} />
                     <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
                     <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />} />
                     <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />} />
-                    <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/home" />} />
-                    <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/home" />} />
+                    <Route path="/profile" element={!authUser ? <ProfilePage /> : <Navigate to="/" />} />
                     <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-                    <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/home" />} />
+                    <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
                 </Routes>
 
                 {authUser && (

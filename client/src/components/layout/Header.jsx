@@ -53,7 +53,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                         <>
                             
-                            <Link to="/home">
+                            <Link to="/">
 
                                 <img src="/Images/aroundyou.png" style={{ height: "34px", flexShrink: 0 }} alt="aroundyou" />
 
@@ -139,7 +139,7 @@ const Header = ({ showMessages = false, showSearch = false }) => {
 
                                 <Dropdown.Divider />
 
-                                <Dropdown.Item className={styles.dropDownItem} onClick={async () => { await logout(); navigate("/home"); }} >
+                                <Dropdown.Item className={styles.dropDownItem} onClick={async () => { await logout(); navigate("/"); }} >
                                     Logout <LogOut color="#FF0000" size={18} className="mx-2" />
                                 </Dropdown.Item>
 

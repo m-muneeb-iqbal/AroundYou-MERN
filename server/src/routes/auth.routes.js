@@ -24,7 +24,7 @@ router.get("/google/callback",
     passport.authenticate("google", { session: false }),
     (req, res) => {
         generateToken(req.user._id, res);
-        res.redirect(`${process.env.CLIENT_URL}/home`);
+        res.redirect(`${process.env.CLIENT_URL}/`);
     }
 );
 router.post("/signup",                                                  signup);

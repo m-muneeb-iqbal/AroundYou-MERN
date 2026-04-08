@@ -23,6 +23,7 @@ export const useAuthStore = create((set) => ({
             });
 
             set({ authUser: res.data });
+            localStorage.setItem("wasAuthenticated", "true");
 
             socket.connect();
 
@@ -32,6 +33,7 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             console.log("Error in checkAuth: ", error);
             set({ authUser: null });
+            localStorage.removeItem("wasAuthenticated");
 
         } finally {
             set({ isCheckingAuth: false });
@@ -66,6 +68,7 @@ export const useAuthStore = create((set) => ({
             const res = await axiosInstance.post("/auth/login", data, {
                 withCredentials: true,
             });
+            localStorage.setItem("wasAuthenticated", "true");
             return res.data;
 
         } catch (error) {
@@ -83,6 +86,7 @@ export const useAuthStore = create((set) => ({
             
             await axiosInstance.post("/auth/logout", {}, { withCredentials: true });
             socket.disconnect()
+            localStorage.removeItem("wasAuthenticated");
             set({ authUser: null });
             console.log("Logged out successfully");
 
