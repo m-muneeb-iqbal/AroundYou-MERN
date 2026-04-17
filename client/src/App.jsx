@@ -55,7 +55,7 @@ export const App = () => {
                     <Route path="/login" element={!authUser ? <LandingPage /> : <Navigate to="/" />} />
                     <Route path="/forgot-password" element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />} />
                     <Route path="/reset-password" element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />} />
-                    <Route path="/profile" element={!authUser ? <ProfilePage /> : <Navigate to="/" />} />
+                    <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/" />} />
                     <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
                     <Route path="/settings" element={authUser ? <SettingsPage /> : <Navigate to="/" />} />
                 </Routes>
