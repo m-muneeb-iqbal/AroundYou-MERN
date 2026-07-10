@@ -4,6 +4,7 @@ client/node_modules/
 server/node_modules/
 server/.env
 client/.env
+documents/
 
 # Optional: Ignore build and log files
 dist/
